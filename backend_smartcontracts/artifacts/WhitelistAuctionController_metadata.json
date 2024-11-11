@@ -1,0 +1,246 @@
+{
+	"compiler": {
+		"version": "0.8.26+commit.8a97fa7a"
+	},
+	"language": "Solidity",
+	"output": {
+		"abi": [
+			{
+				"anonymous": false,
+				"inputs": [
+					{
+						"indexed": true,
+						"internalType": "bytes32",
+						"name": "auctionID_",
+						"type": "bytes32"
+					}
+				],
+				"name": "AddedWhitelistedParticipants",
+				"type": "event"
+			},
+			{
+				"anonymous": false,
+				"inputs": [
+					{
+						"indexed": true,
+						"internalType": "bytes32",
+						"name": "auctionID_",
+						"type": "bytes32"
+					}
+				],
+				"name": "AuctionConfiguredAsClosed",
+				"type": "event"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "bytes32",
+						"name": "auctionID_",
+						"type": "bytes32"
+					}
+				],
+				"name": "closedAuction",
+				"outputs": [
+					{
+						"internalType": "bool",
+						"name": "",
+						"type": "bool"
+					}
+				],
+				"stateMutability": "view",
+				"type": "function"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "bytes32",
+						"name": "auctionID_",
+						"type": "bytes32"
+					}
+				],
+				"name": "configureAsClosedAuction",
+				"outputs": [
+					{
+						"internalType": "bool",
+						"name": "",
+						"type": "bool"
+					}
+				],
+				"stateMutability": "nonpayable",
+				"type": "function"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "bytes32",
+						"name": "auctionID_",
+						"type": "bytes32"
+					},
+					{
+						"internalType": "address",
+						"name": "participant_",
+						"type": "address"
+					}
+				],
+				"name": "isWhitelisted",
+				"outputs": [
+					{
+						"internalType": "bool",
+						"name": "",
+						"type": "bool"
+					}
+				],
+				"stateMutability": "view",
+				"type": "function"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "bytes32",
+						"name": "auctionID_",
+						"type": "bytes32"
+					},
+					{
+						"internalType": "address[]",
+						"name": "participants_",
+						"type": "address[]"
+					}
+				],
+				"name": "whitelistParticipants",
+				"outputs": [
+					{
+						"internalType": "bool",
+						"name": "",
+						"type": "bool"
+					}
+				],
+				"stateMutability": "nonpayable",
+				"type": "function"
+			}
+		],
+		"devdoc": {
+			"author": "Ruben Frisch (Óbuda University - John von Neumann Faculty of Informatics, Business Informatics MSc)",
+			"details": "This contract enables whitelist (closed) auctions",
+			"events": {
+				"AddedWhitelistedParticipants(bytes32)": {
+					"details": "Event for logging the whitelisting of participants",
+					"params": {
+						"auctionID_": "The 256 bit hash identifier of the closed (whitelisted) auction that the whitelisted participants has been registered to"
+					}
+				},
+				"AuctionConfiguredAsClosed(bytes32)": {
+					"details": "Event for logging the configuration of an auction as closed (whitelisted)",
+					"params": {
+						"auctionID_": "The 256 bit hash identifier of the auction that was configured as closed (whitelisted)"
+					}
+				}
+			},
+			"kind": "dev",
+			"methods": {
+				"closedAuction(bytes32)": {
+					"details": "Determines whether an auction is closed (whitelisted) or not, accesses the '_closedAuction' storage variable",
+					"params": {
+						"auctionID_": "The 256 bit hash identifier of the auction"
+					},
+					"returns": {
+						"_0": "Boolean flag indicating whether the auction is closed (true) or not (false)"
+					}
+				},
+				"configureAsClosedAuction(bytes32)": {
+					"custom:virtual": "This function should be overriden in the child contract, with access control, execution preconditions, and other checks implementedThe storage modification should be executed by the internal function '_configureAsClosedAuction'",
+					"details": "Configure an auction as closed (whitelisted)",
+					"params": {
+						"auctionID_": "The 256 bit hash identifier of the auction"
+					},
+					"returns": {
+						"_0": "Returns true if the auction has been configured successfully as a closed (whitelisted) auction"
+					}
+				},
+				"isWhitelisted(bytes32,address)": {
+					"details": "Checks whether an address is whitelisted or not at a certain closed (whitelisted) auction",
+					"params": {
+						"auctionID_": "The 256 bit hash identifier of the auction",
+						"participant_": "The address of the participant we want to check whether it is whitelisted or not"
+					},
+					"returns": {
+						"_0": "Boolean flag indicating whether the address is whitelisted (true) or not (false)"
+					}
+				},
+				"whitelistParticipants(bytes32,address[])": {
+					"custom:virtual": "This function should be overriden in the child contract, with access control, execution preconditions, and other checks implementedThe storage modification should be done by the internal function '_whitelistParticipants'",
+					"details": "Whitelists an array of addresses to be eligible for participation in a closed (whitelisted) auction",
+					"params": {
+						"auctionID_": "The 256 bit hash identifier of the auction",
+						"participants_": "The array of addresses to be whitelisted"
+					},
+					"returns": {
+						"_0": "Returns true if the whitelisting of the passed addresses was successful"
+					}
+				}
+			},
+			"stateVariables": {
+				"_closedAuction": {
+					"details": "Indicates whether an auction is a whitelist auction or not"
+				},
+				"_whitelistedParticipants": {
+					"details": "Indicates whether an address is whitelisted or not in the respective whitelist auction"
+				}
+			},
+			"title": "Whitelist auction controller contract",
+			"version": 1
+		},
+		"userdoc": {
+			"events": {
+				"AddedWhitelistedParticipants(bytes32)": {
+					"notice": "Event for logging the whitelisting of participants"
+				},
+				"AuctionConfiguredAsClosed(bytes32)": {
+					"notice": "Event for logging the configuration of an auction as closed (whitelisted)"
+				}
+			},
+			"kind": "user",
+			"methods": {
+				"closedAuction(bytes32)": {
+					"notice": "Determines whether an auction is closed (whitelisted) or not"
+				},
+				"configureAsClosedAuction(bytes32)": {
+					"notice": "Configure an auction as closed (whitelisted)"
+				},
+				"isWhitelisted(bytes32,address)": {
+					"notice": "Checks whether an address is whitelisted or not at a certain closed (whitelisted) auction"
+				},
+				"whitelistParticipants(bytes32,address[])": {
+					"notice": "Whitelists a group of users to be eligible for participation in a closed (whitelisted) auction"
+				}
+			},
+			"notice": "This contract enables whitelist (closed) auctions",
+			"version": 1
+		}
+	},
+	"settings": {
+		"compilationTarget": {
+			"WhitelistAuctionController.sol": "WhitelistAuctionController"
+		},
+		"evmVersion": "cancun",
+		"libraries": {},
+		"metadata": {
+			"bytecodeHash": "ipfs"
+		},
+		"optimizer": {
+			"enabled": false,
+			"runs": 200
+		},
+		"remappings": []
+	},
+	"sources": {
+		"WhitelistAuctionController.sol": {
+			"keccak256": "0x6963d6cb498c79206f6e1f6770f68cc2249e853d5d4e805888d5a8b6951efaa6",
+			"license": "MIT",
+			"urls": [
+				"bzz-raw://c3feb2b467515e87ee821f654d921a935eee605121da2ae360615369f48edb87",
+				"dweb:/ipfs/QmSuKmynDE28BWvRvJspav4QavYs9oHHJ66EHfsHpoCWqX"
+			]
+		}
+	},
+	"version": 1
+}

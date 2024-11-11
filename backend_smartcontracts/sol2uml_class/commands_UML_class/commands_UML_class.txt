@@ -1,0 +1,20 @@
+sol2uml class OwnershipController_flattened.sol -o OwnershipController_flattened_UML_Class.svg
+
+sol2uml class AuctionsLogic_flattened.sol -o AuctionsLogic_flattened_UML_Class.svg
+
+sol2uml class AuctionERC721_flattened.sol -o AuctionERC721_flattened_UML_Class.svg
+
+sol2uml class BlacklistAuctionController.sol -o BlacklistAuctionController_UML_Class.svg
+
+sol2uml class CancellableAuctionController.sol -o CancellableAuctionController_UML_Class.svg
+
+sol2uml class CircuitBreakerEmergencyController.sol -o CircuitBreakerEmergencyController_UML_Class.svg
+
+sol2uml class EntryFeeController.sol -o EntryFeeController_UML_Class.svg
+
+sol2uml class MultiSignatureGuard.sol -o MultiSignatureGuard_UML_Class.svg
+
+sol2uml class WhitelistAuctionController.sol -o WhitelistAuctionController_UML_Class.svg
+
+sol2uml class TimelockGuard.sol -o TimelockGuard_UML_Class.svg
+

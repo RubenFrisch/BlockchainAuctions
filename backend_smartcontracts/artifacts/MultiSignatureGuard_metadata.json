@@ -1,0 +1,274 @@
+{
+	"compiler": {
+		"version": "0.8.26+commit.8a97fa7a"
+	},
+	"language": "Solidity",
+	"output": {
+		"abi": [
+			{
+				"anonymous": false,
+				"inputs": [
+					{
+						"indexed": false,
+						"internalType": "address",
+						"name": "signer_",
+						"type": "address"
+					}
+				],
+				"name": "SignatureRegistered",
+				"type": "event"
+			},
+			{
+				"anonymous": false,
+				"inputs": [],
+				"name": "SignatureValidityTimeCountdownStarted",
+				"type": "event"
+			},
+			{
+				"anonymous": false,
+				"inputs": [],
+				"name": "SignaturesExpiredAndReset",
+				"type": "event"
+			},
+			{
+				"anonymous": false,
+				"inputs": [],
+				"name": "SignaturesReset",
+				"type": "event"
+			},
+			{
+				"inputs": [],
+				"name": "currentSignatureCount",
+				"outputs": [
+					{
+						"internalType": "uint8",
+						"name": "",
+						"type": "uint8"
+					}
+				],
+				"stateMutability": "view",
+				"type": "function"
+			},
+			{
+				"inputs": [],
+				"name": "getSignatureExpiryTime",
+				"outputs": [
+					{
+						"internalType": "uint256",
+						"name": "",
+						"type": "uint256"
+					}
+				],
+				"stateMutability": "view",
+				"type": "function"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "address",
+						"name": "signer_",
+						"type": "address"
+					}
+				],
+				"name": "hasSigned",
+				"outputs": [
+					{
+						"internalType": "bool",
+						"name": "",
+						"type": "bool"
+					}
+				],
+				"stateMutability": "view",
+				"type": "function"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "address",
+						"name": "signer_",
+						"type": "address"
+					}
+				],
+				"name": "isSigner",
+				"outputs": [
+					{
+						"internalType": "bool",
+						"name": "",
+						"type": "bool"
+					}
+				],
+				"stateMutability": "view",
+				"type": "function"
+			},
+			{
+				"inputs": [],
+				"name": "registerSignature",
+				"outputs": [
+					{
+						"internalType": "bool",
+						"name": "",
+						"type": "bool"
+					}
+				],
+				"stateMutability": "nonpayable",
+				"type": "function"
+			}
+		],
+		"devdoc": {
+			"author": "Ruben Frisch (Óbuda University - John von Neumann Faculty of Informatics, Business Informatics MSc)",
+			"details": "This contract enables the multi signature guard feature to enhance the security of critical operations",
+			"events": {
+				"SignatureRegistered(address)": {
+					"details": "Event for logging when a valid signature is made",
+					"params": {
+						"signer_": "The address of the signer that made the signature"
+					}
+				},
+				"SignatureValidityTimeCountdownStarted()": {
+					"details": "Event for logging when signature validity countdown starts"
+				},
+				"SignaturesExpiredAndReset()": {
+					"details": "Event for logging when signatures are expired and reset"
+				},
+				"SignaturesReset()": {
+					"details": "Event for logging when signatures are reset"
+				}
+			},
+			"kind": "dev",
+			"methods": {
+				"constructor": {
+					"custom:requirement-body": "The number of signers must be equal to the total signers constantThere must be no zero (burn) address in the valid signer set",
+					"details": "The constructor will run once during initial contract deployment, setting the valid signer set"
+				},
+				"currentSignatureCount()": {
+					"details": "Retrieves the current signature count",
+					"returns": {
+						"_0": "Returns the current signature count"
+					}
+				},
+				"getSignatureExpiryTime()": {
+					"details": "Retrieves the current signature expiry timestamp",
+					"returns": {
+						"_0": "Returns the current signature expiry timestamp"
+					}
+				},
+				"hasSigned(address)": {
+					"details": "Evaluates whether a signer has signed or not",
+					"params": {
+						"signer_": "The address to be evaluated"
+					},
+					"returns": {
+						"_0": "Returns a boolean literal indicating whether the passed address has signed or not"
+					}
+				},
+				"isSigner(address)": {
+					"details": "Evaluates whether an address is in the valid signer set or not",
+					"params": {
+						"signer_": "The address to be evaluated"
+					},
+					"returns": {
+						"_0": "Returns a boolean literal indicating whether the passed address is a signer or not"
+					}
+				},
+				"registerSignature()": {
+					"custom:requirement-body": "A signer can only sign once (in the same signature collection session)",
+					"custom:requirement-modifier": "The caller must be a signer",
+					"details": "Registers a valid signature if all conditions are fulfilled, manages the signature expiry mechanism",
+					"returns": {
+						"_0": "Returns true boolean literal if the signature registration was successful"
+					}
+				}
+			},
+			"stateVariables": {
+				"_REQUIRED_SIGNATURES": {
+					"details": "Stores the minimum number of signatures required for multi signature guarded function execution (fault tolerant signature threshold) (uint8: [0;(2**8)-1)]) (default: 5)"
+				},
+				"_SIGNATURE_VALIDITY_TIME": {
+					"details": "Stores the validity time duration of signatures (default: 15 minutes)"
+				},
+				"_TOTAL_SIGNERS": {
+					"details": "Stores the total number of signers (uint8: [0;(2**8)-1)]) (default: 7)"
+				},
+				"_currentSignatureCount": {
+					"details": "Stores the total number of unique valid signatures during collection"
+				},
+				"_hasSigned": {
+					"details": "Stores whether a signer has already signed in the current signature collection session or not"
+				},
+				"_isSigner": {
+					"details": "Stores whether an address is a signer or not"
+				},
+				"_signatureExpiryTime": {
+					"details": "Stores the expiration time of signatures (block.timestamp at signing + _SIGNATURE_VALIDITY_TIME)"
+				},
+				"_signers": {
+					"details": "Constant, fixed-size address array that stores all the valid signers"
+				}
+			},
+			"title": "Multi signature guard contract",
+			"version": 1
+		},
+		"userdoc": {
+			"events": {
+				"SignatureRegistered(address)": {
+					"notice": "Event for logging when a valid signature is made"
+				},
+				"SignatureValidityTimeCountdownStarted()": {
+					"notice": "Event for logging when signature validity countdown starts"
+				},
+				"SignaturesExpiredAndReset()": {
+					"notice": "Event for logging when signatures are expired and reset"
+				},
+				"SignaturesReset()": {
+					"notice": "Event for logging when signatures are reset"
+				}
+			},
+			"kind": "user",
+			"methods": {
+				"currentSignatureCount()": {
+					"notice": "Retrieves the current signature count"
+				},
+				"getSignatureExpiryTime()": {
+					"notice": "Retrieves the current signature expiry timestamp"
+				},
+				"hasSigned(address)": {
+					"notice": "Evaluates whether a signer has signed or not"
+				},
+				"isSigner(address)": {
+					"notice": "Evaluates whether an address is in the valid signer set or not"
+				},
+				"registerSignature()": {
+					"notice": "Registers a valid signature if all conditions are fulfilled, manages the signature expiry mechanism"
+				}
+			},
+			"notice": "This contract enables the multi signature guard feature to enhance the security of critical operations",
+			"version": 1
+		}
+	},
+	"settings": {
+		"compilationTarget": {
+			"MultiSignatureGuard.sol": "MultiSignatureGuard"
+		},
+		"evmVersion": "cancun",
+		"libraries": {},
+		"metadata": {
+			"bytecodeHash": "ipfs"
+		},
+		"optimizer": {
+			"enabled": false,
+			"runs": 200
+		},
+		"remappings": []
+	},
+	"sources": {
+		"MultiSignatureGuard.sol": {
+			"keccak256": "0xc4c8061842da9a600874246654ec12565da79bc8d1b42fa8965909dd0132d527",
+			"license": "MIT",
+			"urls": [
+				"bzz-raw://0553c4cd882059ad508cc00e43744c152e349ee7a551fd1fe5f2e54dd8a67625",
+				"dweb:/ipfs/QmdC2VTHPn3WhE3mvjezSdqBwmP6q1Baz5vc55CzfMWhZz"
+			]
+		}
+	},
+	"version": 1
+}

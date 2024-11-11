@@ -1,0 +1,2685 @@
+{
+	"compiler": {
+		"version": "0.8.26+commit.8a97fa7a"
+	},
+	"language": "Solidity",
+	"output": {
+		"abi": [
+			{
+				"anonymous": false,
+				"inputs": [
+					{
+						"indexed": true,
+						"internalType": "bytes32",
+						"name": "auctionID_",
+						"type": "bytes32"
+					}
+				],
+				"name": "AddedBlacklistedParticipants",
+				"type": "event"
+			},
+			{
+				"anonymous": false,
+				"inputs": [
+					{
+						"indexed": true,
+						"internalType": "bytes32",
+						"name": "auctionID_",
+						"type": "bytes32"
+					}
+				],
+				"name": "AddedWhitelistedParticipants",
+				"type": "event"
+			},
+			{
+				"anonymous": false,
+				"inputs": [
+					{
+						"indexed": true,
+						"internalType": "bytes32",
+						"name": "auctionID_",
+						"type": "bytes32"
+					}
+				],
+				"name": "AuctionCancelled",
+				"type": "event"
+			},
+			{
+				"anonymous": false,
+				"inputs": [
+					{
+						"indexed": true,
+						"internalType": "bytes32",
+						"name": "auctionID_",
+						"type": "bytes32"
+					}
+				],
+				"name": "AuctionConfiguredAsBlacklisted",
+				"type": "event"
+			},
+			{
+				"anonymous": false,
+				"inputs": [
+					{
+						"indexed": true,
+						"internalType": "bytes32",
+						"name": "auctionID_",
+						"type": "bytes32"
+					}
+				],
+				"name": "AuctionConfiguredAsCancellable",
+				"type": "event"
+			},
+			{
+				"anonymous": false,
+				"inputs": [
+					{
+						"indexed": true,
+						"internalType": "bytes32",
+						"name": "auctionID_",
+						"type": "bytes32"
+					}
+				],
+				"name": "AuctionConfiguredAsClosed",
+				"type": "event"
+			},
+			{
+				"anonymous": false,
+				"inputs": [
+					{
+						"indexed": true,
+						"internalType": "bytes32",
+						"name": "auctionID_",
+						"type": "bytes32"
+					},
+					{
+						"indexed": false,
+						"internalType": "address",
+						"name": "bidder_",
+						"type": "address"
+					},
+					{
+						"indexed": false,
+						"internalType": "uint256",
+						"name": "newHighestBidAmount_",
+						"type": "uint256"
+					}
+				],
+				"name": "BidPlaced",
+				"type": "event"
+			},
+			{
+				"anonymous": false,
+				"inputs": [
+					{
+						"indexed": true,
+						"internalType": "bytes32",
+						"name": "auctionID_",
+						"type": "bytes32"
+					},
+					{
+						"indexed": false,
+						"internalType": "address",
+						"name": "entity_",
+						"type": "address"
+					},
+					{
+						"indexed": false,
+						"internalType": "uint256",
+						"name": "withdrawAmount_",
+						"type": "uint256"
+					}
+				],
+				"name": "BidWithdrawn",
+				"type": "event"
+			},
+			{
+				"anonymous": false,
+				"inputs": [],
+				"name": "EmergencyPauseTurnedOff",
+				"type": "event"
+			},
+			{
+				"anonymous": false,
+				"inputs": [],
+				"name": "EmergencyPauseTurnedOn",
+				"type": "event"
+			},
+			{
+				"anonymous": false,
+				"inputs": [
+					{
+						"indexed": true,
+						"internalType": "bytes32",
+						"name": "auctionID_",
+						"type": "bytes32"
+					},
+					{
+						"indexed": false,
+						"internalType": "uint256",
+						"name": "entryFeeValue_",
+						"type": "uint256"
+					}
+				],
+				"name": "EntryFeeConfigured",
+				"type": "event"
+			},
+			{
+				"anonymous": false,
+				"inputs": [
+					{
+						"indexed": true,
+						"internalType": "bytes32",
+						"name": "auctionID_",
+						"type": "bytes32"
+					},
+					{
+						"indexed": false,
+						"internalType": "address",
+						"name": "entity_",
+						"type": "address"
+					},
+					{
+						"indexed": false,
+						"internalType": "uint256",
+						"name": "paidEntryFeeAmount_",
+						"type": "uint256"
+					}
+				],
+				"name": "EntryFeePaid",
+				"type": "event"
+			},
+			{
+				"anonymous": false,
+				"inputs": [
+					{
+						"indexed": true,
+						"internalType": "bytes32",
+						"name": "auctionID_",
+						"type": "bytes32"
+					},
+					{
+						"indexed": false,
+						"internalType": "address",
+						"name": "entity_",
+						"type": "address"
+					},
+					{
+						"indexed": false,
+						"internalType": "uint256",
+						"name": "withdrawnEntryFeeAmount_",
+						"type": "uint256"
+					}
+				],
+				"name": "EntryFeeWithdrawn",
+				"type": "event"
+			},
+			{
+				"anonymous": false,
+				"inputs": [
+					{
+						"indexed": true,
+						"internalType": "bytes32",
+						"name": "auctionID_",
+						"type": "bytes32"
+					}
+				],
+				"name": "NewAuctionRegistered",
+				"type": "event"
+			},
+			{
+				"anonymous": false,
+				"inputs": [
+					{
+						"indexed": true,
+						"internalType": "address",
+						"name": "previousOwner_",
+						"type": "address"
+					},
+					{
+						"indexed": true,
+						"internalType": "address",
+						"name": "newOwner_",
+						"type": "address"
+					}
+				],
+				"name": "OwnershipTransferCompleted",
+				"type": "event"
+			},
+			{
+				"anonymous": false,
+				"inputs": [
+					{
+						"indexed": true,
+						"internalType": "address",
+						"name": "owner_",
+						"type": "address"
+					},
+					{
+						"indexed": true,
+						"internalType": "address",
+						"name": "pendingOwner_",
+						"type": "address"
+					}
+				],
+				"name": "OwnershipTransferInitiated",
+				"type": "event"
+			},
+			{
+				"anonymous": false,
+				"inputs": [
+					{
+						"indexed": true,
+						"internalType": "address",
+						"name": "owner_",
+						"type": "address"
+					}
+				],
+				"name": "RenounceProcessInitiated",
+				"type": "event"
+			},
+			{
+				"anonymous": false,
+				"inputs": [
+					{
+						"indexed": true,
+						"internalType": "address",
+						"name": "owner_",
+						"type": "address"
+					}
+				],
+				"name": "RenounceProcessTerminated",
+				"type": "event"
+			},
+			{
+				"anonymous": false,
+				"inputs": [
+					{
+						"indexed": false,
+						"internalType": "address",
+						"name": "signer_",
+						"type": "address"
+					}
+				],
+				"name": "SignatureRegistered",
+				"type": "event"
+			},
+			{
+				"anonymous": false,
+				"inputs": [],
+				"name": "SignatureValidityTimeCountdownStarted",
+				"type": "event"
+			},
+			{
+				"anonymous": false,
+				"inputs": [],
+				"name": "SignaturesExpiredAndReset",
+				"type": "event"
+			},
+			{
+				"anonymous": false,
+				"inputs": [],
+				"name": "SignaturesReset",
+				"type": "event"
+			},
+			{
+				"anonymous": false,
+				"inputs": [
+					{
+						"indexed": true,
+						"internalType": "bytes32",
+						"name": "auctionID_",
+						"type": "bytes32"
+					},
+					{
+						"indexed": false,
+						"internalType": "address",
+						"name": "bidder_",
+						"type": "address"
+					}
+				],
+				"name": "SnipePreventionTriggered",
+				"type": "event"
+			},
+			{
+				"anonymous": false,
+				"inputs": [],
+				"name": "SocialGuardianRecoveryCompleted",
+				"type": "event"
+			},
+			{
+				"anonymous": false,
+				"inputs": [],
+				"name": "TimeLockQueueReset",
+				"type": "event"
+			},
+			{
+				"anonymous": false,
+				"inputs": [],
+				"name": "TimelockQueueStarted",
+				"type": "event"
+			},
+			{
+				"inputs": [],
+				"name": "acceptOwnership",
+				"outputs": [
+					{
+						"internalType": "bool",
+						"name": "",
+						"type": "bool"
+					}
+				],
+				"stateMutability": "nonpayable",
+				"type": "function"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "bytes32",
+						"name": "auctionID_",
+						"type": "bytes32"
+					}
+				],
+				"name": "auctionEndBlock",
+				"outputs": [
+					{
+						"internalType": "uint256",
+						"name": "",
+						"type": "uint256"
+					}
+				],
+				"stateMutability": "view",
+				"type": "function"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "bytes32",
+						"name": "auctionID_",
+						"type": "bytes32"
+					}
+				],
+				"name": "auctionExists",
+				"outputs": [
+					{
+						"internalType": "bool",
+						"name": "",
+						"type": "bool"
+					}
+				],
+				"stateMutability": "view",
+				"type": "function"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "bytes32",
+						"name": "auctionID_",
+						"type": "bytes32"
+					}
+				],
+				"name": "auctionHighestBidAmount",
+				"outputs": [
+					{
+						"internalType": "uint256",
+						"name": "",
+						"type": "uint256"
+					}
+				],
+				"stateMutability": "view",
+				"type": "function"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "bytes32",
+						"name": "auctionID_",
+						"type": "bytes32"
+					}
+				],
+				"name": "auctionSnipeBlocks",
+				"outputs": [
+					{
+						"internalType": "uint256",
+						"name": "",
+						"type": "uint256"
+					}
+				],
+				"stateMutability": "view",
+				"type": "function"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "bytes32",
+						"name": "auctionID_",
+						"type": "bytes32"
+					}
+				],
+				"name": "auctionSnipeInterval",
+				"outputs": [
+					{
+						"internalType": "uint256",
+						"name": "",
+						"type": "uint256"
+					}
+				],
+				"stateMutability": "view",
+				"type": "function"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "bytes32",
+						"name": "auctionID_",
+						"type": "bytes32"
+					}
+				],
+				"name": "auctionStartBlock",
+				"outputs": [
+					{
+						"internalType": "uint256",
+						"name": "",
+						"type": "uint256"
+					}
+				],
+				"stateMutability": "view",
+				"type": "function"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "bytes32",
+						"name": "auctionID_",
+						"type": "bytes32"
+					}
+				],
+				"name": "auctionWinner",
+				"outputs": [
+					{
+						"internalType": "address",
+						"name": "",
+						"type": "address"
+					}
+				],
+				"stateMutability": "view",
+				"type": "function"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "bytes32",
+						"name": "auctionID_",
+						"type": "bytes32"
+					}
+				],
+				"name": "bid",
+				"outputs": [
+					{
+						"internalType": "bool",
+						"name": "",
+						"type": "bool"
+					}
+				],
+				"stateMutability": "payable",
+				"type": "function"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "bytes32",
+						"name": "auctionID_",
+						"type": "bytes32"
+					}
+				],
+				"name": "bidIncrement",
+				"outputs": [
+					{
+						"internalType": "uint256",
+						"name": "",
+						"type": "uint256"
+					}
+				],
+				"stateMutability": "view",
+				"type": "function"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "bytes32",
+						"name": "auctionID_",
+						"type": "bytes32"
+					},
+					{
+						"internalType": "address[]",
+						"name": "participants_",
+						"type": "address[]"
+					}
+				],
+				"name": "blacklistParticipants",
+				"outputs": [
+					{
+						"internalType": "bool",
+						"name": "",
+						"type": "bool"
+					}
+				],
+				"stateMutability": "nonpayable",
+				"type": "function"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "bytes32",
+						"name": "auctionID_",
+						"type": "bytes32"
+					}
+				],
+				"name": "cancelAuction",
+				"outputs": [
+					{
+						"internalType": "bool",
+						"name": "",
+						"type": "bool"
+					}
+				],
+				"stateMutability": "nonpayable",
+				"type": "function"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "bytes32",
+						"name": "auctionID_",
+						"type": "bytes32"
+					}
+				],
+				"name": "closedAuction",
+				"outputs": [
+					{
+						"internalType": "bool",
+						"name": "",
+						"type": "bool"
+					}
+				],
+				"stateMutability": "view",
+				"type": "function"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "bytes32",
+						"name": "auctionID_",
+						"type": "bytes32"
+					}
+				],
+				"name": "configureAsBlacklistedAuction",
+				"outputs": [
+					{
+						"internalType": "bool",
+						"name": "",
+						"type": "bool"
+					}
+				],
+				"stateMutability": "nonpayable",
+				"type": "function"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "bytes32",
+						"name": "auctionID_",
+						"type": "bytes32"
+					}
+				],
+				"name": "configureAsCancellableAuction",
+				"outputs": [
+					{
+						"internalType": "bool",
+						"name": "",
+						"type": "bool"
+					}
+				],
+				"stateMutability": "nonpayable",
+				"type": "function"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "bytes32",
+						"name": "auctionID_",
+						"type": "bytes32"
+					}
+				],
+				"name": "configureAsClosedAuction",
+				"outputs": [
+					{
+						"internalType": "bool",
+						"name": "",
+						"type": "bool"
+					}
+				],
+				"stateMutability": "nonpayable",
+				"type": "function"
+			},
+			{
+				"inputs": [],
+				"name": "contractETHBalance",
+				"outputs": [
+					{
+						"internalType": "uint256",
+						"name": "",
+						"type": "uint256"
+					}
+				],
+				"stateMutability": "view",
+				"type": "function"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "bytes32",
+						"name": "auctionID_",
+						"type": "bytes32"
+					},
+					{
+						"internalType": "uint256",
+						"name": "auctionStartBlock_",
+						"type": "uint256"
+					},
+					{
+						"internalType": "uint256",
+						"name": "auctionEndBlock_",
+						"type": "uint256"
+					},
+					{
+						"internalType": "uint256",
+						"name": "startingPrice_",
+						"type": "uint256"
+					},
+					{
+						"internalType": "uint256",
+						"name": "bidIncrement_",
+						"type": "uint256"
+					},
+					{
+						"internalType": "uint256",
+						"name": "reservePrice_",
+						"type": "uint256"
+					},
+					{
+						"internalType": "uint256",
+						"name": "auctionSnipeInterval_",
+						"type": "uint256"
+					},
+					{
+						"internalType": "uint256",
+						"name": "auctionSnipeBlocks_",
+						"type": "uint256"
+					},
+					{
+						"internalType": "address",
+						"name": "nftContractAddress_",
+						"type": "address"
+					},
+					{
+						"internalType": "uint256",
+						"name": "nftTokenID_",
+						"type": "uint256"
+					},
+					{
+						"internalType": "string",
+						"name": "ipfs_",
+						"type": "string"
+					}
+				],
+				"name": "createNewAuction",
+				"outputs": [
+					{
+						"internalType": "bool",
+						"name": "",
+						"type": "bool"
+					}
+				],
+				"stateMutability": "nonpayable",
+				"type": "function"
+			},
+			{
+				"inputs": [],
+				"name": "currentSignatureCount",
+				"outputs": [
+					{
+						"internalType": "uint8",
+						"name": "",
+						"type": "uint8"
+					}
+				],
+				"stateMutability": "view",
+				"type": "function"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "bytes32",
+						"name": "auctionID_",
+						"type": "bytes32"
+					},
+					{
+						"internalType": "address",
+						"name": "bidder_",
+						"type": "address"
+					}
+				],
+				"name": "getBidAmountOfBidder",
+				"outputs": [
+					{
+						"internalType": "uint256",
+						"name": "",
+						"type": "uint256"
+					}
+				],
+				"stateMutability": "view",
+				"type": "function"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "bytes32",
+						"name": "auctionID_",
+						"type": "bytes32"
+					}
+				],
+				"name": "getEntryFee",
+				"outputs": [
+					{
+						"internalType": "uint256",
+						"name": "",
+						"type": "uint256"
+					}
+				],
+				"stateMutability": "view",
+				"type": "function"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "bytes32",
+						"name": "auctionID_",
+						"type": "bytes32"
+					}
+				],
+				"name": "getIPFS",
+				"outputs": [
+					{
+						"internalType": "string",
+						"name": "",
+						"type": "string"
+					}
+				],
+				"stateMutability": "view",
+				"type": "function"
+			},
+			{
+				"inputs": [],
+				"name": "getQueueTime",
+				"outputs": [
+					{
+						"internalType": "uint256",
+						"name": "",
+						"type": "uint256"
+					}
+				],
+				"stateMutability": "view",
+				"type": "function"
+			},
+			{
+				"inputs": [],
+				"name": "getSignatureExpiryTime",
+				"outputs": [
+					{
+						"internalType": "uint256",
+						"name": "",
+						"type": "uint256"
+					}
+				],
+				"stateMutability": "view",
+				"type": "function"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "bytes32",
+						"name": "auctionID_",
+						"type": "bytes32"
+					},
+					{
+						"internalType": "address",
+						"name": "participant_",
+						"type": "address"
+					}
+				],
+				"name": "hasPaidEntryFee",
+				"outputs": [
+					{
+						"internalType": "bool",
+						"name": "",
+						"type": "bool"
+					}
+				],
+				"stateMutability": "view",
+				"type": "function"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "address",
+						"name": "signer_",
+						"type": "address"
+					}
+				],
+				"name": "hasSigned",
+				"outputs": [
+					{
+						"internalType": "bool",
+						"name": "",
+						"type": "bool"
+					}
+				],
+				"stateMutability": "view",
+				"type": "function"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "bytes32",
+						"name": "auctionID_",
+						"type": "bytes32"
+					},
+					{
+						"internalType": "address",
+						"name": "participant_",
+						"type": "address"
+					}
+				],
+				"name": "hasWithdrawnEntryFee",
+				"outputs": [
+					{
+						"internalType": "bool",
+						"name": "",
+						"type": "bool"
+					}
+				],
+				"stateMutability": "view",
+				"type": "function"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "bytes32",
+						"name": "auctionID_",
+						"type": "bytes32"
+					}
+				],
+				"name": "isBlacklistAuction",
+				"outputs": [
+					{
+						"internalType": "bool",
+						"name": "",
+						"type": "bool"
+					}
+				],
+				"stateMutability": "view",
+				"type": "function"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "bytes32",
+						"name": "auctionID_",
+						"type": "bytes32"
+					},
+					{
+						"internalType": "address",
+						"name": "participant_",
+						"type": "address"
+					}
+				],
+				"name": "isBlacklistedParticipant",
+				"outputs": [
+					{
+						"internalType": "bool",
+						"name": "",
+						"type": "bool"
+					}
+				],
+				"stateMutability": "view",
+				"type": "function"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "bytes32",
+						"name": "auctionID_",
+						"type": "bytes32"
+					}
+				],
+				"name": "isCancellable",
+				"outputs": [
+					{
+						"internalType": "bool",
+						"name": "",
+						"type": "bool"
+					}
+				],
+				"stateMutability": "view",
+				"type": "function"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "bytes32",
+						"name": "auctionID_",
+						"type": "bytes32"
+					}
+				],
+				"name": "isCancelled",
+				"outputs": [
+					{
+						"internalType": "bool",
+						"name": "",
+						"type": "bool"
+					}
+				],
+				"stateMutability": "view",
+				"type": "function"
+			},
+			{
+				"inputs": [],
+				"name": "isPaused",
+				"outputs": [
+					{
+						"internalType": "bool",
+						"name": "",
+						"type": "bool"
+					}
+				],
+				"stateMutability": "view",
+				"type": "function"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "address",
+						"name": "signer_",
+						"type": "address"
+					}
+				],
+				"name": "isSigner",
+				"outputs": [
+					{
+						"internalType": "bool",
+						"name": "",
+						"type": "bool"
+					}
+				],
+				"stateMutability": "view",
+				"type": "function"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "bytes32",
+						"name": "auctionID_",
+						"type": "bytes32"
+					},
+					{
+						"internalType": "address",
+						"name": "participant_",
+						"type": "address"
+					}
+				],
+				"name": "isWhitelisted",
+				"outputs": [
+					{
+						"internalType": "bool",
+						"name": "",
+						"type": "bool"
+					}
+				],
+				"stateMutability": "view",
+				"type": "function"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "bytes32",
+						"name": "auctionID_",
+						"type": "bytes32"
+					}
+				],
+				"name": "nftContractAddress",
+				"outputs": [
+					{
+						"internalType": "contract AuctionERC721",
+						"name": "",
+						"type": "address"
+					}
+				],
+				"stateMutability": "view",
+				"type": "function"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "bytes32",
+						"name": "auctionID_",
+						"type": "bytes32"
+					}
+				],
+				"name": "nftTokenID",
+				"outputs": [
+					{
+						"internalType": "uint256",
+						"name": "",
+						"type": "uint256"
+					}
+				],
+				"stateMutability": "view",
+				"type": "function"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "address",
+						"name": "",
+						"type": "address"
+					},
+					{
+						"internalType": "address",
+						"name": "",
+						"type": "address"
+					},
+					{
+						"internalType": "uint256",
+						"name": "",
+						"type": "uint256"
+					},
+					{
+						"internalType": "bytes",
+						"name": "",
+						"type": "bytes"
+					}
+				],
+				"name": "onERC721Received",
+				"outputs": [
+					{
+						"internalType": "bytes4",
+						"name": "",
+						"type": "bytes4"
+					}
+				],
+				"stateMutability": "pure",
+				"type": "function"
+			},
+			{
+				"inputs": [],
+				"name": "owner",
+				"outputs": [
+					{
+						"internalType": "address",
+						"name": "",
+						"type": "address"
+					}
+				],
+				"stateMutability": "view",
+				"type": "function"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "bytes32",
+						"name": "auctionID_",
+						"type": "bytes32"
+					}
+				],
+				"name": "ownerWithdrew",
+				"outputs": [
+					{
+						"internalType": "bool",
+						"name": "",
+						"type": "bool"
+					}
+				],
+				"stateMutability": "view",
+				"type": "function"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "bytes32",
+						"name": "auctionID_",
+						"type": "bytes32"
+					}
+				],
+				"name": "payEntryFee",
+				"outputs": [
+					{
+						"internalType": "bool",
+						"name": "",
+						"type": "bool"
+					}
+				],
+				"stateMutability": "payable",
+				"type": "function"
+			},
+			{
+				"inputs": [],
+				"name": "pendingOwner",
+				"outputs": [
+					{
+						"internalType": "address",
+						"name": "",
+						"type": "address"
+					}
+				],
+				"stateMutability": "view",
+				"type": "function"
+			},
+			{
+				"inputs": [],
+				"name": "registerSignature",
+				"outputs": [
+					{
+						"internalType": "bool",
+						"name": "",
+						"type": "bool"
+					}
+				],
+				"stateMutability": "nonpayable",
+				"type": "function"
+			},
+			{
+				"inputs": [],
+				"name": "renounceOwnership",
+				"outputs": [
+					{
+						"internalType": "bool",
+						"name": "",
+						"type": "bool"
+					}
+				],
+				"stateMutability": "nonpayable",
+				"type": "function"
+			},
+			{
+				"inputs": [],
+				"name": "renounceUnlocked",
+				"outputs": [
+					{
+						"internalType": "bool",
+						"name": "",
+						"type": "bool"
+					}
+				],
+				"stateMutability": "view",
+				"type": "function"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "bytes32",
+						"name": "auctionID_",
+						"type": "bytes32"
+					}
+				],
+				"name": "reservePrice",
+				"outputs": [
+					{
+						"internalType": "uint256",
+						"name": "",
+						"type": "uint256"
+					}
+				],
+				"stateMutability": "view",
+				"type": "function"
+			},
+			{
+				"inputs": [],
+				"name": "resetPendingOwner",
+				"outputs": [
+					{
+						"internalType": "bool",
+						"name": "",
+						"type": "bool"
+					}
+				],
+				"stateMutability": "nonpayable",
+				"type": "function"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "bytes32",
+						"name": "auctionID_",
+						"type": "bytes32"
+					},
+					{
+						"internalType": "uint256",
+						"name": "entryFee_",
+						"type": "uint256"
+					}
+				],
+				"name": "setEntryFee",
+				"outputs": [
+					{
+						"internalType": "bool",
+						"name": "",
+						"type": "bool"
+					}
+				],
+				"stateMutability": "nonpayable",
+				"type": "function"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "address",
+						"name": "newOwner_",
+						"type": "address"
+					}
+				],
+				"name": "socialGuardianRecovery",
+				"outputs": [
+					{
+						"internalType": "bool",
+						"name": "",
+						"type": "bool"
+					}
+				],
+				"stateMutability": "nonpayable",
+				"type": "function"
+			},
+			{
+				"inputs": [],
+				"name": "startQueue",
+				"outputs": [
+					{
+						"internalType": "bool",
+						"name": "",
+						"type": "bool"
+					}
+				],
+				"stateMutability": "nonpayable",
+				"type": "function"
+			},
+			{
+				"inputs": [],
+				"name": "startRenounceProcess",
+				"outputs": [
+					{
+						"internalType": "bool",
+						"name": "",
+						"type": "bool"
+					}
+				],
+				"stateMutability": "nonpayable",
+				"type": "function"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "bytes32",
+						"name": "auctionID_",
+						"type": "bytes32"
+					}
+				],
+				"name": "startingPrice",
+				"outputs": [
+					{
+						"internalType": "uint256",
+						"name": "",
+						"type": "uint256"
+					}
+				],
+				"stateMutability": "view",
+				"type": "function"
+			},
+			{
+				"inputs": [],
+				"name": "terminateRenounceProcess",
+				"outputs": [
+					{
+						"internalType": "bool",
+						"name": "",
+						"type": "bool"
+					}
+				],
+				"stateMutability": "nonpayable",
+				"type": "function"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "address",
+						"name": "newOwner_",
+						"type": "address"
+					}
+				],
+				"name": "transferOwnership",
+				"outputs": [
+					{
+						"internalType": "bool",
+						"name": "",
+						"type": "bool"
+					}
+				],
+				"stateMutability": "nonpayable",
+				"type": "function"
+			},
+			{
+				"inputs": [],
+				"name": "turnEmergencyPauseOff",
+				"outputs": [
+					{
+						"internalType": "bool",
+						"name": "",
+						"type": "bool"
+					}
+				],
+				"stateMutability": "nonpayable",
+				"type": "function"
+			},
+			{
+				"inputs": [],
+				"name": "turnEmergencyPauseOn",
+				"outputs": [
+					{
+						"internalType": "bool",
+						"name": "",
+						"type": "bool"
+					}
+				],
+				"stateMutability": "nonpayable",
+				"type": "function"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "bytes32",
+						"name": "auctionID_",
+						"type": "bytes32"
+					},
+					{
+						"internalType": "address[]",
+						"name": "participants_",
+						"type": "address[]"
+					}
+				],
+				"name": "whitelistParticipants",
+				"outputs": [
+					{
+						"internalType": "bool",
+						"name": "",
+						"type": "bool"
+					}
+				],
+				"stateMutability": "nonpayable",
+				"type": "function"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "bytes32",
+						"name": "auctionID_",
+						"type": "bytes32"
+					}
+				],
+				"name": "withdrawBid",
+				"outputs": [
+					{
+						"internalType": "bool",
+						"name": "",
+						"type": "bool"
+					}
+				],
+				"stateMutability": "nonpayable",
+				"type": "function"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "bytes32",
+						"name": "auctionID_",
+						"type": "bytes32"
+					}
+				],
+				"name": "withdrawEntryFee",
+				"outputs": [
+					{
+						"internalType": "bool",
+						"name": "",
+						"type": "bool"
+					}
+				],
+				"stateMutability": "nonpayable",
+				"type": "function"
+			}
+		],
+		"devdoc": {
+			"author": "Ruben Frisch (Óbuda University - John von Neumann Faculty of Informatics, Business Informatics MSc)",
+			"details": "This contract facilitates the registration, configuration and management of all processes of decentralized parametric auctions",
+			"events": {
+				"AddedBlacklistedParticipants(bytes32)": {
+					"details": "Event for logging the blacklisting of participants",
+					"params": {
+						"auctionID_": "The 256 bit hash identifier of the auction"
+					}
+				},
+				"AddedWhitelistedParticipants(bytes32)": {
+					"details": "Event for logging the whitelisting of participants",
+					"params": {
+						"auctionID_": "The 256 bit hash identifier of the closed (whitelisted) auction that the whitelisted participants has been registered to"
+					}
+				},
+				"AuctionCancelled(bytes32)": {
+					"details": "Event for logging when an auction has been cancelled",
+					"params": {
+						"auctionID_": "The 256 bit hash identifier of the auction"
+					}
+				},
+				"AuctionConfiguredAsBlacklisted(bytes32)": {
+					"details": "Event for logging the configuration of blacklist auctions",
+					"params": {
+						"auctionID_": "The 256 bit hash identifier of the auction"
+					}
+				},
+				"AuctionConfiguredAsCancellable(bytes32)": {
+					"details": "Event for logging when an auction has been configured as cancellable",
+					"params": {
+						"auctionID_": "The 256 bit hash identifier of the auction"
+					}
+				},
+				"AuctionConfiguredAsClosed(bytes32)": {
+					"details": "Event for logging the configuration of an auction as closed (whitelisted)",
+					"params": {
+						"auctionID_": "The 256 bit hash identifier of the auction that was configured as closed (whitelisted)"
+					}
+				},
+				"BidPlaced(bytes32,address,uint256)": {
+					"details": "Event for logging bids",
+					"params": {
+						"auctionID_": "The 256 bit hash identifier of the auction that the bid was placed for",
+						"bidder_": "The address of the bidder",
+						"newHighestBidAmount_": "The amount of the bid in Wei (1000000000000000000 Wei = 1 Ether = 1000000000 Gwei)"
+					}
+				},
+				"BidWithdrawn(bytes32,address,uint256)": {
+					"details": "Event for logging bid withdrawals",
+					"params": {
+						"auctionID_": "The 256 bit hash identifier of the auction that the bid was withdrawn from",
+						"entity_": "The address which initiated the bid withdrawal",
+						"withdrawAmount_": "The amount of the withdrawal in Wei (1000000000000000000 Wei = 1 Ether = 1000000000 Gwei)"
+					}
+				},
+				"EmergencyPauseTurnedOff()": {
+					"details": "Event for logging when the emergency pause feature has been toggled off"
+				},
+				"EmergencyPauseTurnedOn()": {
+					"details": "Event for logging when the emergency pause feature has been toggled on"
+				},
+				"EntryFeeConfigured(bytes32,uint256)": {
+					"details": "Event for logging the configuration of the entry fee for a specific auction",
+					"params": {
+						"auctionID_": "The 256 bit hash identifier of the auction that the entry fee is being configured for",
+						"entryFeeValue_": "The set entry fee amount in WEI (1000000000000000000 Wei = 1 Ether = 1000000000 Gwei)"
+					}
+				},
+				"EntryFeePaid(bytes32,address,uint256)": {
+					"details": "Event for logging the payment of entry fees",
+					"params": {
+						"auctionID_": "The 256 bit hash identifier of the auction that the entry fee is being paid to",
+						"entity_": "The address that paid the entry fee by calling the 'payEntryFee' function",
+						"paidEntryFeeAmount_": "The amount of the entry fee being paid in Wei (1000000000000000000 Wei = 1 Ether = 1000000000 Gwei)"
+					}
+				},
+				"EntryFeeWithdrawn(bytes32,address,uint256)": {
+					"details": "Event for logging the withdrawal of entry fees",
+					"params": {
+						"auctionID_": "The 256 bit hash identifier of the auction that the entry fee is being withdrawn from",
+						"entity_": "The address that withdrew the entry fee by calling the 'withdrawEntryFee' function",
+						"withdrawnEntryFeeAmount_": "The amount of the entry fee being withdrawn in Wei (1000000000000000000 Wei = 1 Ether = 1000000000 Gwei)"
+					}
+				},
+				"NewAuctionRegistered(bytes32)": {
+					"details": "Event for logging the registration of new auctions",
+					"params": {
+						"auctionID_": "The 256 bit hash identifier of the auction that is being initialized"
+					}
+				},
+				"OwnershipTransferCompleted(address,address)": {
+					"details": "Event for logging the transfer of ownership to a new address (also logs ownership relinquishment to the burn (zero) address)",
+					"params": {
+						"newOwner_": "The address of the new owner (admin)",
+						"previousOwner_": "The address of the previous owner (admin)"
+					}
+				},
+				"OwnershipTransferInitiated(address,address)": {
+					"details": "Event for logging the initiation of the ownership transfer process (nomination of the new owner)",
+					"params": {
+						"owner_": "The current owner's address who initiated the transfer of ownership",
+						"pendingOwner_": "The address of the nominated new owner (pending owner)"
+					}
+				},
+				"RenounceProcessInitiated(address)": {
+					"details": "Event for logging the initiation of the safe 2-step ownership relinquishment (renounce) mechanism",
+					"params": {
+						"owner_": "The owner's address who initiated the 2-step ownership renounce process"
+					}
+				},
+				"RenounceProcessTerminated(address)": {
+					"details": "Event for logging the termination of the 2-step ownership relinquishment (renounce) process",
+					"params": {
+						"owner_": "The owner's address who terminated the 2-step ownership renounce process"
+					}
+				},
+				"SignatureRegistered(address)": {
+					"details": "Event for logging when a valid signature is made",
+					"params": {
+						"signer_": "The address of the signer that made the signature"
+					}
+				},
+				"SignatureValidityTimeCountdownStarted()": {
+					"details": "Event for logging when signature validity countdown starts"
+				},
+				"SignaturesExpiredAndReset()": {
+					"details": "Event for logging when signatures are expired and reset"
+				},
+				"SignaturesReset()": {
+					"details": "Event for logging when signatures are reset"
+				},
+				"SnipePreventionTriggered(bytes32,address)": {
+					"details": "Event for logging snipe prevention mechanism triggers",
+					"params": {
+						"auctionID_": "The 256 bit hash identifier of the auction at which the snipe prevention mechanism was triggered",
+						"bidder_": "The address of the bidder who triggered the snipe prevention mechanism"
+					}
+				},
+				"SocialGuardianRecoveryCompleted()": {
+					"details": "Event for logging the completion of a social guardian ownership recovery process"
+				},
+				"TimeLockQueueReset()": {
+					"details": "Event for logging when the timelock queue was reset"
+				},
+				"TimelockQueueStarted()": {
+					"details": "Event for logging when a new timelock queue was started"
+				}
+			},
+			"kind": "dev",
+			"methods": {
+				"acceptOwnership()": {
+					"custom:requirement-body": "Only the pending owner can accept ownership",
+					"details": "Handles the second step of the 2-step ownership transfer process (acceptance phase)",
+					"returns": {
+						"_0": "Returns true boolean if the ownership transfer's acceptance phase was successful"
+					}
+				},
+				"auctionEndBlock(bytes32)": {
+					"details": "Retrieves the end block number where the specific auction ends",
+					"params": {
+						"auctionID_": "The 256 bit hash identifier of the auction"
+					},
+					"returns": {
+						"_0": "Returns the end block number where the auction ends"
+					}
+				},
+				"auctionExists(bytes32)": {
+					"details": "Retrieves the boolean value associated with the passed auction ID",
+					"params": {
+						"auctionID_": "The 256 bit hash identifier of the auction"
+					},
+					"returns": {
+						"_0": "Returns a boolean literal that indicates whether the auction is registered or not"
+					}
+				},
+				"auctionHighestBidAmount(bytes32)": {
+					"details": "Retrieves the amount of the current highest bid in the specific auction",
+					"params": {
+						"auctionID_": "The 256 bit hash identifier of the auction"
+					},
+					"returns": {
+						"_0": "Returns the amount of the current highest bid in WEI (1000000000000000000 Wei = 1 Ether = 1000000000 Gwei)"
+					}
+				},
+				"auctionSnipeBlocks(bytes32)": {
+					"details": "Retrieves the auction snipe block count of a specific auction",
+					"params": {
+						"auctionID_": "The 256 bit hash identifier of the auction"
+					},
+					"returns": {
+						"_0": "Returns the auction snipe block count of the auction"
+					}
+				},
+				"auctionSnipeInterval(bytes32)": {
+					"details": "Retrieves the auction snipe interval of a specific auction",
+					"params": {
+						"auctionID_": "The 256 bit hash identifier of the auction"
+					},
+					"returns": {
+						"_0": "Returns the auction snipe interval of the auction"
+					}
+				},
+				"auctionStartBlock(bytes32)": {
+					"details": "Retrieves the start block number where the specific auction begins",
+					"params": {
+						"auctionID_": "The 256 bit hash identifier of the auction"
+					},
+					"returns": {
+						"_0": "Returns the start block number where the auction starts"
+					}
+				},
+				"auctionWinner(bytes32)": {
+					"details": "Retrieves the current auction winnner's address from the specific auction",
+					"params": {
+						"auctionID_": "The 256 bit hash identifier of the auction"
+					},
+					"returns": {
+						"_0": "Returns the address of the current auction winner"
+					}
+				},
+				"bid(bytes32)": {
+					"custom:requirement-body": "The bid's value must be greater than 0If there is an entry fee configured for the auction, it must be paid in order to participate in the bidding processIf it is a blacklist auction and the address is blacklisted, then the caller will not be able to participate in biddingIf it is a whitelist auction and the address is not whitelisted, then the caller will not be able to participate in biddingThe total bid of the participant must be greater or equal to the starting price of the auctionThe total bid of the participant must be greater or equal to the highest bid + the bid increment",
+					"custom:requirement-modifier": "The owner cannot place bidsBids cannot be placed while the system is paused by the emergency circuit breakerBids can only be placed for registered auctionsBids cannot be placed on cancelled auctionsBids can only be placed on auctions that have already startedBids can only be placed on auctions that have not ended yet",
+					"details": "Places a bid on an auction",
+					"params": {
+						"auctionID_": "The 256 bit hash identifier of the auction"
+					},
+					"returns": {
+						"_0": "Returns a true boolean literal if the bid was successful"
+					}
+				},
+				"bidIncrement(bytes32)": {
+					"details": "Retrieves the bid increment value of a specific auction",
+					"params": {
+						"auctionID_": "The 256 bit hash identifier of the auction"
+					},
+					"returns": {
+						"_0": "Returns the bid increment value of the auction in WEI (1000000000000000000 Wei = 1 Ether = 1000000000 Gwei)"
+					}
+				},
+				"blacklistParticipants(bytes32,address[])": {
+					"custom:requirement-body": "Only at an auction that was configured as a blacklist auction can addresses be blacklisted",
+					"custom:requirement-modifier": "Only the owner can blacklist addressesBlacklisting addresses is only possible when the contracts are not paused by the emergency circuit breakerOnly at a registered (existing) auction can addresses be blacklistedBlacklisting is only possible before the auction begins",
+					"details": "Blacklists an array of addresses (participants) at the specified blacklist auction",
+					"params": {
+						"auctionID_": "The 256 bit hash identifier of the auction",
+						"participants_": "The addresses (participants) to be blacklisted at the specified blacklist auction"
+					},
+					"returns": {
+						"_0": "Returns true boolean literal if the addresses (participants) were successfully blacklisted at the specified auction"
+					}
+				},
+				"cancelAuction(bytes32)": {
+					"custom:requirement-body": "Only a cancellable auction can be cancalled (needs to be configured as cancellable before the auction starts)",
+					"custom:requirement-modifier": "Only the owner can call this functionThis function will only execute if the contracts are not paused by the emergency circuit breakerOnly an existing (registered) auction can be cancelledA cancellable auction can only be cancelled once the auction has startedA cancellable auction can only be cancelled before it ends",
+					"details": "Cancels a cancellable auction and burns the NFT",
+					"params": {
+						"auctionID_": "The 256 bit hash identifier of the auction"
+					},
+					"returns": {
+						"_0": "Returns a true boolean literal if the auction was cancelled successfully"
+					}
+				},
+				"closedAuction(bytes32)": {
+					"details": "Determines whether an auction is closed (whitelisted) or not, accesses the '_closedAuction' storage variable",
+					"params": {
+						"auctionID_": "The 256 bit hash identifier of the auction"
+					},
+					"returns": {
+						"_0": "Boolean flag indicating whether the auction is closed (true) or not (false)"
+					}
+				},
+				"configureAsBlacklistedAuction(bytes32)": {
+					"custom:requirement-body": "Only a non-blacklist auction can be configured as a blacklist auction (save gas)",
+					"custom:requirement-modifier": "Only the owner can configure an auction as a blacklist auctionBlacklist auction configuration is only possible when the contracts are not paused by the emergency circuit breakerOnly a registered (existing) auction can be configured as a blacklist auctionAn auction can only be configured as a blacklist auction before it begins",
+					"details": "Configures a blacklist auction",
+					"params": {
+						"auctionID_": "The 256 bit hash identifier of the auction"
+					},
+					"returns": {
+						"_0": "Returns true boolean literal if the blacklist auction configuration was successful"
+					}
+				},
+				"configureAsCancellableAuction(bytes32)": {
+					"custom:requirement-body": "Only a non-cancellable auction can be configured as cancellable (prevents additional wasted computation and gas)",
+					"custom:requirement-modifier": "Only the owner can call this functionThis function will only execute if the contracts are not paused by the emergency circuit breakerOnly an existing (registered) auction can be configured as a cancellable auctionAn auction can only be configured when it hasn't started yet",
+					"details": "Configures an auction as cancellable",
+					"params": {
+						"auctionID_": "The 256 bit hash identifier of the auction"
+					},
+					"returns": {
+						"_0": "Returns a true boolean literal if the configuration of an auction as cancellable was successful"
+					}
+				},
+				"configureAsClosedAuction(bytes32)": {
+					"custom:requirement-body": "Only an auction that is not yet a whitelist auction can be configured as one (prevents additional wasted computation and gas)",
+					"custom:requirement-modifier": "Only the owner can call this functionThis function will only execute if the contracts are not paused by the emergency circuit breakerOnly an existing (registered) auction can be configured as a whitelist auctionAn auction can only be configured when it hasn't started yet",
+					"details": "Configure an auction as closed (whitelisted)",
+					"params": {
+						"auctionID_": "The 256 bit hash identifier of the auction"
+					},
+					"returns": {
+						"_0": "Returns true if the auction has been configured successfully as a closed (whitelisted) auction"
+					}
+				},
+				"contractETHBalance()": {
+					"details": "Retrieves the ETH balance of the contract itself (funds from committed bids and collected entry fees)",
+					"returns": {
+						"_0": "Returns the ETH balance of the smart contract in WEI (1000000000000000000 Wei = 1 Ether = 1000000000 Gwei)"
+					}
+				},
+				"createNewAuction(bytes32,uint256,uint256,uint256,uint256,uint256,uint256,uint256,address,uint256,string)": {
+					"custom:requirement-body": "The auction start block must be lower than the auction end blockThe auction start block must be at least of the value of the current block numberThe starting price must be greater or equal to 0The bid increment value must be greater or equal to 0The reserve price must be greater or equal to 0The snipe prevention mechanism's activation interval value must be greater or equal to 0The snipe prevention mechanism's activation interval value must be lower than the total duration of the auctionThe snipe prevention mechanism's auction duration expansion value must be greater or equal to 0The NFT contract address must be a smart contractThe NFT contract address must support the IERC721 interfaceThe NFT with the passed token ID must be owned by the auction smart contract",
+					"custom:requirement-modifier": "Only the owner can register new auctionsNew auctions cannot be registered while the system is paused by the emergency circuit breakerThe auction ID must be unique (auctions with the same ID must not exist)",
+					"details": "Registers and configures a new parametric auction",
+					"params": {
+						"auctionEndBlock_": "The block number where the auction will end",
+						"auctionID_": "The 256 bit hash identifier (pass with 0x prefix, hexadeciaml encoding, recommended hash function is SHA256 or Keccak256) of the auction",
+						"auctionSnipeBlocks_": "The snipe prevention mechanism's auction duration expansion value",
+						"auctionSnipeInterval_": "The snipe prevention mechanism's activation interval value",
+						"auctionStartBlock_": "The block number where the auction will start",
+						"bidIncrement_": "The bid increment value in Wei (1000000000000000000 Wei = 1 Ether = 1000000000 Gwei)",
+						"ipfs_": "The IPFS auction metadata URL string",
+						"nftContractAddress_": "The address of the IERC-721 complient NFT smart contract",
+						"nftTokenID_": "The ID number of the NFT token that represents the item to be sold",
+						"reservePrice_": "The reserve price in Wei (1000000000000000000 Wei = 1 Ether = 1000000000 Gwei)",
+						"startingPrice_": "The starting price in Wei (1000000000000000000 Wei = 1 Ether = 1000000000 Gwei)"
+					},
+					"returns": {
+						"_0": "Returns a true boolean literal if the auction registration was successful"
+					}
+				},
+				"currentSignatureCount()": {
+					"details": "Retrieves the current signature count",
+					"returns": {
+						"_0": "Returns the current signature count"
+					}
+				},
+				"getBidAmountOfBidder(bytes32,address)": {
+					"details": "Retrieves the bid amount of a bidder from a specific auction",
+					"params": {
+						"auctionID_": "The 256 bit hash identifier of the auction",
+						"bidder_": "The address of the bidder"
+					},
+					"returns": {
+						"_0": "Returns the bid amount of a bidder from a specific auction"
+					}
+				},
+				"getEntryFee(bytes32)": {
+					"details": "Retrieves the entry fee set for the specific auction",
+					"params": {
+						"auctionID_": "The 256 bit hash identifier of the auction"
+					},
+					"returns": {
+						"_0": "Returns the entry fee amount for the specific auction in Wei (1000000000000000000 Wei = 1 Ether = 1000000000 Gwei)"
+					}
+				},
+				"getIPFS(bytes32)": {
+					"details": "Retrieves the IPFS of a specific auction",
+					"params": {
+						"auctionID_": "The 256 bit hash identifier of the auction"
+					},
+					"returns": {
+						"_0": "Returns the IPFS string of the auction"
+					}
+				},
+				"getQueueTime()": {
+					"details": "Retrieves the queue timestamp",
+					"returns": {
+						"_0": "Returns the queue timestamp in epoch seconds"
+					}
+				},
+				"getSignatureExpiryTime()": {
+					"details": "Retrieves the current signature expiry timestamp",
+					"returns": {
+						"_0": "Returns the current signature expiry timestamp"
+					}
+				},
+				"hasPaidEntryFee(bytes32,address)": {
+					"details": "Retrieves the boolean logical value indicating whether the address has paid the entry fee or not for the specific auction",
+					"params": {
+						"auctionID_": "The 256 bit hash identifier of the auction",
+						"participant_": "The address of the participant to be checked"
+					},
+					"returns": {
+						"_0": "Returns a boolean literal that indicates whether the address has paid the entry fee for the specific auction or not"
+					}
+				},
+				"hasSigned(address)": {
+					"details": "Evaluates whether a signer has signed or not",
+					"params": {
+						"signer_": "The address to be evaluated"
+					},
+					"returns": {
+						"_0": "Returns a boolean literal indicating whether the passed address has signed or not"
+					}
+				},
+				"hasWithdrawnEntryFee(bytes32,address)": {
+					"details": "Retrieves the boolean logical value indicating whether the address has withdrawn the entry fee or not from the specific auction",
+					"params": {
+						"auctionID_": "The 256 bit hash identifier of the auction",
+						"participant_": "The address of the participant to be checked"
+					},
+					"returns": {
+						"_0": "Returns a boolean literal that indicates whether the address has withdrawn the entry fee from the specific auction or not"
+					}
+				},
+				"isBlacklistAuction(bytes32)": {
+					"details": "Retrieves whether an auction is configured as a blacklist auction or not",
+					"params": {
+						"auctionID_": "The 256 bit hash identifier of the auction"
+					},
+					"returns": {
+						"_0": "Returns a boolean flag that indicates whether an auction is configured as a blacklist auction or not"
+					}
+				},
+				"isBlacklistedParticipant(bytes32,address)": {
+					"details": "Retrieves whether a participant is blacklisted or not at a blacklist auction",
+					"params": {
+						"auctionID_": "The 256 bit hash identifier of the auction",
+						"participant_": "The address of the participant"
+					},
+					"returns": {
+						"_0": "Returns a boolean flag indicating whether the participant is blacklisted or not at the specified blacklist auction"
+					}
+				},
+				"isCancellable(bytes32)": {
+					"details": "Retrieves whether a specific auction is cancellable (true) or not cancellable (false)",
+					"params": {
+						"auctionID_": "The 256 bit hash identifier of the auction"
+					},
+					"returns": {
+						"_0": "Returns a boolean flag indicating whether an auction is cancellable (true) or not cancellable (false)"
+					}
+				},
+				"isCancelled(bytes32)": {
+					"details": "Retrieves whether a specific cancellable auction is cancelled (true) or not cancelled (false)",
+					"params": {
+						"auctionID_": "The 256 bit hash identifier of the auction"
+					},
+					"returns": {
+						"_0": "Returns a boolean flag indicating whether a cancellable auction is cancelled (true) or not cancelled (false)"
+					}
+				},
+				"isPaused()": {
+					"details": "Retrieves whether the system is currently paused (true) or not paused (false)",
+					"returns": {
+						"_0": "Returns a boolean flag indicating whether the system is paused (true) or not paused (false)"
+					}
+				},
+				"isSigner(address)": {
+					"details": "Evaluates whether an address is in the valid signer set or not",
+					"params": {
+						"signer_": "The address to be evaluated"
+					},
+					"returns": {
+						"_0": "Returns a boolean literal indicating whether the passed address is a signer or not"
+					}
+				},
+				"isWhitelisted(bytes32,address)": {
+					"details": "Checks whether an address is whitelisted or not at a certain closed (whitelisted) auction",
+					"params": {
+						"auctionID_": "The 256 bit hash identifier of the auction",
+						"participant_": "The address of the participant we want to check whether it is whitelisted or not"
+					},
+					"returns": {
+						"_0": "Boolean flag indicating whether the address is whitelisted (true) or not (false)"
+					}
+				},
+				"nftContractAddress(bytes32)": {
+					"details": "Retrieves the NFT contract address associated with a specific auction",
+					"params": {
+						"auctionID_": "The 256 bit hash identifier of the auction"
+					},
+					"returns": {
+						"_0": "Returns the NFT contract address of the auction"
+					}
+				},
+				"nftTokenID(bytes32)": {
+					"details": "Retrieves the NFT token ID of a specific auction",
+					"params": {
+						"auctionID_": "The 256 bit hash identifier of the auction"
+					},
+					"returns": {
+						"_0": "Returns the NFT token ID of the auction"
+					}
+				},
+				"onERC721Received(address,address,uint256,bytes)": {
+					"custom:param-unnamed": "_operator The address which called `safeTransferFrom` function_from The address which previously owned the token_tokenId The NFT identifier which is being transferred_data Additional data with no specified format",
+					"details": "Ensures that the auction contract receiving the ERC-721 token is capable of handling ERC-721 NFT tokens (safeTranfer eligibility to prevent accidental NFT token loss)Prevents accidental transfers to contracts that don't know how to process them and are not IERC-721 complientWhen the ERC-721 token is transferred to the auction contracct with the safeTransferFrom method, it needs to implement the onERC721Received function to accept the tokenComputes the 4 byte Keccak-256 hash of the function signature (name and parameter list data types) to generate a selector hash, then truncates it to the first 4 bytes to form a selectorThe function will always return 0x150b7a02The safeTransferFrom function from the ERC-721 contract will require the recipient (to parameter) to implement the onERC721Received functionFor a successful safeTransferFrom execution, the called onERC721Received return value must be equal to the hardcoded selector hash in the ERC-721 contract (IERC721Receiver.onERC721Received.selector)",
+					"returns": {
+						"_0": "Returns the function selector (first 4 bytes of the Keccak-256 hash of the function signature (name + parameter list data types))"
+					}
+				},
+				"owner()": {
+					"details": "Retrieves the current owner's address",
+					"returns": {
+						"_0": "Returns the address of the owner"
+					}
+				},
+				"ownerWithdrew(bytes32)": {
+					"details": "Retrieves whether the owner has withdrawn from the specific auction or not",
+					"params": {
+						"auctionID_": "The 256 bit hash identifier of the auction"
+					},
+					"returns": {
+						"_0": "Returns a boolean literal that indicates whether the owner has withdrawn from the specified auction or not"
+					}
+				},
+				"payEntryFee(bytes32)": {
+					"custom:requirement-body": "The entry fee configured for the specified auction must be greater than 0 (meaning that it is an entry fee gated auction)The value of the function call must be equal to the configured entry fee in order to accept an entry fee paymentThe entry fee can only be paid once by the same account at the specified auction",
+					"custom:requirement-modifier": "Only non-owner accounts can pay entry feeThis function will only execute if the contracts are not paused by the emergency circuit breakerOnly an existing (registered) auction can receive entry fee paymentsEntry fee can only be paid before the auction begins",
+					"details": "Manages the internal accounting of entry fee payments",
+					"params": {
+						"auctionID_": "The 256 bit hash identifier of the auction"
+					},
+					"returns": {
+						"_0": "Returns true boolean literal if the entry fee has been successfully paid"
+					}
+				},
+				"pendingOwner()": {
+					"details": "Retrieves the pending owner's address",
+					"returns": {
+						"_0": "Returns the address of the pending (nominated) owner"
+					}
+				},
+				"registerSignature()": {
+					"custom:requirement-body": "A signer can only sign once (in the same signature collection session)",
+					"custom:requirement-modifier": "The caller must be a signer",
+					"details": "Registers a valid signature if all conditions are fulfilled, manages the signature expiry mechanism",
+					"returns": {
+						"_0": "Returns true boolean literal if the signature registration was successful"
+					}
+				},
+				"renounceOwnership()": {
+					"custom:requirement-body": "Ownership relinquishment feature must be toggled on (unlocked) to complete the process",
+					"custom:requirement-modifier": "Only the owner (admin) can call this function",
+					"details": "Completes the 2-step ownership relinquishment process and renounces the ownership in an irreversible way",
+					"returns": {
+						"_0": "Returns true boolean if the 2-step ownership relinquishment process was completed successfully"
+					}
+				},
+				"renounceUnlocked()": {
+					"details": "Retrieves whether the 2-step ownership relinquishment (renounce) mechanism has been initiated or not",
+					"returns": {
+						"_0": "Returns a boolean flag indicating whether the 2-step ownership relinquishment (renounce) mechanism has been initiated or not"
+					}
+				},
+				"reservePrice(bytes32)": {
+					"details": "Retrieves the reserve price of a specific auction",
+					"params": {
+						"auctionID_": "The 256 bit hash identifier of the auction"
+					},
+					"returns": {
+						"_0": "Returns the reserve price of the auction in WEI (1000000000000000000 Wei = 1 Ether = 1000000000 Gwei)"
+					}
+				},
+				"resetPendingOwner()": {
+					"custom:requirement-modifier": "Only the owner (admin) can call this function",
+					"details": "Resets the pending owner to the default zero address",
+					"returns": {
+						"_0": "Returns true boolean if the reset of the pending owner was successful"
+					}
+				},
+				"setEntryFee(bytes32,uint256)": {
+					"custom:requirement-body": "The passed entry fee argument must be greater than 0",
+					"custom:requirement-modifier": "Only the owner can call this functionThis function will only execute if the contracts are not paused by the emergency circuit breakerOnly an existing (registered) auction can have an entry feeEntry fee can only be set before the auction begins",
+					"details": "Sets the entry fee for a specific auction",
+					"params": {
+						"auctionID_": "The 256 bit hash identifier of the auction",
+						"entryFee_": "The amount of the entry fee in WEI (1000000000000000000 Wei = 1 Ether = 1000000000 Gwei)"
+					},
+					"returns": {
+						"_0": "Returns true boolean literal if the entry fee has been successfully set"
+					}
+				},
+				"socialGuardianRecovery(address)": {
+					"custom:requirement-modifier": "Only one of the signers can call this functionTimelock guard protected function (timelock delay period must be passed and must be within the grace period)Multi signature guard protected function (unexpired valid signature threshold must be reached)",
+					"details": "Initiates a social recovery by a trusted guardian to regain ownership control in case of a lost or compromised private key",
+					"params": {
+						"newOwner_": "The address of the new owner for the replacement of the current owner"
+					},
+					"returns": {
+						"_0": "Returns a true boolean flag if the social recovery process was completed successfully"
+					}
+				},
+				"startQueue()": {
+					"custom:requirement-modifier": "Only the owner (admin) can call this functionMulti signature guard protected function (unexpired valid signature threshold must be reached)",
+					"details": "Starts a new timelock countdown queue",
+					"returns": {
+						"_0": "Returns true boolean flag if the queue was started successfully"
+					}
+				},
+				"startRenounceProcess()": {
+					"custom:requirement-body": "Ownership relinquishment feature must be toggled off (locked)",
+					"custom:requirement-modifier": "Only the owner (admin) can call this functionTimelock guard protected function (timelock delay period must be passed and must be within the grace period)Multi signature guard protected function (unexpired valid signature threshold must be reached)",
+					"details": "Initiates and unlocks the 2-step ownership relinquishment feature",
+					"returns": {
+						"_0": "Returns true boolean if the initiation of the 2-step ownership relinquishment process was successful"
+					}
+				},
+				"startingPrice(bytes32)": {
+					"details": "Retrieves the starting price of a specific auction",
+					"params": {
+						"auctionID_": "The 256 bit hash identifier of the auction"
+					},
+					"returns": {
+						"_0": "Returns the starting price of the auction in WEI (1000000000000000000 Wei = 1 Ether = 1000000000 Gwei)"
+					}
+				},
+				"terminateRenounceProcess()": {
+					"custom:requirement-body": "Ownership relinquishment feature must be toggled on (unlocked)",
+					"custom:requirement-modifier": "Only the owner (admin) can call this function",
+					"details": "Terminates the 2-step ownership relinquishment process and locks the feature until it is unlocked again",
+					"returns": {
+						"_0": "Returns true boolean if the termination of the 2-step ownership relinquishment process was successful"
+					}
+				},
+				"transferOwnership(address)": {
+					"custom:requirement-body": "The new owner cannot be the zero (burn) addressThe new owner cannot be the current ownerThe new owner cannot be the current pending (nominated) owner",
+					"custom:requirement-modifier": "Only the owner (admin) can call this functionTimelock guard protected function (timelock delay period must be passed and must be within the grace period)Multi signature guard protected function (unexpired valid signature threshold must be reached)",
+					"details": "Handles the first step of the 2-step ownership transfer process (nomination phase)",
+					"params": {
+						"newOwner_": "The address of the nominated new owner (pending owner)"
+					},
+					"returns": {
+						"_0": "Returns true boolean if the nomination phase of the ownership transfer was successful"
+					}
+				},
+				"turnEmergencyPauseOff()": {
+					"custom:requirement-modifier": "Only the owner can turn off the circuit breaker emergencyEmergency can only be disabled if if was previously enabled",
+					"details": "Turns emergency pause off",
+					"returns": {
+						"_0": "Returns true boolean if the emergency pause has been disabled successfully"
+					}
+				},
+				"turnEmergencyPauseOn()": {
+					"custom:requirement-modifier": "Only the owner can turn on the circuit breaker emergencyEmergency can only be enabled if if was previously disabled",
+					"details": "Turns emergency pause on",
+					"returns": {
+						"_0": "Returns true boolean if the emergency pause has been enabled successfully"
+					}
+				},
+				"whitelistParticipants(bytes32,address[])": {
+					"custom:requirement-body": "Participants can only be whitelisted if the auction is configured as a whitelist auction",
+					"custom:requirement-modifier": "Only the owner can call this functionThis function will only execute if the contracts are not paused by the emergency circuit breakerOnly an existing (registered) auction can have whitelisted participantsParticipants can only be whitelisted for a whitelist auction before it starts running",
+					"details": "Whitelists an array of addresses to be eligible for participation in a closed (whitelisted) auction",
+					"params": {
+						"auctionID_": "The 256 bit hash identifier of the auction",
+						"participants_": "The array of addresses to be whitelisted"
+					},
+					"returns": {
+						"_0": "Returns true if the whitelisting of the passed addresses was successful"
+					}
+				},
+				"withdrawBid(bytes32)": {
+					"custom:requirement-body": "Bid withdrawals can only be submitted when the auction is either cancelled or has ended naturallyThe owner can only withdraw the winning bid once from an auctionThe winner of the auction can only withdraw the prize NFT once",
+					"custom:requirement-modifier": "Bid withdrawal requests can only be submitted to registered auctions",
+					"details": "Withdraws a bid from an aucttion",
+					"params": {
+						"auctionID_": "The 256 bit hash identifier of the auction"
+					},
+					"returns": {
+						"_0": "Returns a true boolean literal if the bid withdrawal was successful"
+					}
+				},
+				"withdrawEntryFee(bytes32)": {
+					"custom:requirement-body": "The entry fee can only be withdrawn when the auction is either cancelled or the duration elapsed naturallyEntry fee can only be withdrawn from an auction that has an entry fee configuredOnly participants who paid the entry fee can withdraw itEntry fee can only be withdrawn once from the specific auction by an account",
+					"custom:requirement-modifier": "Only non-owner accounts can withdraw the entry feeOnly from existing auctions can the entry fee be withdrawn",
+					"details": "Manages the internal accounting of entry fee withdrawals",
+					"params": {
+						"auctionID_": "The 256 bit hash identifier of the auction"
+					},
+					"returns": {
+						"_0": "Returns true if the entry fee withdrawal was successful"
+					}
+				}
+			},
+			"stateVariables": {
+				"_auctionEndBlock": {
+					"details": "Stores the block number where the respective auction ends"
+				},
+				"_auctionHighestBidAmount": {
+					"details": "Stores the highest bid amount of the respective auction"
+				},
+				"_auctionID": {
+					"details": "Indicates whether an auction exists (has been created) or not"
+				},
+				"_auctionSnipeBlocks": {
+					"details": "Stores the snipe prevention mechanism's block increment value of the respective auction"
+				},
+				"_auctionSnipeInterval": {
+					"details": "Stores the snipe prevention mechanism's block interval value of the respective auction"
+				},
+				"_auctionStartBlock": {
+					"details": "Stores the block number where the respective auction begins"
+				},
+				"_auctionWinner": {
+					"details": "Stores the winner's address of the respective auction"
+				},
+				"_bidAmountsOfBidders": {
+					"details": "Stores the bid amounts of participants of the respective auction"
+				},
+				"_bidIncrement": {
+					"details": "Stores the bid increment value of the respective auction"
+				},
+				"_ipfs": {
+					"details": "Stores the IPFS metadata reference string of the respective auction"
+				},
+				"_nftContractAddress": {
+					"details": "Stores the NFT contract's address of the respective auction"
+				},
+				"_nftTokenID": {
+					"details": "Stores the NFT token ID number of the respective auction"
+				},
+				"_ownerWithdrew": {
+					"details": "Indicates whether the owner has withdrawn the winning bid from the respective auction or not"
+				},
+				"_reservePrice": {
+					"details": "Stores the reserve price of the respective auction"
+				},
+				"_startingPrice": {
+					"details": "Stores the starting price of the respective auction"
+				}
+			},
+			"title": "Auction core implementation contract",
+			"version": 1
+		},
+		"userdoc": {
+			"events": {
+				"AddedBlacklistedParticipants(bytes32)": {
+					"notice": "Event for logging the blacklisting of participants"
+				},
+				"AddedWhitelistedParticipants(bytes32)": {
+					"notice": "Event for logging the whitelisting of participants"
+				},
+				"AuctionCancelled(bytes32)": {
+					"notice": "Event for logging when an auction has been cancelled"
+				},
+				"AuctionConfiguredAsBlacklisted(bytes32)": {
+					"notice": "Event for logging the configuration of blacklist auctions"
+				},
+				"AuctionConfiguredAsCancellable(bytes32)": {
+					"notice": "Event for logging when an auction has been configured as cancellable"
+				},
+				"AuctionConfiguredAsClosed(bytes32)": {
+					"notice": "Event for logging the configuration of an auction as closed (whitelisted)"
+				},
+				"BidPlaced(bytes32,address,uint256)": {
+					"notice": "Event for logging bids"
+				},
+				"BidWithdrawn(bytes32,address,uint256)": {
+					"notice": "Event for logging bid withdrawals"
+				},
+				"EmergencyPauseTurnedOff()": {
+					"notice": "Event for logging when the emergency pause feature has been toggled off"
+				},
+				"EmergencyPauseTurnedOn()": {
+					"notice": "Event for logging when the emergency pause feature has been toggled on"
+				},
+				"EntryFeeConfigured(bytes32,uint256)": {
+					"notice": "Event for logging the configuration of the entry fee for a specific auction"
+				},
+				"EntryFeePaid(bytes32,address,uint256)": {
+					"notice": "Event for logging the payment of entry fees"
+				},
+				"EntryFeeWithdrawn(bytes32,address,uint256)": {
+					"notice": "Event for logging the withdrawal of entry fees"
+				},
+				"NewAuctionRegistered(bytes32)": {
+					"notice": "Event for logging the registration of new auctions"
+				},
+				"OwnershipTransferCompleted(address,address)": {
+					"notice": "Event for logging the transfer of ownership to a new address"
+				},
+				"OwnershipTransferInitiated(address,address)": {
+					"notice": "Event for logging the initiation of the ownership transfer process (nomination of the new owner)"
+				},
+				"RenounceProcessInitiated(address)": {
+					"notice": "Event for logging the initiation of the safe 2-step mechanism for the ownership relinquishment (renounce) process"
+				},
+				"RenounceProcessTerminated(address)": {
+					"notice": "Event for logging the termination of the 2-step ownership relinquishment (renounce) process"
+				},
+				"SignatureRegistered(address)": {
+					"notice": "Event for logging when a valid signature is made"
+				},
+				"SignatureValidityTimeCountdownStarted()": {
+					"notice": "Event for logging when signature validity countdown starts"
+				},
+				"SignaturesExpiredAndReset()": {
+					"notice": "Event for logging when signatures are expired and reset"
+				},
+				"SignaturesReset()": {
+					"notice": "Event for logging when signatures are reset"
+				},
+				"SnipePreventionTriggered(bytes32,address)": {
+					"notice": "Event for logging snipe prevention mechanism triggers"
+				},
+				"SocialGuardianRecoveryCompleted()": {
+					"notice": "Event for logging the completion of a social guardian ownership recovery process"
+				},
+				"TimeLockQueueReset()": {
+					"notice": "Event for logging when the timelock queue was reset"
+				},
+				"TimelockQueueStarted()": {
+					"notice": "Event for logging when a new timelock queue was started"
+				}
+			},
+			"kind": "user",
+			"methods": {
+				"acceptOwnership()": {
+					"notice": "Handles the second step of the 2-step ownership transfer process (acceptance phase)"
+				},
+				"auctionEndBlock(bytes32)": {
+					"notice": "Retrieves the end block number where the specific auction ends"
+				},
+				"auctionExists(bytes32)": {
+					"notice": "Retrieves the boolean value associated with the passed auction ID"
+				},
+				"auctionHighestBidAmount(bytes32)": {
+					"notice": "Retrieves the amount of the current highest bid in the specific auction"
+				},
+				"auctionSnipeBlocks(bytes32)": {
+					"notice": "Retrieves the auction snipe block count of a specific auction"
+				},
+				"auctionSnipeInterval(bytes32)": {
+					"notice": "Retrieves the auction snipe interval of a specific auction"
+				},
+				"auctionStartBlock(bytes32)": {
+					"notice": "Retrieves the starting block number of the specific auction"
+				},
+				"auctionWinner(bytes32)": {
+					"notice": "Retrieves the current auction winnner's address from the specific auction"
+				},
+				"bid(bytes32)": {
+					"notice": "Places a bid on an auction"
+				},
+				"bidIncrement(bytes32)": {
+					"notice": "Retrieves the bid increment value of a specific auction"
+				},
+				"blacklistParticipants(bytes32,address[])": {
+					"notice": "Blacklists an array of addresses (participants) at the specified blacklist auction"
+				},
+				"cancelAuction(bytes32)": {
+					"notice": "Cancels a cancellable auction and burns the NFT"
+				},
+				"closedAuction(bytes32)": {
+					"notice": "Determines whether an auction is closed (whitelisted) or not"
+				},
+				"configureAsBlacklistedAuction(bytes32)": {
+					"notice": "Configures a blacklist auction"
+				},
+				"configureAsCancellableAuction(bytes32)": {
+					"notice": "Configures an auction as cancellable"
+				},
+				"configureAsClosedAuction(bytes32)": {
+					"notice": "Configure an auction as closed (whitelisted)"
+				},
+				"contractETHBalance()": {
+					"notice": "Retrieves the ETH balance of the contract itself (funds from committed bids and collected entry fees)"
+				},
+				"createNewAuction(bytes32,uint256,uint256,uint256,uint256,uint256,uint256,uint256,address,uint256,string)": {
+					"notice": "Registers and configures a new parametric auction"
+				},
+				"currentSignatureCount()": {
+					"notice": "Retrieves the current signature count"
+				},
+				"getBidAmountOfBidder(bytes32,address)": {
+					"notice": "Retrieves the bid amount of a bidder from a specific auction"
+				},
+				"getEntryFee(bytes32)": {
+					"notice": "Retrieves the entry fee set for the specific auction"
+				},
+				"getIPFS(bytes32)": {
+					"notice": "Retrieves the IPFS of a specific auction"
+				},
+				"getQueueTime()": {
+					"notice": "Retrieves the queue timestamp"
+				},
+				"getSignatureExpiryTime()": {
+					"notice": "Retrieves the current signature expiry timestamp"
+				},
+				"hasPaidEntryFee(bytes32,address)": {
+					"notice": "Retrieves the boolean logical value indicating whether the address has paid the entry fee or not for the specific auction"
+				},
+				"hasSigned(address)": {
+					"notice": "Evaluates whether a signer has signed or not"
+				},
+				"hasWithdrawnEntryFee(bytes32,address)": {
+					"notice": "Retrieves the boolean logical value indicating whether the address has withdrawn the entry fee or not from the specific auction"
+				},
+				"isBlacklistAuction(bytes32)": {
+					"notice": "Retrieves whether an auction is configured as a blacklist auction or not"
+				},
+				"isBlacklistedParticipant(bytes32,address)": {
+					"notice": "Retrieves whether a participant is blacklisted or not at a blacklist auction"
+				},
+				"isCancellable(bytes32)": {
+					"notice": "Retrieves whether a specific auction is cancellable (true) or not cancellable (false)"
+				},
+				"isCancelled(bytes32)": {
+					"notice": "Retrieves whether a specific cancellable auction is cancelled (true) or not cancelled (false)"
+				},
+				"isPaused()": {
+					"notice": "Retrieves whether the system is currently paused (true) or not paused (false)"
+				},
+				"isSigner(address)": {
+					"notice": "Evaluates whether an address is in the valid signer set or not"
+				},
+				"isWhitelisted(bytes32,address)": {
+					"notice": "Checks whether an address is whitelisted or not at a certain closed (whitelisted) auction"
+				},
+				"nftContractAddress(bytes32)": {
+					"notice": "Retrieves the NFT contract address associated with a specific auction"
+				},
+				"nftTokenID(bytes32)": {
+					"notice": "Retrieves the NFT token ID of a specific auction"
+				},
+				"onERC721Received(address,address,uint256,bytes)": {
+					"notice": "Ensures that the auction contract receiving the ERC-721 token is capable of handling ERC-721 NFT tokens"
+				},
+				"owner()": {
+					"notice": "Retrieves the current owner's address"
+				},
+				"ownerWithdrew(bytes32)": {
+					"notice": "Retrieves whether the owner has withdrawn from the specific auction or not"
+				},
+				"payEntryFee(bytes32)": {
+					"notice": "Manages the internal accounting of entry fee payments"
+				},
+				"pendingOwner()": {
+					"notice": "Retrieves the pending owner's address"
+				},
+				"registerSignature()": {
+					"notice": "Registers a valid signature if all conditions are fulfilled, manages the signature expiry mechanism"
+				},
+				"renounceOwnership()": {
+					"notice": "Completes the 2-step ownership relinquishment process and renounces the ownership in an irreversible way"
+				},
+				"renounceUnlocked()": {
+					"notice": "Retrieves whether the 2-step ownership relinquishment (renounce) mechanism has been initiated or not"
+				},
+				"reservePrice(bytes32)": {
+					"notice": "Retrieves the reserve price of a specific auction"
+				},
+				"resetPendingOwner()": {
+					"notice": "Resets the pending owner to the default zero address"
+				},
+				"setEntryFee(bytes32,uint256)": {
+					"notice": "Sets the entry fee for a specific auction"
+				},
+				"socialGuardianRecovery(address)": {
+					"notice": "Initiates a social recovery by a trusted guardian to regain ownership control in case of a lost or compromised private key"
+				},
+				"startQueue()": {
+					"notice": "Starts a new timelock countdown queue"
+				},
+				"startRenounceProcess()": {
+					"notice": "Initiates and unlocks the 2-step ownership relinquishment feature"
+				},
+				"startingPrice(bytes32)": {
+					"notice": "Retrieves the starting price of a specific auction"
+				},
+				"terminateRenounceProcess()": {
+					"notice": "Terminates the 2-step ownership relinquishment process and locks the feature until it is unlocked again"
+				},
+				"transferOwnership(address)": {
+					"notice": "Handles the first step of the 2-step ownership transfer process (nomination phase)"
+				},
+				"turnEmergencyPauseOff()": {
+					"notice": "Turns emergency pause off"
+				},
+				"turnEmergencyPauseOn()": {
+					"notice": "Turns emergency pause on"
+				},
+				"whitelistParticipants(bytes32,address[])": {
+					"notice": "Whitelists a group of users to be eligible for participation in a closed (whitelisted) auction"
+				},
+				"withdrawBid(bytes32)": {
+					"notice": "Withdraws a bid from an aucttion"
+				},
+				"withdrawEntryFee(bytes32)": {
+					"notice": "Manages the internal accounting of entry fee withdrawals"
+				}
+			},
+			"notice": "This contract facilitates the registration, configuration and management of all processes of decentralized parametric auctions",
+			"version": 1
+		}
+	},
+	"settings": {
+		"compilationTarget": {
+			"AuctionsLogic.sol": "AuctionsLogic"
+		},
+		"evmVersion": "cancun",
+		"libraries": {},
+		"metadata": {
+			"bytecodeHash": "ipfs"
+		},
+		"optimizer": {
+			"enabled": false,
+			"runs": 200
+		},
+		"remappings": []
+	},
+	"sources": {
+		"@openzeppelin/contracts/interfaces/IERC165.sol": {
+			"keccak256": "0xde7e9fd9aee8d4f40772f96bb3b58836cbc6dfc0227014a061947f8821ea9724",
+			"license": "MIT",
+			"urls": [
+				"bzz-raw://11fea9f8bc98949ac6709f0c1699db7430d2948137aa94d5a9e95a91f61a710a",
+				"dweb:/ipfs/QmQdfRXxQjwP6yn3DVo1GHPpriKNcFghSPi94Z1oKEFUNS"
+			]
+		},
+		"@openzeppelin/contracts/interfaces/IERC4906.sol": {
+			"keccak256": "0xb31b86c03f4677dcffa4655285d62433509513be9bafa0e04984565052d34e44",
+			"license": "MIT",
+			"urls": [
+				"bzz-raw://a89c6fb0cd5fef4244500b633f63def9f2bb2134debb961e590bd5a2910662fd",
+				"dweb:/ipfs/QmNqWyCxyopvb99RbRomPpfTZGXRi5MnzgpFXE2BFLLgMc"
+			]
+		},
+		"@openzeppelin/contracts/interfaces/IERC721.sol": {
+			"keccak256": "0xc4d7ebf63eb2f6bf3fee1b6c0ee775efa9f31b4843a5511d07eea147e212932d",
+			"license": "MIT",
+			"urls": [
+				"bzz-raw://01c66a2fad66bc710db7510419a7eee569b40b67cd9f01b70a3fc90d6f76c03b",
+				"dweb:/ipfs/QmT1CjJZq4eTNA4nu8E9ZrWfaZu6ReUsDbjcK8DbEFqwx5"
+			]
+		},
+		"@openzeppelin/contracts/interfaces/draft-IERC6093.sol": {
+			"keccak256": "0x60c65f701957fdd6faea1acb0bb45825791d473693ed9ecb34726fdfaa849dd7",
+			"license": "MIT",
+			"urls": [
+				"bzz-raw://ea290300e0efc4d901244949dc4d877fd46e6c5e43dc2b26620e8efab3ab803f",
+				"dweb:/ipfs/QmcLLJppxKeJWqHxE2CUkcfhuRTgHSn8J4kijcLa5MYhSt"
+			]
+		},
+		"@openzeppelin/contracts/token/ERC721/ERC721.sol": {
+			"keccak256": "0x13dd061770956c8489b80cfc89d9cdfc8ea2783d953691ea037a380731d52784",
+			"license": "MIT",
+			"urls": [
+				"bzz-raw://ed37f0f86e7fe31659e48c3a2a5920a92dd7f13c85cf8991fb79fe5f01e08efd",
+				"dweb:/ipfs/QmUtm9bQGvjr9hHGwkPWrbgFmVqzaJcxjkaYDex2oGsonS"
+			]
+		},
+		"@openzeppelin/contracts/token/ERC721/IERC721.sol": {
+			"keccak256": "0x5ef46daa3b58ef2702279d514780316efaa952915ee1aa3396f041ee2982b0b4",
+			"license": "MIT",
+			"urls": [
+				"bzz-raw://2f8f2a76e23b02fc69e8cd24c3cb47da6c7af3a2d6c3a382f8ac25c6e094ade7",
+				"dweb:/ipfs/QmPV4ZS4tPVv4mTCf9ejyZ1ai57EEibDRj7mN2ARDCLV5n"
+			]
+		},
+		"@openzeppelin/contracts/token/ERC721/IERC721Receiver.sol": {
+			"keccak256": "0x7f7a26306c79a65fb8b3b6c757cd74660c532cd8a02e165488e30027dd34ca49",
+			"license": "MIT",
+			"urls": [
+				"bzz-raw://d01e0b2b837ee2f628545e54d8715b49c7ef2befd08356c2e7f6c50dde8a1c22",
+				"dweb:/ipfs/QmWBAn6y2D1xgftci97Z3qR9tQnkvwQpYwFwkTvDMvqU4i"
+			]
+		},
+		"@openzeppelin/contracts/token/ERC721/extensions/ERC721Burnable.sol": {
+			"keccak256": "0xc48434419baa510862ba4b4802bc0500ccddadd02ae2f195548af748c3206b20",
+			"license": "MIT",
+			"urls": [
+				"bzz-raw://85ae0bacd8623ce1cfad08c70ed111e995d23c66ad057b779b838ad2e5598681",
+				"dweb:/ipfs/QmWZGSEjZ9DmbQmHjjsdkRbJtU25Ai65VScDnEziRCkPRB"
+			]
+		},
+		"@openzeppelin/contracts/token/ERC721/extensions/ERC721URIStorage.sol": {
+			"keccak256": "0xcc6f49e0c57072d6a18eef0d5fc22a4cc20462c18f0c365d2dd9a2c732fde670",
+			"license": "MIT",
+			"urls": [
+				"bzz-raw://24915e61c7896c336b60788408cd5792b97b782e98e392920a2c55eb1803fe96",
+				"dweb:/ipfs/QmVHhcmFnMYZBCjnVUk6f5quMCDsBR2j669a1nuMiGWY9Z"
+			]
+		},
+		"@openzeppelin/contracts/token/ERC721/extensions/IERC721Metadata.sol": {
+			"keccak256": "0x37d1aaaa5a2908a09e9dcf56a26ddf762ecf295afb5964695937344fc6802ce1",
+			"license": "MIT",
+			"urls": [
+				"bzz-raw://ed0bfc1b92153c5000e50f4021367b931bbe96372ac6facec3c4961b72053d02",
+				"dweb:/ipfs/Qmbwp8VDerjS5SV1quwHH1oMXxPQ93fzfLVqJ2RCqbowGE"
+			]
+		},
+		"@openzeppelin/contracts/utils/Context.sol": {
+			"keccak256": "0x493033a8d1b176a037b2cc6a04dad01a5c157722049bbecf632ca876224dd4b2",
+			"license": "MIT",
+			"urls": [
+				"bzz-raw://6a708e8a5bdb1011c2c381c9a5cfd8a9a956d7d0a9dc1bd8bcdaf52f76ef2f12",
+				"dweb:/ipfs/Qmax9WHBnVsZP46ZxEMNRQpLQnrdE4dK8LehML1Py8FowF"
+			]
+		},
+		"@openzeppelin/contracts/utils/Strings.sol": {
+			"keccak256": "0x55f102ea785d8399c0e58d1108e2d289506dde18abc6db1b7f68c1f9f9bc5792",
+			"license": "MIT",
+			"urls": [
+				"bzz-raw://6e52e0a7765c943ef14e5bcf11e46e6139fa044be564881378349236bf2e3453",
+				"dweb:/ipfs/QmZEeeXoFPW47amyP35gfzomF9DixqqTEPwzBakv6cZw6i"
+			]
+		},
+		"@openzeppelin/contracts/utils/introspection/ERC165.sol": {
+			"keccak256": "0x9e8778b14317ba9e256c30a76fd6c32b960af621987f56069e1e819c77c6a133",
+			"license": "MIT",
+			"urls": [
+				"bzz-raw://1777404f1dcd0fac188e55a288724ec3c67b45288e49cc64723e95e702b49ab8",
+				"dweb:/ipfs/QmZFdC626GButBApwDUvvTnUzdinevC3B24d7yyh57XkiA"
+			]
+		},
+		"@openzeppelin/contracts/utils/introspection/IERC165.sol": {
+			"keccak256": "0x4296879f55019b23e135000eb36896057e7101fb7fb859c5ef690cf14643757b",
+			"license": "MIT",
+			"urls": [
+				"bzz-raw://87b3541437c8c443ccd36795e56a338ed12855eec17f8da624511b8d1a7e14df",
+				"dweb:/ipfs/QmeJQCtZrQjtJLr6u7ZHWeH3pBnjtLWzvRrKViAi7UZqxL"
+			]
+		},
+		"@openzeppelin/contracts/utils/math/Math.sol": {
+			"keccak256": "0x005ec64c6313f0555d59e278f9a7a5ab2db5bdc72a027f255a37c327af1ec02d",
+			"license": "MIT",
+			"urls": [
+				"bzz-raw://4ece9f0b9c8daca08c76b6b5405a6446b6f73b3a15fab7ff56e296cbd4a2c875",
+				"dweb:/ipfs/QmQyRpyPRL5SQuAgj6SHmbir3foX65FJjbVTTQrA2EFg6L"
+			]
+		},
+		"@openzeppelin/contracts/utils/math/SignedMath.sol": {
+			"keccak256": "0x5f7e4076e175393767754387c962926577f1660dd9b810187b9002407656be72",
+			"license": "MIT",
+			"urls": [
+				"bzz-raw://7d533a1c97cd43a57cd9c465f7ee8dd0e39ae93a8fb8ff8e5303a356b081cdcc",
+				"dweb:/ipfs/QmVBEei6aTnvYNZp2CHYVNKyZS4q1KkjANfY39WVXZXVoT"
+			]
+		},
+		"AuctionERC721.sol": {
+			"keccak256": "0x059e3aebc5f7446c308ebbf201d5aa6efa8fb32aeedfeee2428fba02c3d53634",
+			"license": "MIT",
+			"urls": [
+				"bzz-raw://7af3bcf4c4ff20ec0d24faa90213a6ca7996964910618351fbde760546cd8f3c",
+				"dweb:/ipfs/QmZz93dR1JE9C3AUFiw8Hwm9ihtcdoNxzNk298ACiGtQq5"
+			]
+		},
+		"AuctionsLogic.sol": {
+			"keccak256": "0x4b01bf2e526a677ff809dbce9538cfe7e4e4c74577c2e35c61c63a3061cc228d",
+			"license": "MIT",
+			"urls": [
+				"bzz-raw://eb0719726bbae3d8a0df2261cce241a769d83b107de6949d71ddea1f76412cdf",
+				"dweb:/ipfs/Qmcpx7f9NJdbRcKZkdu3VhPE6ueDiijT2kbpjQNxHH6LzT"
+			]
+		},
+		"BlacklistAuctionController.sol": {
+			"keccak256": "0x5c891f7e73dfcdde5c71e3de9fd833fa3fab475f4bd6fbaa13e666579685b727",
+			"license": "MIT",
+			"urls": [
+				"bzz-raw://4adb87a617c62d68a084c0582b8a6574f71ace80a9be4312af7a102435c24af1",
+				"dweb:/ipfs/QmS4u8h5QwCgwZ9VpkWgj3L8U8iw3X86SKu16q2DMHnzQJ"
+			]
+		},
+		"CancellableAuctionController.sol": {
+			"keccak256": "0x1b9bd661d007fa009b2294247bb5be633311a905527269d7e926b31bc9108829",
+			"license": "MIT",
+			"urls": [
+				"bzz-raw://c116f1a0f5f47fba130369cad665bc73ad9147ef5c5ffa6c8737ed7ee2a82d1d",
+				"dweb:/ipfs/QmS7dFEYZEsKLqwYVr4J8squkQi5MXhtTVae16hZaRkvHt"
+			]
+		},
+		"CircuitBreakerEmergencyController.sol": {
+			"keccak256": "0x1642bffbe96b2754ef5e60cbaee2e155bdded5007aa5db67c4651da432c0ba23",
+			"license": "MIT",
+			"urls": [
+				"bzz-raw://9786edaecfd2666348247396b44bbac2482eb87a4d7cf813b4bef380d8492590",
+				"dweb:/ipfs/QmWiPWTxium3BSbyD8h9MdMK9mgVEpeWHGcZJPzx88DukC"
+			]
+		},
+		"EntryFeeController.sol": {
+			"keccak256": "0x8c35b12f797a30ffc1b7dac9342c6df2408aa6809690405921b3b1aa399b530f",
+			"license": "MIT",
+			"urls": [
+				"bzz-raw://8d1d1eba65492b384472e1a71fd26d9a0b52280ae3c9558973149c1c936ad30c",
+				"dweb:/ipfs/QmUoaGN7Mgp8PZrDhBUBmqQfEcjYzp8iRZWHBRrKAaqbdB"
+			]
+		},
+		"MultiSignatureGuard.sol": {
+			"keccak256": "0xc4c8061842da9a600874246654ec12565da79bc8d1b42fa8965909dd0132d527",
+			"license": "MIT",
+			"urls": [
+				"bzz-raw://0553c4cd882059ad508cc00e43744c152e349ee7a551fd1fe5f2e54dd8a67625",
+				"dweb:/ipfs/QmdC2VTHPn3WhE3mvjezSdqBwmP6q1Baz5vc55CzfMWhZz"
+			]
+		},
+		"OwnershipController.sol": {
+			"keccak256": "0x2ac82459c9cf584ec15cec35a2992a51f9bb42a817d98fa41cab7f07744d0508",
+			"license": "MIT",
+			"urls": [
+				"bzz-raw://f682eb32b63a8aab031d43649c51377a712d808b93ccaec4968230669da88f44",
+				"dweb:/ipfs/QmNu5MqiWt7VENviLzuKJPGzDMHZ3M8g8BvhBLzWrWBX1K"
+			]
+		},
+		"TimelockGuard.sol": {
+			"keccak256": "0xb5778c5f92de1db539d47c012fd1a443e9fbdfcab88c5a1cd9de96edb8fb1dba",
+			"license": "MIT",
+			"urls": [
+				"bzz-raw://8cdbde0fa19fb915ba4f569cbb4fb723a12fa37c9707949ab89171e06aedb188",
+				"dweb:/ipfs/QmcPrbEGzB9TvgoXrn618c6f9WURVCCU1BTnwGWKduyeaQ"
+			]
+		},
+		"WhitelistAuctionController.sol": {
+			"keccak256": "0x6963d6cb498c79206f6e1f6770f68cc2249e853d5d4e805888d5a8b6951efaa6",
+			"license": "MIT",
+			"urls": [
+				"bzz-raw://c3feb2b467515e87ee821f654d921a935eee605121da2ae360615369f48edb87",
+				"dweb:/ipfs/QmSuKmynDE28BWvRvJspav4QavYs9oHHJ66EHfsHpoCWqX"
+			]
+		}
+	},
+	"version": 1
+}

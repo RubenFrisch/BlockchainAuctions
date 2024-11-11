@@ -1,0 +1,136 @@
+{
+	"compiler": {
+		"version": "0.8.26+commit.8a97fa7a"
+	},
+	"language": "Solidity",
+	"output": {
+		"abi": [
+			{
+				"anonymous": false,
+				"inputs": [],
+				"name": "TimeLockQueueReset",
+				"type": "event"
+			},
+			{
+				"anonymous": false,
+				"inputs": [],
+				"name": "TimelockQueueStarted",
+				"type": "event"
+			},
+			{
+				"inputs": [],
+				"name": "getQueueTime",
+				"outputs": [
+					{
+						"internalType": "uint256",
+						"name": "",
+						"type": "uint256"
+					}
+				],
+				"stateMutability": "view",
+				"type": "function"
+			},
+			{
+				"inputs": [],
+				"name": "startQueue",
+				"outputs": [
+					{
+						"internalType": "bool",
+						"name": "",
+						"type": "bool"
+					}
+				],
+				"stateMutability": "nonpayable",
+				"type": "function"
+			}
+		],
+		"devdoc": {
+			"author": "Ruben Frisch (Óbuda University - John von Neumann Faculty of Informatics, Business Informatics MSc)",
+			"details": "This contract enables the timelock guard feature to enhance the security of critical operations",
+			"events": {
+				"TimeLockQueueReset()": {
+					"details": "Event for logging when the timelock queue was reset"
+				},
+				"TimelockQueueStarted()": {
+					"details": "Event for logging when a new timelock queue was started"
+				}
+			},
+			"kind": "dev",
+			"methods": {
+				"getQueueTime()": {
+					"details": "Retrieves the queue timestamp",
+					"returns": {
+						"_0": "Returns the queue timestamp in epoch seconds"
+					}
+				},
+				"startQueue()": {
+					"custom:virtual": "This function should be overriden in the child contract, with access control, execution preconditions, and other checks implementedThe storage modification should be done by the internal function '_startQueue'",
+					"details": "Starts a new timelock countdown queue",
+					"returns": {
+						"_0": "Returns true boolean flag if the queue was started successfully"
+					}
+				}
+			},
+			"stateVariables": {
+				"_DELAY": {
+					"details": "Constant that stores the time duration of the timelock delay (can be changed, no side-effects) (default: 10 days)"
+				},
+				"_GRACE_PERIOD": {
+					"details": "Constant that stores the time duration of the grace period (can be changed, no side-effects) (default: 1 days)"
+				},
+				"_queueTime": {
+					"details": "Stores the timestamp of the queue that has been initiated"
+				}
+			},
+			"title": "Timelock guard contract",
+			"version": 1
+		},
+		"userdoc": {
+			"events": {
+				"TimeLockQueueReset()": {
+					"notice": "Event for logging when the timelock queue was reset"
+				},
+				"TimelockQueueStarted()": {
+					"notice": "Event for logging when a new timelock queue was started"
+				}
+			},
+			"kind": "user",
+			"methods": {
+				"getQueueTime()": {
+					"notice": "Retrieves the queue timestamp"
+				},
+				"startQueue()": {
+					"notice": "Starts a new timelock countdown queue"
+				}
+			},
+			"notice": "This contract enables the timelock guard feature to enhance the security of critial operations",
+			"version": 1
+		}
+	},
+	"settings": {
+		"compilationTarget": {
+			"TimelockGuard.sol": "TimelockGuard"
+		},
+		"evmVersion": "cancun",
+		"libraries": {},
+		"metadata": {
+			"bytecodeHash": "ipfs"
+		},
+		"optimizer": {
+			"enabled": false,
+			"runs": 200
+		},
+		"remappings": []
+	},
+	"sources": {
+		"TimelockGuard.sol": {
+			"keccak256": "0xb5778c5f92de1db539d47c012fd1a443e9fbdfcab88c5a1cd9de96edb8fb1dba",
+			"license": "MIT",
+			"urls": [
+				"bzz-raw://8cdbde0fa19fb915ba4f569cbb4fb723a12fa37c9707949ab89171e06aedb188",
+				"dweb:/ipfs/QmcPrbEGzB9TvgoXrn618c6f9WURVCCU1BTnwGWKduyeaQ"
+			]
+		}
+	},
+	"version": 1
+}

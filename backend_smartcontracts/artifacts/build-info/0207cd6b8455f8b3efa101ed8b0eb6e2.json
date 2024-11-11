@@ -1,0 +1,3830 @@
+{
+	"id": "0207cd6b8455f8b3efa101ed8b0eb6e2",
+	"_format": "hh-sol-build-info-1",
+	"solcVersion": "0.8.26",
+	"solcLongVersion": "0.8.26+commit.8a97fa7a",
+	"input": {
+		"language": "Solidity",
+		"sources": {
+			"MultiSignatureGuard.sol": {
+				"content": "// SPDX-License-Identifier: MIT\r\npragma solidity >=0.8.0;\r\n\r\n/// @title Multi signature guard contract\r\n/// @author Ruben Frisch (Óbuda University - John von Neumann Faculty of Informatics, Business Informatics MSc)\r\n/// @notice This contract enables the multi signature guard feature to enhance the security of critical operations\r\n/// @dev This contract enables the multi signature guard feature to enhance the security of critical operations\r\nabstract contract MultiSignatureGuard {\r\n\r\n     // <<< STATE VARIABLES >>>\r\n    /// @dev Stores the total number of signers (uint8: [0;(2**8)-1)]) (default: 7)\r\n    uint8 private constant _TOTAL_SIGNERS = 7;\r\n\r\n    /// @dev Stores the minimum number of signatures required for multi signature guarded function execution (fault tolerant signature threshold) (uint8: [0;(2**8)-1)]) (default: 5)\r\n    uint8 private constant _REQUIRED_SIGNATURES = 5;\r\n\r\n    /// @dev Stores the validity time duration of signatures (default: 15 minutes)\r\n    uint256 private constant _SIGNATURE_VALIDITY_TIME = 15 minutes;\r\n\r\n    /// @dev Stores the expiration time of signatures (block.timestamp at signing + _SIGNATURE_VALIDITY_TIME)\r\n    uint256 private _signatureExpiryTime;\r\n\r\n    /// @dev Stores the total number of unique valid signatures during collection\r\n    uint8 private _currentSignatureCount;\r\n\r\n    /// @dev Stores whether an address is a signer or not\r\n    mapping(address => bool) private _isSigner;\r\n    \r\n    /// @dev Stores whether a signer has already signed in the current signature collection session or not\r\n    mapping(address => bool) private _hasSigned;\r\n    \r\n    /// @dev Constant, fixed-size address array that stores all the valid signers\r\n    address[7] private _signers = [\r\n        0x5B38Da6a701c568545dCfcB03FcB875f56beddC4,\r\n        0xAb8483F64d9C6d1EcF9b849Ae677dD3315835cb2,\r\n        0x4B20993Bc481177ec7E8f571ceCaE8A9e22C02db,\r\n        0x78731D3Ca6b7E34aC0F824c42a7cC18A495cabaB,\r\n        0x617F2E2fD72FD9D5503197092aC168c91465E7f2,\r\n        0x17F6AD8Ef982297579C203069C1DbfFE4348c372,\r\n        0x5c6B0f7Bf3E7ce046039Bd8FABdfD3f9F5021678\r\n    ];\r\n\r\n     // <<< EVENTS >>>\r\n    /// @dev Event for logging when a valid signature is made\r\n    /// @notice Event for logging when a valid signature is made\r\n    /// @param signer_ The address of the signer that made the signature\r\n    event SignatureRegistered(address signer_);\r\n\r\n    /// @dev Event for logging when signatures are reset\r\n    /// @notice Event for logging when signatures are reset\r\n    event SignaturesReset();\r\n\r\n    /// @dev Event for logging when signature validity countdown starts\r\n    /// @notice Event for logging when signature validity countdown starts\r\n    event SignatureValidityTimeCountdownStarted();\r\n\r\n    /// @dev Event for logging when signatures are expired and reset\r\n    /// @notice Event for logging when signatures are expired and reset\r\n    event SignaturesExpiredAndReset();\r\n\r\n     // <<< CONSTRUCTOR >>>\r\n    /// @dev The constructor will run once during initial contract deployment, setting the valid signer set\r\n    /// @custom:requirement-body The number of signers must be equal to the total signers constant\r\n    /// @custom:requirement-body There must be no zero (burn) address in the valid signer set\r\n    constructor() {\r\n        require(_signers.length == _TOTAL_SIGNERS);\r\n        for(uint8 i = 0; i < _TOTAL_SIGNERS; i++) {\r\n            require(_signers[i] != address(0));\r\n            _isSigner[_signers[i]] = true;\r\n        }\r\n    }\r\n\r\n     // <<< MODIFIERS >>>\r\n    /// @dev This modifier absorbs the associated function's body when the caller is a signer\r\n    modifier onlySigner {\r\n        require(isSigner(msg.sender), \"Not a signer!\");\r\n        _;\r\n    }\r\n\r\n    /// @dev This modifier absorbs the associated function's body when the conditions of the multi signature guard security scheme are fulfilled\r\n    /// @custom:requirement-body The number of valid signatures collected from signers must be greater or equal than the configured signature threshold\r\n    /// @custom:requirement-body Signatures must not be expired\r\n    modifier multiSignatureGuard {\r\n        require(currentSignatureCount() >= _REQUIRED_SIGNATURES, \"Not enough signatures!\");\r\n        require(block.timestamp <= getSignatureExpiryTime(), \"Signatures have expired!\");\r\n        _;\r\n        _resetAllSignatures();\r\n    }\r\n\r\n     // <<< READ FUNCTIONS >>>\r\n    /// @dev Retrieves the current signature count\r\n    /// @notice Retrieves the current signature count\r\n    /// @return Returns the current signature count\r\n    function currentSignatureCount() public view returns (uint8) {\r\n        return _currentSignatureCount;\r\n    }\r\n\r\n    /// @dev Evaluates whether an address is in the valid signer set or not\r\n    /// @notice Evaluates whether an address is in the valid signer set or not\r\n    /// @param signer_ The address to be evaluated\r\n    /// @return Returns a boolean literal indicating whether the passed address is a signer or not\r\n    function isSigner(address signer_) public view returns (bool) {\r\n        return _isSigner[signer_];\r\n    }\r\n\r\n    /// @dev Evaluates whether a signer has signed or not\r\n    /// @notice Evaluates whether a signer has signed or not\r\n    /// @param signer_ The address to be evaluated\r\n    /// @return Returns a boolean literal indicating whether the passed address has signed or not\r\n    function hasSigned(address signer_) public view returns (bool) {\r\n        return _hasSigned[signer_];\r\n    }\r\n\r\n    /// @dev Retrieves the current signature expiry timestamp\r\n    /// @notice Retrieves the current signature expiry timestamp\r\n    /// @return Returns the current signature expiry timestamp\r\n    function getSignatureExpiryTime() public view returns (uint256) {\r\n        return _signatureExpiryTime;\r\n    }\r\n\r\n     // <<< CORE MULTI SIGNATURE FUNCTIONS >>>\r\n    /// @dev Resets all signatures by setting the current signature count to 0 and invalidating all signatures made by signers\r\n    /// @notice Resets all signatures by setting the current signature count to 0 and invalidating all signatures made by signers\r\n    function _resetAllSignatures() internal {\r\n        delete _currentSignatureCount;\r\n        for(uint8 i = 0; i < _TOTAL_SIGNERS; i++) {\r\n            _hasSigned[_signers[i]] = false;\r\n        }\r\n        emit SignaturesReset();\r\n    }\r\n\r\n    /// @dev Registers a valid signature if all conditions are fulfilled, manages the signature expiry mechanism\r\n    /// @notice Registers a valid signature if all conditions are fulfilled, manages the signature expiry mechanism\r\n    /// @return Returns true boolean literal if the signature registration was successful\r\n    /// @custom:requirement-modifier The caller must be a signer\r\n    /// @custom:requirement-body A signer can only sign once (in the same signature collection session)\r\n    function registerSignature() external onlySigner returns (bool) {\r\n        if(currentSignatureCount() == 0) {\r\n            _signatureExpiryTime = block.timestamp + _SIGNATURE_VALIDITY_TIME;\r\n            emit SignatureValidityTimeCountdownStarted();\r\n        }\r\n        \r\n        if(block.timestamp > getSignatureExpiryTime()) {\r\n            _resetAllSignatures();\r\n            emit SignaturesExpiredAndReset();\r\n            _signatureExpiryTime = block.timestamp + _SIGNATURE_VALIDITY_TIME;\r\n            emit SignatureValidityTimeCountdownStarted();\r\n        }\r\n        \r\n        require(!hasSigned(msg.sender));\r\n        _hasSigned[msg.sender] = true;\r\n        _currentSignatureCount++;\r\n\r\n        emit SignatureRegistered(msg.sender);\r\n        return true;\r\n    }\r\n}"
+			}
+		},
+		"settings": {
+			"optimizer": {
+				"enabled": false,
+				"runs": 200
+			},
+			"outputSelection": {
+				"*": {
+					"": [
+						"ast"
+					],
+					"*": [
+						"abi",
+						"metadata",
+						"devdoc",
+						"userdoc",
+						"storageLayout",
+						"evm.legacyAssembly",
+						"evm.bytecode",
+						"evm.deployedBytecode",
+						"evm.methodIdentifiers",
+						"evm.gasEstimates",
+						"evm.assembly"
+					]
+				}
+			},
+			"remappings": []
+		}
+	},
+	"output": {
+		"contracts": {
+			"MultiSignatureGuard.sol": {
+				"MultiSignatureGuard": {
+					"abi": [
+						{
+							"anonymous": false,
+							"inputs": [
+								{
+									"indexed": false,
+									"internalType": "address",
+									"name": "signer_",
+									"type": "address"
+								}
+							],
+							"name": "SignatureRegistered",
+							"type": "event"
+						},
+						{
+							"anonymous": false,
+							"inputs": [],
+							"name": "SignatureValidityTimeCountdownStarted",
+							"type": "event"
+						},
+						{
+							"anonymous": false,
+							"inputs": [],
+							"name": "SignaturesExpiredAndReset",
+							"type": "event"
+						},
+						{
+							"anonymous": false,
+							"inputs": [],
+							"name": "SignaturesReset",
+							"type": "event"
+						},
+						{
+							"inputs": [],
+							"name": "currentSignatureCount",
+							"outputs": [
+								{
+									"internalType": "uint8",
+									"name": "",
+									"type": "uint8"
+								}
+							],
+							"stateMutability": "view",
+							"type": "function"
+						},
+						{
+							"inputs": [],
+							"name": "getSignatureExpiryTime",
+							"outputs": [
+								{
+									"internalType": "uint256",
+									"name": "",
+									"type": "uint256"
+								}
+							],
+							"stateMutability": "view",
+							"type": "function"
+						},
+						{
+							"inputs": [
+								{
+									"internalType": "address",
+									"name": "signer_",
+									"type": "address"
+								}
+							],
+							"name": "hasSigned",
+							"outputs": [
+								{
+									"internalType": "bool",
+									"name": "",
+									"type": "bool"
+								}
+							],
+							"stateMutability": "view",
+							"type": "function"
+						},
+						{
+							"inputs": [
+								{
+									"internalType": "address",
+									"name": "signer_",
+									"type": "address"
+								}
+							],
+							"name": "isSigner",
+							"outputs": [
+								{
+									"internalType": "bool",
+									"name": "",
+									"type": "bool"
+								}
+							],
+							"stateMutability": "view",
+							"type": "function"
+						},
+						{
+							"inputs": [],
+							"name": "registerSignature",
+							"outputs": [
+								{
+									"internalType": "bool",
+									"name": "",
+									"type": "bool"
+								}
+							],
+							"stateMutability": "nonpayable",
+							"type": "function"
+						}
+					],
+					"devdoc": {
+						"author": "Ruben Frisch (Óbuda University - John von Neumann Faculty of Informatics, Business Informatics MSc)",
+						"details": "This contract enables the multi signature guard feature to enhance the security of critical operations",
+						"events": {
+							"SignatureRegistered(address)": {
+								"details": "Event for logging when a valid signature is made",
+								"params": {
+									"signer_": "The address of the signer that made the signature"
+								}
+							},
+							"SignatureValidityTimeCountdownStarted()": {
+								"details": "Event for logging when signature validity countdown starts"
+							},
+							"SignaturesExpiredAndReset()": {
+								"details": "Event for logging when signatures are expired and reset"
+							},
+							"SignaturesReset()": {
+								"details": "Event for logging when signatures are reset"
+							}
+						},
+						"kind": "dev",
+						"methods": {
+							"constructor": {
+								"custom:requirement-body": "The number of signers must be equal to the total signers constantThere must be no zero (burn) address in the valid signer set",
+								"details": "The constructor will run once during initial contract deployment, setting the valid signer set"
+							},
+							"currentSignatureCount()": {
+								"details": "Retrieves the current signature count",
+								"returns": {
+									"_0": "Returns the current signature count"
+								}
+							},
+							"getSignatureExpiryTime()": {
+								"details": "Retrieves the current signature expiry timestamp",
+								"returns": {
+									"_0": "Returns the current signature expiry timestamp"
+								}
+							},
+							"hasSigned(address)": {
+								"details": "Evaluates whether a signer has signed or not",
+								"params": {
+									"signer_": "The address to be evaluated"
+								},
+								"returns": {
+									"_0": "Returns a boolean literal indicating whether the passed address has signed or not"
+								}
+							},
+							"isSigner(address)": {
+								"details": "Evaluates whether an address is in the valid signer set or not",
+								"params": {
+									"signer_": "The address to be evaluated"
+								},
+								"returns": {
+									"_0": "Returns a boolean literal indicating whether the passed address is a signer or not"
+								}
+							},
+							"registerSignature()": {
+								"custom:requirement-body": "A signer can only sign once (in the same signature collection session)",
+								"custom:requirement-modifier": "The caller must be a signer",
+								"details": "Registers a valid signature if all conditions are fulfilled, manages the signature expiry mechanism",
+								"returns": {
+									"_0": "Returns true boolean literal if the signature registration was successful"
+								}
+							}
+						},
+						"stateVariables": {
+							"_REQUIRED_SIGNATURES": {
+								"details": "Stores the minimum number of signatures required for multi signature guarded function execution (fault tolerant signature threshold) (uint8: [0;(2**8)-1)]) (default: 5)"
+							},
+							"_SIGNATURE_VALIDITY_TIME": {
+								"details": "Stores the validity time duration of signatures (default: 15 minutes)"
+							},
+							"_TOTAL_SIGNERS": {
+								"details": "Stores the total number of signers (uint8: [0;(2**8)-1)]) (default: 7)"
+							},
+							"_currentSignatureCount": {
+								"details": "Stores the total number of unique valid signatures during collection"
+							},
+							"_hasSigned": {
+								"details": "Stores whether a signer has already signed in the current signature collection session or not"
+							},
+							"_isSigner": {
+								"details": "Stores whether an address is a signer or not"
+							},
+							"_signatureExpiryTime": {
+								"details": "Stores the expiration time of signatures (block.timestamp at signing + _SIGNATURE_VALIDITY_TIME)"
+							},
+							"_signers": {
+								"details": "Constant, fixed-size address array that stores all the valid signers"
+							}
+						},
+						"title": "Multi signature guard contract",
+						"version": 1
+					},
+					"evm": {
+						"assembly": "",
+						"bytecode": {
+							"functionDebugData": {},
+							"generatedSources": [],
+							"linkReferences": {},
+							"object": "",
+							"opcodes": "",
+							"sourceMap": ""
+						},
+						"deployedBytecode": {
+							"functionDebugData": {},
+							"generatedSources": [],
+							"immutableReferences": {},
+							"linkReferences": {},
+							"object": "",
+							"opcodes": "",
+							"sourceMap": ""
+						},
+						"gasEstimates": null,
+						"legacyAssembly": null,
+						"methodIdentifiers": {
+							"currentSignatureCount()": "75782ab6",
+							"getSignatureExpiryTime()": "8e4e210c",
+							"hasSigned(address)": "bf6a1413",
+							"isSigner(address)": "7df73e27",
+							"registerSignature()": "7e9e7959"
+						}
+					},
+					"metadata": "{\"compiler\":{\"version\":\"0.8.26+commit.8a97fa7a\"},\"language\":\"Solidity\",\"output\":{\"abi\":[{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"internalType\":\"address\",\"name\":\"signer_\",\"type\":\"address\"}],\"name\":\"SignatureRegistered\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[],\"name\":\"SignatureValidityTimeCountdownStarted\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[],\"name\":\"SignaturesExpiredAndReset\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[],\"name\":\"SignaturesReset\",\"type\":\"event\"},{\"inputs\":[],\"name\":\"currentSignatureCount\",\"outputs\":[{\"internalType\":\"uint8\",\"name\":\"\",\"type\":\"uint8\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"getSignatureExpiryTime\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"signer_\",\"type\":\"address\"}],\"name\":\"hasSigned\",\"outputs\":[{\"internalType\":\"bool\",\"name\":\"\",\"type\":\"bool\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"signer_\",\"type\":\"address\"}],\"name\":\"isSigner\",\"outputs\":[{\"internalType\":\"bool\",\"name\":\"\",\"type\":\"bool\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"registerSignature\",\"outputs\":[{\"internalType\":\"bool\",\"name\":\"\",\"type\":\"bool\"}],\"stateMutability\":\"nonpayable\",\"type\":\"function\"}],\"devdoc\":{\"author\":\"Ruben Frisch (\\u00d3buda University - John von Neumann Faculty of Informatics, Business Informatics MSc)\",\"details\":\"This contract enables the multi signature guard feature to enhance the security of critical operations\",\"events\":{\"SignatureRegistered(address)\":{\"details\":\"Event for logging when a valid signature is made\",\"params\":{\"signer_\":\"The address of the signer that made the signature\"}},\"SignatureValidityTimeCountdownStarted()\":{\"details\":\"Event for logging when signature validity countdown starts\"},\"SignaturesExpiredAndReset()\":{\"details\":\"Event for logging when signatures are expired and reset\"},\"SignaturesReset()\":{\"details\":\"Event for logging when signatures are reset\"}},\"kind\":\"dev\",\"methods\":{\"constructor\":{\"custom:requirement-body\":\"The number of signers must be equal to the total signers constantThere must be no zero (burn) address in the valid signer set\",\"details\":\"The constructor will run once during initial contract deployment, setting the valid signer set\"},\"currentSignatureCount()\":{\"details\":\"Retrieves the current signature count\",\"returns\":{\"_0\":\"Returns the current signature count\"}},\"getSignatureExpiryTime()\":{\"details\":\"Retrieves the current signature expiry timestamp\",\"returns\":{\"_0\":\"Returns the current signature expiry timestamp\"}},\"hasSigned(address)\":{\"details\":\"Evaluates whether a signer has signed or not\",\"params\":{\"signer_\":\"The address to be evaluated\"},\"returns\":{\"_0\":\"Returns a boolean literal indicating whether the passed address has signed or not\"}},\"isSigner(address)\":{\"details\":\"Evaluates whether an address is in the valid signer set or not\",\"params\":{\"signer_\":\"The address to be evaluated\"},\"returns\":{\"_0\":\"Returns a boolean literal indicating whether the passed address is a signer or not\"}},\"registerSignature()\":{\"custom:requirement-body\":\"A signer can only sign once (in the same signature collection session)\",\"custom:requirement-modifier\":\"The caller must be a signer\",\"details\":\"Registers a valid signature if all conditions are fulfilled, manages the signature expiry mechanism\",\"returns\":{\"_0\":\"Returns true boolean literal if the signature registration was successful\"}}},\"stateVariables\":{\"_REQUIRED_SIGNATURES\":{\"details\":\"Stores the minimum number of signatures required for multi signature guarded function execution (fault tolerant signature threshold) (uint8: [0;(2**8)-1)]) (default: 5)\"},\"_SIGNATURE_VALIDITY_TIME\":{\"details\":\"Stores the validity time duration of signatures (default: 15 minutes)\"},\"_TOTAL_SIGNERS\":{\"details\":\"Stores the total number of signers (uint8: [0;(2**8)-1)]) (default: 7)\"},\"_currentSignatureCount\":{\"details\":\"Stores the total number of unique valid signatures during collection\"},\"_hasSigned\":{\"details\":\"Stores whether a signer has already signed in the current signature collection session or not\"},\"_isSigner\":{\"details\":\"Stores whether an address is a signer or not\"},\"_signatureExpiryTime\":{\"details\":\"Stores the expiration time of signatures (block.timestamp at signing + _SIGNATURE_VALIDITY_TIME)\"},\"_signers\":{\"details\":\"Constant, fixed-size address array that stores all the valid signers\"}},\"title\":\"Multi signature guard contract\",\"version\":1},\"userdoc\":{\"events\":{\"SignatureRegistered(address)\":{\"notice\":\"Event for logging when a valid signature is made\"},\"SignatureValidityTimeCountdownStarted()\":{\"notice\":\"Event for logging when signature validity countdown starts\"},\"SignaturesExpiredAndReset()\":{\"notice\":\"Event for logging when signatures are expired and reset\"},\"SignaturesReset()\":{\"notice\":\"Event for logging when signatures are reset\"}},\"kind\":\"user\",\"methods\":{\"currentSignatureCount()\":{\"notice\":\"Retrieves the current signature count\"},\"getSignatureExpiryTime()\":{\"notice\":\"Retrieves the current signature expiry timestamp\"},\"hasSigned(address)\":{\"notice\":\"Evaluates whether a signer has signed or not\"},\"isSigner(address)\":{\"notice\":\"Evaluates whether an address is in the valid signer set or not\"},\"registerSignature()\":{\"notice\":\"Registers a valid signature if all conditions are fulfilled, manages the signature expiry mechanism\"}},\"notice\":\"This contract enables the multi signature guard feature to enhance the security of critical operations\",\"version\":1}},\"settings\":{\"compilationTarget\":{\"MultiSignatureGuard.sol\":\"MultiSignatureGuard\"},\"evmVersion\":\"cancun\",\"libraries\":{},\"metadata\":{\"bytecodeHash\":\"ipfs\"},\"optimizer\":{\"enabled\":false,\"runs\":200},\"remappings\":[]},\"sources\":{\"MultiSignatureGuard.sol\":{\"keccak256\":\"0xc4c8061842da9a600874246654ec12565da79bc8d1b42fa8965909dd0132d527\",\"license\":\"MIT\",\"urls\":[\"bzz-raw://0553c4cd882059ad508cc00e43744c152e349ee7a551fd1fe5f2e54dd8a67625\",\"dweb:/ipfs/QmdC2VTHPn3WhE3mvjezSdqBwmP6q1Baz5vc55CzfMWhZz\"]}},\"version\":1}",
+					"storageLayout": {
+						"storage": [
+							{
+								"astId": 17,
+								"contract": "MultiSignatureGuard.sol:MultiSignatureGuard",
+								"label": "_signatureExpiryTime",
+								"offset": 0,
+								"slot": "0",
+								"type": "t_uint256"
+							},
+							{
+								"astId": 20,
+								"contract": "MultiSignatureGuard.sol:MultiSignatureGuard",
+								"label": "_currentSignatureCount",
+								"offset": 0,
+								"slot": "1",
+								"type": "t_uint8"
+							},
+							{
+								"astId": 25,
+								"contract": "MultiSignatureGuard.sol:MultiSignatureGuard",
+								"label": "_isSigner",
+								"offset": 0,
+								"slot": "2",
+								"type": "t_mapping(t_address,t_bool)"
+							},
+							{
+								"astId": 30,
+								"contract": "MultiSignatureGuard.sol:MultiSignatureGuard",
+								"label": "_hasSigned",
+								"offset": 0,
+								"slot": "3",
+								"type": "t_mapping(t_address,t_bool)"
+							},
+							{
+								"astId": 43,
+								"contract": "MultiSignatureGuard.sol:MultiSignatureGuard",
+								"label": "_signers",
+								"offset": 0,
+								"slot": "4",
+								"type": "t_array(t_address)7_storage"
+							}
+						],
+						"types": {
+							"t_address": {
+								"encoding": "inplace",
+								"label": "address",
+								"numberOfBytes": "20"
+							},
+							"t_array(t_address)7_storage": {
+								"base": "t_address",
+								"encoding": "inplace",
+								"label": "address[7]",
+								"numberOfBytes": "224"
+							},
+							"t_bool": {
+								"encoding": "inplace",
+								"label": "bool",
+								"numberOfBytes": "1"
+							},
+							"t_mapping(t_address,t_bool)": {
+								"encoding": "mapping",
+								"key": "t_address",
+								"label": "mapping(address => bool)",
+								"numberOfBytes": "32",
+								"value": "t_bool"
+							},
+							"t_uint256": {
+								"encoding": "inplace",
+								"label": "uint256",
+								"numberOfBytes": "32"
+							},
+							"t_uint8": {
+								"encoding": "inplace",
+								"label": "uint8",
+								"numberOfBytes": "1"
+							}
+						}
+					},
+					"userdoc": {
+						"events": {
+							"SignatureRegistered(address)": {
+								"notice": "Event for logging when a valid signature is made"
+							},
+							"SignatureValidityTimeCountdownStarted()": {
+								"notice": "Event for logging when signature validity countdown starts"
+							},
+							"SignaturesExpiredAndReset()": {
+								"notice": "Event for logging when signatures are expired and reset"
+							},
+							"SignaturesReset()": {
+								"notice": "Event for logging when signatures are reset"
+							}
+						},
+						"kind": "user",
+						"methods": {
+							"currentSignatureCount()": {
+								"notice": "Retrieves the current signature count"
+							},
+							"getSignatureExpiryTime()": {
+								"notice": "Retrieves the current signature expiry timestamp"
+							},
+							"hasSigned(address)": {
+								"notice": "Evaluates whether a signer has signed or not"
+							},
+							"isSigner(address)": {
+								"notice": "Evaluates whether an address is in the valid signer set or not"
+							},
+							"registerSignature()": {
+								"notice": "Registers a valid signature if all conditions are fulfilled, manages the signature expiry mechanism"
+							}
+						},
+						"notice": "This contract enables the multi signature guard feature to enhance the security of critical operations",
+						"version": 1
+					}
+				}
+			}
+		},
+		"sources": {
+			"MultiSignatureGuard.sol": {
+				"ast": {
+					"absolutePath": "MultiSignatureGuard.sol",
+					"exportedSymbols": {
+						"MultiSignatureGuard": [
+							287
+						]
+					},
+					"id": 288,
+					"license": "MIT",
+					"nodeType": "SourceUnit",
+					"nodes": [
+						{
+							"id": 1,
+							"literals": [
+								"solidity",
+								">=",
+								"0.8",
+								".0"
+							],
+							"nodeType": "PragmaDirective",
+							"src": "33:24:0"
+						},
+						{
+							"abstract": true,
+							"baseContracts": [],
+							"canonicalName": "MultiSignatureGuard",
+							"contractDependencies": [],
+							"contractKind": "contract",
+							"documentation": {
+								"id": 2,
+								"nodeType": "StructuredDocumentation",
+								"src": "61:386:0",
+								"text": "@title Multi signature guard contract\n @author Ruben Frisch (Óbuda University - John von Neumann Faculty of Informatics, Business Informatics MSc)\n @notice This contract enables the multi signature guard feature to enhance the security of critical operations\n @dev This contract enables the multi signature guard feature to enhance the security of critical operations"
+							},
+							"fullyImplemented": true,
+							"id": 287,
+							"linearizedBaseContracts": [
+								287
+							],
+							"name": "MultiSignatureGuard",
+							"nameLocation": "465:19:0",
+							"nodeType": "ContractDefinition",
+							"nodes": [
+								{
+									"constant": true,
+									"documentation": {
+										"id": 3,
+										"nodeType": "StructuredDocumentation",
+										"src": "527:79:0",
+										"text": "@dev Stores the total number of signers (uint8: [0;(2**8)-1)]) (default: 7)"
+									},
+									"id": 6,
+									"mutability": "constant",
+									"name": "_TOTAL_SIGNERS",
+									"nameLocation": "635:14:0",
+									"nodeType": "VariableDeclaration",
+									"scope": 287,
+									"src": "612:41:0",
+									"stateVariable": true,
+									"storageLocation": "default",
+									"typeDescriptions": {
+										"typeIdentifier": "t_uint8",
+										"typeString": "uint8"
+									},
+									"typeName": {
+										"id": 4,
+										"name": "uint8",
+										"nodeType": "ElementaryTypeName",
+										"src": "612:5:0",
+										"typeDescriptions": {
+											"typeIdentifier": "t_uint8",
+											"typeString": "uint8"
+										}
+									},
+									"value": {
+										"hexValue": "37",
+										"id": 5,
+										"isConstant": false,
+										"isLValue": false,
+										"isPure": true,
+										"kind": "number",
+										"lValueRequested": false,
+										"nodeType": "Literal",
+										"src": "652:1:0",
+										"typeDescriptions": {
+											"typeIdentifier": "t_rational_7_by_1",
+											"typeString": "int_const 7"
+										},
+										"value": "7"
+									},
+									"visibility": "private"
+								},
+								{
+									"constant": true,
+									"documentation": {
+										"id": 7,
+										"nodeType": "StructuredDocumentation",
+										"src": "662:177:0",
+										"text": "@dev Stores the minimum number of signatures required for multi signature guarded function execution (fault tolerant signature threshold) (uint8: [0;(2**8)-1)]) (default: 5)"
+									},
+									"id": 10,
+									"mutability": "constant",
+									"name": "_REQUIRED_SIGNATURES",
+									"nameLocation": "868:20:0",
+									"nodeType": "VariableDeclaration",
+									"scope": 287,
+									"src": "845:47:0",
+									"stateVariable": true,
+									"storageLocation": "default",
+									"typeDescriptions": {
+										"typeIdentifier": "t_uint8",
+										"typeString": "uint8"
+									},
+									"typeName": {
+										"id": 8,
+										"name": "uint8",
+										"nodeType": "ElementaryTypeName",
+										"src": "845:5:0",
+										"typeDescriptions": {
+											"typeIdentifier": "t_uint8",
+											"typeString": "uint8"
+										}
+									},
+									"value": {
+										"hexValue": "35",
+										"id": 9,
+										"isConstant": false,
+										"isLValue": false,
+										"isPure": true,
+										"kind": "number",
+										"lValueRequested": false,
+										"nodeType": "Literal",
+										"src": "891:1:0",
+										"typeDescriptions": {
+											"typeIdentifier": "t_rational_5_by_1",
+											"typeString": "int_const 5"
+										},
+										"value": "5"
+									},
+									"visibility": "private"
+								},
+								{
+									"constant": true,
+									"documentation": {
+										"id": 11,
+										"nodeType": "StructuredDocumentation",
+										"src": "901:78:0",
+										"text": "@dev Stores the validity time duration of signatures (default: 15 minutes)"
+									},
+									"id": 14,
+									"mutability": "constant",
+									"name": "_SIGNATURE_VALIDITY_TIME",
+									"nameLocation": "1010:24:0",
+									"nodeType": "VariableDeclaration",
+									"scope": 287,
+									"src": "985:62:0",
+									"stateVariable": true,
+									"storageLocation": "default",
+									"typeDescriptions": {
+										"typeIdentifier": "t_uint256",
+										"typeString": "uint256"
+									},
+									"typeName": {
+										"id": 12,
+										"name": "uint256",
+										"nodeType": "ElementaryTypeName",
+										"src": "985:7:0",
+										"typeDescriptions": {
+											"typeIdentifier": "t_uint256",
+											"typeString": "uint256"
+										}
+									},
+									"value": {
+										"hexValue": "3135",
+										"id": 13,
+										"isConstant": false,
+										"isLValue": false,
+										"isPure": true,
+										"kind": "number",
+										"lValueRequested": false,
+										"nodeType": "Literal",
+										"src": "1037:10:0",
+										"subdenomination": "minutes",
+										"typeDescriptions": {
+											"typeIdentifier": "t_rational_900_by_1",
+											"typeString": "int_const 900"
+										},
+										"value": "15"
+									},
+									"visibility": "private"
+								},
+								{
+									"constant": false,
+									"documentation": {
+										"id": 15,
+										"nodeType": "StructuredDocumentation",
+										"src": "1056:105:0",
+										"text": "@dev Stores the expiration time of signatures (block.timestamp at signing + _SIGNATURE_VALIDITY_TIME)"
+									},
+									"id": 17,
+									"mutability": "mutable",
+									"name": "_signatureExpiryTime",
+									"nameLocation": "1183:20:0",
+									"nodeType": "VariableDeclaration",
+									"scope": 287,
+									"src": "1167:36:0",
+									"stateVariable": true,
+									"storageLocation": "default",
+									"typeDescriptions": {
+										"typeIdentifier": "t_uint256",
+										"typeString": "uint256"
+									},
+									"typeName": {
+										"id": 16,
+										"name": "uint256",
+										"nodeType": "ElementaryTypeName",
+										"src": "1167:7:0",
+										"typeDescriptions": {
+											"typeIdentifier": "t_uint256",
+											"typeString": "uint256"
+										}
+									},
+									"visibility": "private"
+								},
+								{
+									"constant": false,
+									"documentation": {
+										"id": 18,
+										"nodeType": "StructuredDocumentation",
+										"src": "1212:77:0",
+										"text": "@dev Stores the total number of unique valid signatures during collection"
+									},
+									"id": 20,
+									"mutability": "mutable",
+									"name": "_currentSignatureCount",
+									"nameLocation": "1309:22:0",
+									"nodeType": "VariableDeclaration",
+									"scope": 287,
+									"src": "1295:36:0",
+									"stateVariable": true,
+									"storageLocation": "default",
+									"typeDescriptions": {
+										"typeIdentifier": "t_uint8",
+										"typeString": "uint8"
+									},
+									"typeName": {
+										"id": 19,
+										"name": "uint8",
+										"nodeType": "ElementaryTypeName",
+										"src": "1295:5:0",
+										"typeDescriptions": {
+											"typeIdentifier": "t_uint8",
+											"typeString": "uint8"
+										}
+									},
+									"visibility": "private"
+								},
+								{
+									"constant": false,
+									"documentation": {
+										"id": 21,
+										"nodeType": "StructuredDocumentation",
+										"src": "1340:53:0",
+										"text": "@dev Stores whether an address is a signer or not"
+									},
+									"id": 25,
+									"mutability": "mutable",
+									"name": "_isSigner",
+									"nameLocation": "1432:9:0",
+									"nodeType": "VariableDeclaration",
+									"scope": 287,
+									"src": "1399:42:0",
+									"stateVariable": true,
+									"storageLocation": "default",
+									"typeDescriptions": {
+										"typeIdentifier": "t_mapping$_t_address_$_t_bool_$",
+										"typeString": "mapping(address => bool)"
+									},
+									"typeName": {
+										"id": 24,
+										"keyName": "",
+										"keyNameLocation": "-1:-1:-1",
+										"keyType": {
+											"id": 22,
+											"name": "address",
+											"nodeType": "ElementaryTypeName",
+											"src": "1407:7:0",
+											"typeDescriptions": {
+												"typeIdentifier": "t_address",
+												"typeString": "address"
+											}
+										},
+										"nodeType": "Mapping",
+										"src": "1399:24:0",
+										"typeDescriptions": {
+											"typeIdentifier": "t_mapping$_t_address_$_t_bool_$",
+											"typeString": "mapping(address => bool)"
+										},
+										"valueName": "",
+										"valueNameLocation": "-1:-1:-1",
+										"valueType": {
+											"id": 23,
+											"name": "bool",
+											"nodeType": "ElementaryTypeName",
+											"src": "1418:4:0",
+											"typeDescriptions": {
+												"typeIdentifier": "t_bool",
+												"typeString": "bool"
+											}
+										}
+									},
+									"visibility": "private"
+								},
+								{
+									"constant": false,
+									"documentation": {
+										"id": 26,
+										"nodeType": "StructuredDocumentation",
+										"src": "1454:102:0",
+										"text": "@dev Stores whether a signer has already signed in the current signature collection session or not"
+									},
+									"id": 30,
+									"mutability": "mutable",
+									"name": "_hasSigned",
+									"nameLocation": "1595:10:0",
+									"nodeType": "VariableDeclaration",
+									"scope": 287,
+									"src": "1562:43:0",
+									"stateVariable": true,
+									"storageLocation": "default",
+									"typeDescriptions": {
+										"typeIdentifier": "t_mapping$_t_address_$_t_bool_$",
+										"typeString": "mapping(address => bool)"
+									},
+									"typeName": {
+										"id": 29,
+										"keyName": "",
+										"keyNameLocation": "-1:-1:-1",
+										"keyType": {
+											"id": 27,
+											"name": "address",
+											"nodeType": "ElementaryTypeName",
+											"src": "1570:7:0",
+											"typeDescriptions": {
+												"typeIdentifier": "t_address",
+												"typeString": "address"
+											}
+										},
+										"nodeType": "Mapping",
+										"src": "1562:24:0",
+										"typeDescriptions": {
+											"typeIdentifier": "t_mapping$_t_address_$_t_bool_$",
+											"typeString": "mapping(address => bool)"
+										},
+										"valueName": "",
+										"valueNameLocation": "-1:-1:-1",
+										"valueType": {
+											"id": 28,
+											"name": "bool",
+											"nodeType": "ElementaryTypeName",
+											"src": "1581:4:0",
+											"typeDescriptions": {
+												"typeIdentifier": "t_bool",
+												"typeString": "bool"
+											}
+										}
+									},
+									"visibility": "private"
+								},
+								{
+									"constant": false,
+									"documentation": {
+										"id": 31,
+										"nodeType": "StructuredDocumentation",
+										"src": "1618:77:0",
+										"text": "@dev Constant, fixed-size address array that stores all the valid signers"
+									},
+									"id": 43,
+									"mutability": "mutable",
+									"name": "_signers",
+									"nameLocation": "1720:8:0",
+									"nodeType": "VariableDeclaration",
+									"scope": 287,
+									"src": "1701:408:0",
+									"stateVariable": true,
+									"storageLocation": "default",
+									"typeDescriptions": {
+										"typeIdentifier": "t_array$_t_address_$7_storage",
+										"typeString": "address[7]"
+									},
+									"typeName": {
+										"baseType": {
+											"id": 32,
+											"name": "address",
+											"nodeType": "ElementaryTypeName",
+											"src": "1701:7:0",
+											"stateMutability": "nonpayable",
+											"typeDescriptions": {
+												"typeIdentifier": "t_address",
+												"typeString": "address"
+											}
+										},
+										"id": 34,
+										"length": {
+											"hexValue": "37",
+											"id": 33,
+											"isConstant": false,
+											"isLValue": false,
+											"isPure": true,
+											"kind": "number",
+											"lValueRequested": false,
+											"nodeType": "Literal",
+											"src": "1709:1:0",
+											"typeDescriptions": {
+												"typeIdentifier": "t_rational_7_by_1",
+												"typeString": "int_const 7"
+											},
+											"value": "7"
+										},
+										"nodeType": "ArrayTypeName",
+										"src": "1701:10:0",
+										"typeDescriptions": {
+											"typeIdentifier": "t_array$_t_address_$7_storage_ptr",
+											"typeString": "address[7]"
+										}
+									},
+									"value": {
+										"components": [
+											{
+												"hexValue": "307835423338446136613730316335363835343564436663423033466342383735663536626564644334",
+												"id": 35,
+												"isConstant": false,
+												"isLValue": false,
+												"isPure": true,
+												"kind": "number",
+												"lValueRequested": false,
+												"nodeType": "Literal",
+												"src": "1742:42:0",
+												"typeDescriptions": {
+													"typeIdentifier": "t_address",
+													"typeString": "address"
+												},
+												"value": "0x5B38Da6a701c568545dCfcB03FcB875f56beddC4"
+											},
+											{
+												"hexValue": "307841623834383346363464394336643145634639623834394165363737644433333135383335636232",
+												"id": 36,
+												"isConstant": false,
+												"isLValue": false,
+												"isPure": true,
+												"kind": "number",
+												"lValueRequested": false,
+												"nodeType": "Literal",
+												"src": "1795:42:0",
+												"typeDescriptions": {
+													"typeIdentifier": "t_address",
+													"typeString": "address"
+												},
+												"value": "0xAb8483F64d9C6d1EcF9b849Ae677dD3315835cb2"
+											},
+											{
+												"hexValue": "307834423230393933426334383131373765633745386635373163654361453841396532324330326462",
+												"id": 37,
+												"isConstant": false,
+												"isLValue": false,
+												"isPure": true,
+												"kind": "number",
+												"lValueRequested": false,
+												"nodeType": "Literal",
+												"src": "1848:42:0",
+												"typeDescriptions": {
+													"typeIdentifier": "t_address",
+													"typeString": "address"
+												},
+												"value": "0x4B20993Bc481177ec7E8f571ceCaE8A9e22C02db"
+											},
+											{
+												"hexValue": "307837383733314433436136623745333461433046383234633432613763433138413439356361626142",
+												"id": 38,
+												"isConstant": false,
+												"isLValue": false,
+												"isPure": true,
+												"kind": "number",
+												"lValueRequested": false,
+												"nodeType": "Literal",
+												"src": "1901:42:0",
+												"typeDescriptions": {
+													"typeIdentifier": "t_address",
+													"typeString": "address"
+												},
+												"value": "0x78731D3Ca6b7E34aC0F824c42a7cC18A495cabaB"
+											},
+											{
+												"hexValue": "307836313746324532664437324644394435353033313937303932614331363863393134363545376632",
+												"id": 39,
+												"isConstant": false,
+												"isLValue": false,
+												"isPure": true,
+												"kind": "number",
+												"lValueRequested": false,
+												"nodeType": "Literal",
+												"src": "1954:42:0",
+												"typeDescriptions": {
+													"typeIdentifier": "t_address",
+													"typeString": "address"
+												},
+												"value": "0x617F2E2fD72FD9D5503197092aC168c91465E7f2"
+											},
+											{
+												"hexValue": "307831374636414438456639383232393735373943323033303639433144626646453433343863333732",
+												"id": 40,
+												"isConstant": false,
+												"isLValue": false,
+												"isPure": true,
+												"kind": "number",
+												"lValueRequested": false,
+												"nodeType": "Literal",
+												"src": "2007:42:0",
+												"typeDescriptions": {
+													"typeIdentifier": "t_address",
+													"typeString": "address"
+												},
+												"value": "0x17F6AD8Ef982297579C203069C1DbfFE4348c372"
+											},
+											{
+												"hexValue": "307835633642306637426633453763653034363033394264384641426466443366394635303231363738",
+												"id": 41,
+												"isConstant": false,
+												"isLValue": false,
+												"isPure": true,
+												"kind": "number",
+												"lValueRequested": false,
+												"nodeType": "Literal",
+												"src": "2060:42:0",
+												"typeDescriptions": {
+													"typeIdentifier": "t_address",
+													"typeString": "address"
+												},
+												"value": "0x5c6B0f7Bf3E7ce046039Bd8FABdfD3f9F5021678"
+											}
+										],
+										"id": 42,
+										"isConstant": false,
+										"isInlineArray": true,
+										"isLValue": false,
+										"isPure": true,
+										"lValueRequested": false,
+										"nodeType": "TupleExpression",
+										"src": "1731:378:0",
+										"typeDescriptions": {
+											"typeIdentifier": "t_array$_t_address_$7_memory_ptr",
+											"typeString": "address[7] memory"
+										}
+									},
+									"visibility": "private"
+								},
+								{
+									"anonymous": false,
+									"documentation": {
+										"id": 44,
+										"nodeType": "StructuredDocumentation",
+										"src": "2142:197:0",
+										"text": "@dev Event for logging when a valid signature is made\n @notice Event for logging when a valid signature is made\n @param signer_ The address of the signer that made the signature"
+									},
+									"eventSelector": "c803a19e7438fff95a91e23440dc06b415144c5e9fe746580b03219adbd15e51",
+									"id": 48,
+									"name": "SignatureRegistered",
+									"nameLocation": "2351:19:0",
+									"nodeType": "EventDefinition",
+									"parameters": {
+										"id": 47,
+										"nodeType": "ParameterList",
+										"parameters": [
+											{
+												"constant": false,
+												"id": 46,
+												"indexed": false,
+												"mutability": "mutable",
+												"name": "signer_",
+												"nameLocation": "2379:7:0",
+												"nodeType": "VariableDeclaration",
+												"scope": 48,
+												"src": "2371:15:0",
+												"stateVariable": false,
+												"storageLocation": "default",
+												"typeDescriptions": {
+													"typeIdentifier": "t_address",
+													"typeString": "address"
+												},
+												"typeName": {
+													"id": 45,
+													"name": "address",
+													"nodeType": "ElementaryTypeName",
+													"src": "2371:7:0",
+													"stateMutability": "nonpayable",
+													"typeDescriptions": {
+														"typeIdentifier": "t_address",
+														"typeString": "address"
+													}
+												},
+												"visibility": "internal"
+											}
+										],
+										"src": "2370:17:0"
+									},
+									"src": "2345:43:0"
+								},
+								{
+									"anonymous": false,
+									"documentation": {
+										"id": 49,
+										"nodeType": "StructuredDocumentation",
+										"src": "2396:113:0",
+										"text": "@dev Event for logging when signatures are reset\n @notice Event for logging when signatures are reset"
+									},
+									"eventSelector": "4bd70d790e1606677e1c786e3ae5eea8fc03f909f5d3529d068651521d0f7eb7",
+									"id": 51,
+									"name": "SignaturesReset",
+									"nameLocation": "2521:15:0",
+									"nodeType": "EventDefinition",
+									"parameters": {
+										"id": 50,
+										"nodeType": "ParameterList",
+										"parameters": [],
+										"src": "2536:2:0"
+									},
+									"src": "2515:24:0"
+								},
+								{
+									"anonymous": false,
+									"documentation": {
+										"id": 52,
+										"nodeType": "StructuredDocumentation",
+										"src": "2547:143:0",
+										"text": "@dev Event for logging when signature validity countdown starts\n @notice Event for logging when signature validity countdown starts"
+									},
+									"eventSelector": "7bb44a6efdad870f652b2266a57e13683a9959d8f6208ec491b76f3b3e30ca85",
+									"id": 54,
+									"name": "SignatureValidityTimeCountdownStarted",
+									"nameLocation": "2702:37:0",
+									"nodeType": "EventDefinition",
+									"parameters": {
+										"id": 53,
+										"nodeType": "ParameterList",
+										"parameters": [],
+										"src": "2739:2:0"
+									},
+									"src": "2696:46:0"
+								},
+								{
+									"anonymous": false,
+									"documentation": {
+										"id": 55,
+										"nodeType": "StructuredDocumentation",
+										"src": "2750:137:0",
+										"text": "@dev Event for logging when signatures are expired and reset\n @notice Event for logging when signatures are expired and reset"
+									},
+									"eventSelector": "a700eb5f46aa32bbe59bb5588095453766771b449f12098230e7711c2cc1373e",
+									"id": 57,
+									"name": "SignaturesExpiredAndReset",
+									"nameLocation": "2899:25:0",
+									"nodeType": "EventDefinition",
+									"parameters": {
+										"id": 56,
+										"nodeType": "ParameterList",
+										"parameters": [],
+										"src": "2924:2:0"
+									},
+									"src": "2893:34:0"
+								},
+								{
+									"body": {
+										"id": 99,
+										"nodeType": "Block",
+										"src": "3282:218:0",
+										"statements": [
+											{
+												"expression": {
+													"arguments": [
+														{
+															"commonType": {
+																"typeIdentifier": "t_uint256",
+																"typeString": "uint256"
+															},
+															"id": 65,
+															"isConstant": false,
+															"isLValue": false,
+															"isPure": false,
+															"lValueRequested": false,
+															"leftExpression": {
+																"expression": {
+																	"id": 62,
+																	"name": "_signers",
+																	"nodeType": "Identifier",
+																	"overloadedDeclarations": [],
+																	"referencedDeclaration": 43,
+																	"src": "3301:8:0",
+																	"typeDescriptions": {
+																		"typeIdentifier": "t_array$_t_address_$7_storage",
+																		"typeString": "address[7] storage ref"
+																	}
+																},
+																"id": 63,
+																"isConstant": false,
+																"isLValue": false,
+																"isPure": false,
+																"lValueRequested": false,
+																"memberLocation": "3310:6:0",
+																"memberName": "length",
+																"nodeType": "MemberAccess",
+																"src": "3301:15:0",
+																"typeDescriptions": {
+																	"typeIdentifier": "t_uint256",
+																	"typeString": "uint256"
+																}
+															},
+															"nodeType": "BinaryOperation",
+															"operator": "==",
+															"rightExpression": {
+																"id": 64,
+																"name": "_TOTAL_SIGNERS",
+																"nodeType": "Identifier",
+																"overloadedDeclarations": [],
+																"referencedDeclaration": 6,
+																"src": "3320:14:0",
+																"typeDescriptions": {
+																	"typeIdentifier": "t_uint8",
+																	"typeString": "uint8"
+																}
+															},
+															"src": "3301:33:0",
+															"typeDescriptions": {
+																"typeIdentifier": "t_bool",
+																"typeString": "bool"
+															}
+														}
+													],
+													"expression": {
+														"argumentTypes": [
+															{
+																"typeIdentifier": "t_bool",
+																"typeString": "bool"
+															}
+														],
+														"id": 61,
+														"name": "require",
+														"nodeType": "Identifier",
+														"overloadedDeclarations": [
+															4294967278,
+															4294967278,
+															4294967278
+														],
+														"referencedDeclaration": 4294967278,
+														"src": "3293:7:0",
+														"typeDescriptions": {
+															"typeIdentifier": "t_function_require_pure$_t_bool_$returns$__$",
+															"typeString": "function (bool) pure"
+														}
+													},
+													"id": 66,
+													"isConstant": false,
+													"isLValue": false,
+													"isPure": false,
+													"kind": "functionCall",
+													"lValueRequested": false,
+													"nameLocations": [],
+													"names": [],
+													"nodeType": "FunctionCall",
+													"src": "3293:42:0",
+													"tryCall": false,
+													"typeDescriptions": {
+														"typeIdentifier": "t_tuple$__$",
+														"typeString": "tuple()"
+													}
+												},
+												"id": 67,
+												"nodeType": "ExpressionStatement",
+												"src": "3293:42:0"
+											},
+											{
+												"body": {
+													"id": 97,
+													"nodeType": "Block",
+													"src": "3388:105:0",
+													"statements": [
+														{
+															"expression": {
+																"arguments": [
+																	{
+																		"commonType": {
+																			"typeIdentifier": "t_address",
+																			"typeString": "address"
+																		},
+																		"id": 86,
+																		"isConstant": false,
+																		"isLValue": false,
+																		"isPure": false,
+																		"lValueRequested": false,
+																		"leftExpression": {
+																			"baseExpression": {
+																				"id": 79,
+																				"name": "_signers",
+																				"nodeType": "Identifier",
+																				"overloadedDeclarations": [],
+																				"referencedDeclaration": 43,
+																				"src": "3411:8:0",
+																				"typeDescriptions": {
+																					"typeIdentifier": "t_array$_t_address_$7_storage",
+																					"typeString": "address[7] storage ref"
+																				}
+																			},
+																			"id": 81,
+																			"indexExpression": {
+																				"id": 80,
+																				"name": "i",
+																				"nodeType": "Identifier",
+																				"overloadedDeclarations": [],
+																				"referencedDeclaration": 69,
+																				"src": "3420:1:0",
+																				"typeDescriptions": {
+																					"typeIdentifier": "t_uint8",
+																					"typeString": "uint8"
+																				}
+																			},
+																			"isConstant": false,
+																			"isLValue": true,
+																			"isPure": false,
+																			"lValueRequested": false,
+																			"nodeType": "IndexAccess",
+																			"src": "3411:11:0",
+																			"typeDescriptions": {
+																				"typeIdentifier": "t_address",
+																				"typeString": "address"
+																			}
+																		},
+																		"nodeType": "BinaryOperation",
+																		"operator": "!=",
+																		"rightExpression": {
+																			"arguments": [
+																				{
+																					"hexValue": "30",
+																					"id": 84,
+																					"isConstant": false,
+																					"isLValue": false,
+																					"isPure": true,
+																					"kind": "number",
+																					"lValueRequested": false,
+																					"nodeType": "Literal",
+																					"src": "3434:1:0",
+																					"typeDescriptions": {
+																						"typeIdentifier": "t_rational_0_by_1",
+																						"typeString": "int_const 0"
+																					},
+																					"value": "0"
+																				}
+																			],
+																			"expression": {
+																				"argumentTypes": [
+																					{
+																						"typeIdentifier": "t_rational_0_by_1",
+																						"typeString": "int_const 0"
+																					}
+																				],
+																				"id": 83,
+																				"isConstant": false,
+																				"isLValue": false,
+																				"isPure": true,
+																				"lValueRequested": false,
+																				"nodeType": "ElementaryTypeNameExpression",
+																				"src": "3426:7:0",
+																				"typeDescriptions": {
+																					"typeIdentifier": "t_type$_t_address_$",
+																					"typeString": "type(address)"
+																				},
+																				"typeName": {
+																					"id": 82,
+																					"name": "address",
+																					"nodeType": "ElementaryTypeName",
+																					"src": "3426:7:0",
+																					"typeDescriptions": {}
+																				}
+																			},
+																			"id": 85,
+																			"isConstant": false,
+																			"isLValue": false,
+																			"isPure": true,
+																			"kind": "typeConversion",
+																			"lValueRequested": false,
+																			"nameLocations": [],
+																			"names": [],
+																			"nodeType": "FunctionCall",
+																			"src": "3426:10:0",
+																			"tryCall": false,
+																			"typeDescriptions": {
+																				"typeIdentifier": "t_address",
+																				"typeString": "address"
+																			}
+																		},
+																		"src": "3411:25:0",
+																		"typeDescriptions": {
+																			"typeIdentifier": "t_bool",
+																			"typeString": "bool"
+																		}
+																	}
+																],
+																"expression": {
+																	"argumentTypes": [
+																		{
+																			"typeIdentifier": "t_bool",
+																			"typeString": "bool"
+																		}
+																	],
+																	"id": 78,
+																	"name": "require",
+																	"nodeType": "Identifier",
+																	"overloadedDeclarations": [
+																		4294967278,
+																		4294967278,
+																		4294967278
+																	],
+																	"referencedDeclaration": 4294967278,
+																	"src": "3403:7:0",
+																	"typeDescriptions": {
+																		"typeIdentifier": "t_function_require_pure$_t_bool_$returns$__$",
+																		"typeString": "function (bool) pure"
+																	}
+																},
+																"id": 87,
+																"isConstant": false,
+																"isLValue": false,
+																"isPure": false,
+																"kind": "functionCall",
+																"lValueRequested": false,
+																"nameLocations": [],
+																"names": [],
+																"nodeType": "FunctionCall",
+																"src": "3403:34:0",
+																"tryCall": false,
+																"typeDescriptions": {
+																	"typeIdentifier": "t_tuple$__$",
+																	"typeString": "tuple()"
+																}
+															},
+															"id": 88,
+															"nodeType": "ExpressionStatement",
+															"src": "3403:34:0"
+														},
+														{
+															"expression": {
+																"id": 95,
+																"isConstant": false,
+																"isLValue": false,
+																"isPure": false,
+																"lValueRequested": false,
+																"leftHandSide": {
+																	"baseExpression": {
+																		"id": 89,
+																		"name": "_isSigner",
+																		"nodeType": "Identifier",
+																		"overloadedDeclarations": [],
+																		"referencedDeclaration": 25,
+																		"src": "3452:9:0",
+																		"typeDescriptions": {
+																			"typeIdentifier": "t_mapping$_t_address_$_t_bool_$",
+																			"typeString": "mapping(address => bool)"
+																		}
+																	},
+																	"id": 93,
+																	"indexExpression": {
+																		"baseExpression": {
+																			"id": 90,
+																			"name": "_signers",
+																			"nodeType": "Identifier",
+																			"overloadedDeclarations": [],
+																			"referencedDeclaration": 43,
+																			"src": "3462:8:0",
+																			"typeDescriptions": {
+																				"typeIdentifier": "t_array$_t_address_$7_storage",
+																				"typeString": "address[7] storage ref"
+																			}
+																		},
+																		"id": 92,
+																		"indexExpression": {
+																			"id": 91,
+																			"name": "i",
+																			"nodeType": "Identifier",
+																			"overloadedDeclarations": [],
+																			"referencedDeclaration": 69,
+																			"src": "3471:1:0",
+																			"typeDescriptions": {
+																				"typeIdentifier": "t_uint8",
+																				"typeString": "uint8"
+																			}
+																		},
+																		"isConstant": false,
+																		"isLValue": true,
+																		"isPure": false,
+																		"lValueRequested": false,
+																		"nodeType": "IndexAccess",
+																		"src": "3462:11:0",
+																		"typeDescriptions": {
+																			"typeIdentifier": "t_address",
+																			"typeString": "address"
+																		}
+																	},
+																	"isConstant": false,
+																	"isLValue": true,
+																	"isPure": false,
+																	"lValueRequested": true,
+																	"nodeType": "IndexAccess",
+																	"src": "3452:22:0",
+																	"typeDescriptions": {
+																		"typeIdentifier": "t_bool",
+																		"typeString": "bool"
+																	}
+																},
+																"nodeType": "Assignment",
+																"operator": "=",
+																"rightHandSide": {
+																	"hexValue": "74727565",
+																	"id": 94,
+																	"isConstant": false,
+																	"isLValue": false,
+																	"isPure": true,
+																	"kind": "bool",
+																	"lValueRequested": false,
+																	"nodeType": "Literal",
+																	"src": "3477:4:0",
+																	"typeDescriptions": {
+																		"typeIdentifier": "t_bool",
+																		"typeString": "bool"
+																	},
+																	"value": "true"
+																},
+																"src": "3452:29:0",
+																"typeDescriptions": {
+																	"typeIdentifier": "t_bool",
+																	"typeString": "bool"
+																}
+															},
+															"id": 96,
+															"nodeType": "ExpressionStatement",
+															"src": "3452:29:0"
+														}
+													]
+												},
+												"condition": {
+													"commonType": {
+														"typeIdentifier": "t_uint8",
+														"typeString": "uint8"
+													},
+													"id": 74,
+													"isConstant": false,
+													"isLValue": false,
+													"isPure": false,
+													"lValueRequested": false,
+													"leftExpression": {
+														"id": 72,
+														"name": "i",
+														"nodeType": "Identifier",
+														"overloadedDeclarations": [],
+														"referencedDeclaration": 69,
+														"src": "3363:1:0",
+														"typeDescriptions": {
+															"typeIdentifier": "t_uint8",
+															"typeString": "uint8"
+														}
+													},
+													"nodeType": "BinaryOperation",
+													"operator": "<",
+													"rightExpression": {
+														"id": 73,
+														"name": "_TOTAL_SIGNERS",
+														"nodeType": "Identifier",
+														"overloadedDeclarations": [],
+														"referencedDeclaration": 6,
+														"src": "3367:14:0",
+														"typeDescriptions": {
+															"typeIdentifier": "t_uint8",
+															"typeString": "uint8"
+														}
+													},
+													"src": "3363:18:0",
+													"typeDescriptions": {
+														"typeIdentifier": "t_bool",
+														"typeString": "bool"
+													}
+												},
+												"id": 98,
+												"initializationExpression": {
+													"assignments": [
+														69
+													],
+													"declarations": [
+														{
+															"constant": false,
+															"id": 69,
+															"mutability": "mutable",
+															"name": "i",
+															"nameLocation": "3356:1:0",
+															"nodeType": "VariableDeclaration",
+															"scope": 98,
+															"src": "3350:7:0",
+															"stateVariable": false,
+															"storageLocation": "default",
+															"typeDescriptions": {
+																"typeIdentifier": "t_uint8",
+																"typeString": "uint8"
+															},
+															"typeName": {
+																"id": 68,
+																"name": "uint8",
+																"nodeType": "ElementaryTypeName",
+																"src": "3350:5:0",
+																"typeDescriptions": {
+																	"typeIdentifier": "t_uint8",
+																	"typeString": "uint8"
+																}
+															},
+															"visibility": "internal"
+														}
+													],
+													"id": 71,
+													"initialValue": {
+														"hexValue": "30",
+														"id": 70,
+														"isConstant": false,
+														"isLValue": false,
+														"isPure": true,
+														"kind": "number",
+														"lValueRequested": false,
+														"nodeType": "Literal",
+														"src": "3360:1:0",
+														"typeDescriptions": {
+															"typeIdentifier": "t_rational_0_by_1",
+															"typeString": "int_const 0"
+														},
+														"value": "0"
+													},
+													"nodeType": "VariableDeclarationStatement",
+													"src": "3350:11:0"
+												},
+												"isSimpleCounterLoop": true,
+												"loopExpression": {
+													"expression": {
+														"id": 76,
+														"isConstant": false,
+														"isLValue": false,
+														"isPure": false,
+														"lValueRequested": false,
+														"nodeType": "UnaryOperation",
+														"operator": "++",
+														"prefix": false,
+														"src": "3383:3:0",
+														"subExpression": {
+															"id": 75,
+															"name": "i",
+															"nodeType": "Identifier",
+															"overloadedDeclarations": [],
+															"referencedDeclaration": 69,
+															"src": "3383:1:0",
+															"typeDescriptions": {
+																"typeIdentifier": "t_uint8",
+																"typeString": "uint8"
+															}
+														},
+														"typeDescriptions": {
+															"typeIdentifier": "t_uint8",
+															"typeString": "uint8"
+														}
+													},
+													"id": 77,
+													"nodeType": "ExpressionStatement",
+													"src": "3383:3:0"
+												},
+												"nodeType": "ForStatement",
+												"src": "3346:147:0"
+											}
+										]
+									},
+									"documentation": {
+										"id": 58,
+										"nodeType": "StructuredDocumentation",
+										"src": "2964:298:0",
+										"text": "@dev The constructor will run once during initial contract deployment, setting the valid signer set\n @custom:requirement-body The number of signers must be equal to the total signers constant\n @custom:requirement-body There must be no zero (burn) address in the valid signer set"
+									},
+									"id": 100,
+									"implemented": true,
+									"kind": "constructor",
+									"modifiers": [],
+									"name": "",
+									"nameLocation": "-1:-1:-1",
+									"nodeType": "FunctionDefinition",
+									"parameters": {
+										"id": 59,
+										"nodeType": "ParameterList",
+										"parameters": [],
+										"src": "3279:2:0"
+									},
+									"returnParameters": {
+										"id": 60,
+										"nodeType": "ParameterList",
+										"parameters": [],
+										"src": "3282:0:0"
+									},
+									"scope": 287,
+									"src": "3268:232:0",
+									"stateMutability": "nonpayable",
+									"virtual": false,
+									"visibility": "internal"
+								},
+								{
+									"body": {
+										"id": 112,
+										"nodeType": "Block",
+										"src": "3650:77:0",
+										"statements": [
+											{
+												"expression": {
+													"arguments": [
+														{
+															"arguments": [
+																{
+																	"expression": {
+																		"id": 105,
+																		"name": "msg",
+																		"nodeType": "Identifier",
+																		"overloadedDeclarations": [],
+																		"referencedDeclaration": 4294967281,
+																		"src": "3678:3:0",
+																		"typeDescriptions": {
+																			"typeIdentifier": "t_magic_message",
+																			"typeString": "msg"
+																		}
+																	},
+																	"id": 106,
+																	"isConstant": false,
+																	"isLValue": false,
+																	"isPure": false,
+																	"lValueRequested": false,
+																	"memberLocation": "3682:6:0",
+																	"memberName": "sender",
+																	"nodeType": "MemberAccess",
+																	"src": "3678:10:0",
+																	"typeDescriptions": {
+																		"typeIdentifier": "t_address",
+																		"typeString": "address"
+																	}
+																}
+															],
+															"expression": {
+																"argumentTypes": [
+																	{
+																		"typeIdentifier": "t_address",
+																		"typeString": "address"
+																	}
+																],
+																"id": 104,
+																"name": "isSigner",
+																"nodeType": "Identifier",
+																"overloadedDeclarations": [],
+																"referencedDeclaration": 160,
+																"src": "3669:8:0",
+																"typeDescriptions": {
+																	"typeIdentifier": "t_function_internal_view$_t_address_$returns$_t_bool_$",
+																	"typeString": "function (address) view returns (bool)"
+																}
+															},
+															"id": 107,
+															"isConstant": false,
+															"isLValue": false,
+															"isPure": false,
+															"kind": "functionCall",
+															"lValueRequested": false,
+															"nameLocations": [],
+															"names": [],
+															"nodeType": "FunctionCall",
+															"src": "3669:20:0",
+															"tryCall": false,
+															"typeDescriptions": {
+																"typeIdentifier": "t_bool",
+																"typeString": "bool"
+															}
+														},
+														{
+															"hexValue": "4e6f742061207369676e657221",
+															"id": 108,
+															"isConstant": false,
+															"isLValue": false,
+															"isPure": true,
+															"kind": "string",
+															"lValueRequested": false,
+															"nodeType": "Literal",
+															"src": "3691:15:0",
+															"typeDescriptions": {
+																"typeIdentifier": "t_stringliteral_ee6f27f535553cc049e62d3a4b52ada9d4d1f0c4187a3dd5ad6d7cdf777e1b64",
+																"typeString": "literal_string \"Not a signer!\""
+															},
+															"value": "Not a signer!"
+														}
+													],
+													"expression": {
+														"argumentTypes": [
+															{
+																"typeIdentifier": "t_bool",
+																"typeString": "bool"
+															},
+															{
+																"typeIdentifier": "t_stringliteral_ee6f27f535553cc049e62d3a4b52ada9d4d1f0c4187a3dd5ad6d7cdf777e1b64",
+																"typeString": "literal_string \"Not a signer!\""
+															}
+														],
+														"id": 103,
+														"name": "require",
+														"nodeType": "Identifier",
+														"overloadedDeclarations": [
+															4294967278,
+															4294967278,
+															4294967278
+														],
+														"referencedDeclaration": 4294967278,
+														"src": "3661:7:0",
+														"typeDescriptions": {
+															"typeIdentifier": "t_function_require_pure$_t_bool_$_t_string_memory_ptr_$returns$__$",
+															"typeString": "function (bool,string memory) pure"
+														}
+													},
+													"id": 109,
+													"isConstant": false,
+													"isLValue": false,
+													"isPure": false,
+													"kind": "functionCall",
+													"lValueRequested": false,
+													"nameLocations": [],
+													"names": [],
+													"nodeType": "FunctionCall",
+													"src": "3661:46:0",
+													"tryCall": false,
+													"typeDescriptions": {
+														"typeIdentifier": "t_tuple$__$",
+														"typeString": "tuple()"
+													}
+												},
+												"id": 110,
+												"nodeType": "ExpressionStatement",
+												"src": "3661:46:0"
+											},
+											{
+												"id": 111,
+												"nodeType": "PlaceholderStatement",
+												"src": "3718:1:0"
+											}
+										]
+									},
+									"documentation": {
+										"id": 101,
+										"nodeType": "StructuredDocumentation",
+										"src": "3535:89:0",
+										"text": "@dev This modifier absorbs the associated function's body when the caller is a signer"
+									},
+									"id": 113,
+									"name": "onlySigner",
+									"nameLocation": "3639:10:0",
+									"nodeType": "ModifierDefinition",
+									"parameters": {
+										"id": 102,
+										"nodeType": "ParameterList",
+										"parameters": [],
+										"src": "3650:0:0"
+									},
+									"src": "3630:97:0",
+									"virtual": false,
+									"visibility": "internal"
+								},
+								{
+									"body": {
+										"id": 137,
+										"nodeType": "Block",
+										"src": "4128:236:0",
+										"statements": [
+											{
+												"expression": {
+													"arguments": [
+														{
+															"commonType": {
+																"typeIdentifier": "t_uint8",
+																"typeString": "uint8"
+															},
+															"id": 120,
+															"isConstant": false,
+															"isLValue": false,
+															"isPure": false,
+															"lValueRequested": false,
+															"leftExpression": {
+																"arguments": [],
+																"expression": {
+																	"argumentTypes": [],
+																	"id": 117,
+																	"name": "currentSignatureCount",
+																	"nodeType": "Identifier",
+																	"overloadedDeclarations": [],
+																	"referencedDeclaration": 147,
+																	"src": "4147:21:0",
+																	"typeDescriptions": {
+																		"typeIdentifier": "t_function_internal_view$__$returns$_t_uint8_$",
+																		"typeString": "function () view returns (uint8)"
+																	}
+																},
+																"id": 118,
+																"isConstant": false,
+																"isLValue": false,
+																"isPure": false,
+																"kind": "functionCall",
+																"lValueRequested": false,
+																"nameLocations": [],
+																"names": [],
+																"nodeType": "FunctionCall",
+																"src": "4147:23:0",
+																"tryCall": false,
+																"typeDescriptions": {
+																	"typeIdentifier": "t_uint8",
+																	"typeString": "uint8"
+																}
+															},
+															"nodeType": "BinaryOperation",
+															"operator": ">=",
+															"rightExpression": {
+																"id": 119,
+																"name": "_REQUIRED_SIGNATURES",
+																"nodeType": "Identifier",
+																"overloadedDeclarations": [],
+																"referencedDeclaration": 10,
+																"src": "4174:20:0",
+																"typeDescriptions": {
+																	"typeIdentifier": "t_uint8",
+																	"typeString": "uint8"
+																}
+															},
+															"src": "4147:47:0",
+															"typeDescriptions": {
+																"typeIdentifier": "t_bool",
+																"typeString": "bool"
+															}
+														},
+														{
+															"hexValue": "4e6f7420656e6f756768207369676e61747572657321",
+															"id": 121,
+															"isConstant": false,
+															"isLValue": false,
+															"isPure": true,
+															"kind": "string",
+															"lValueRequested": false,
+															"nodeType": "Literal",
+															"src": "4196:24:0",
+															"typeDescriptions": {
+																"typeIdentifier": "t_stringliteral_e6b2992bb46fad6c82be00e03e19dc6e869899be36950c17cdb28273193145e0",
+																"typeString": "literal_string \"Not enough signatures!\""
+															},
+															"value": "Not enough signatures!"
+														}
+													],
+													"expression": {
+														"argumentTypes": [
+															{
+																"typeIdentifier": "t_bool",
+																"typeString": "bool"
+															},
+															{
+																"typeIdentifier": "t_stringliteral_e6b2992bb46fad6c82be00e03e19dc6e869899be36950c17cdb28273193145e0",
+																"typeString": "literal_string \"Not enough signatures!\""
+															}
+														],
+														"id": 116,
+														"name": "require",
+														"nodeType": "Identifier",
+														"overloadedDeclarations": [
+															4294967278,
+															4294967278,
+															4294967278
+														],
+														"referencedDeclaration": 4294967278,
+														"src": "4139:7:0",
+														"typeDescriptions": {
+															"typeIdentifier": "t_function_require_pure$_t_bool_$_t_string_memory_ptr_$returns$__$",
+															"typeString": "function (bool,string memory) pure"
+														}
+													},
+													"id": 122,
+													"isConstant": false,
+													"isLValue": false,
+													"isPure": false,
+													"kind": "functionCall",
+													"lValueRequested": false,
+													"nameLocations": [],
+													"names": [],
+													"nodeType": "FunctionCall",
+													"src": "4139:82:0",
+													"tryCall": false,
+													"typeDescriptions": {
+														"typeIdentifier": "t_tuple$__$",
+														"typeString": "tuple()"
+													}
+												},
+												"id": 123,
+												"nodeType": "ExpressionStatement",
+												"src": "4139:82:0"
+											},
+											{
+												"expression": {
+													"arguments": [
+														{
+															"commonType": {
+																"typeIdentifier": "t_uint256",
+																"typeString": "uint256"
+															},
+															"id": 129,
+															"isConstant": false,
+															"isLValue": false,
+															"isPure": false,
+															"lValueRequested": false,
+															"leftExpression": {
+																"expression": {
+																	"id": 125,
+																	"name": "block",
+																	"nodeType": "Identifier",
+																	"overloadedDeclarations": [],
+																	"referencedDeclaration": 4294967292,
+																	"src": "4240:5:0",
+																	"typeDescriptions": {
+																		"typeIdentifier": "t_magic_block",
+																		"typeString": "block"
+																	}
+																},
+																"id": 126,
+																"isConstant": false,
+																"isLValue": false,
+																"isPure": false,
+																"lValueRequested": false,
+																"memberLocation": "4246:9:0",
+																"memberName": "timestamp",
+																"nodeType": "MemberAccess",
+																"src": "4240:15:0",
+																"typeDescriptions": {
+																	"typeIdentifier": "t_uint256",
+																	"typeString": "uint256"
+																}
+															},
+															"nodeType": "BinaryOperation",
+															"operator": "<=",
+															"rightExpression": {
+																"arguments": [],
+																"expression": {
+																	"argumentTypes": [],
+																	"id": 127,
+																	"name": "getSignatureExpiryTime",
+																	"nodeType": "Identifier",
+																	"overloadedDeclarations": [],
+																	"referencedDeclaration": 182,
+																	"src": "4259:22:0",
+																	"typeDescriptions": {
+																		"typeIdentifier": "t_function_internal_view$__$returns$_t_uint256_$",
+																		"typeString": "function () view returns (uint256)"
+																	}
+																},
+																"id": 128,
+																"isConstant": false,
+																"isLValue": false,
+																"isPure": false,
+																"kind": "functionCall",
+																"lValueRequested": false,
+																"nameLocations": [],
+																"names": [],
+																"nodeType": "FunctionCall",
+																"src": "4259:24:0",
+																"tryCall": false,
+																"typeDescriptions": {
+																	"typeIdentifier": "t_uint256",
+																	"typeString": "uint256"
+																}
+															},
+															"src": "4240:43:0",
+															"typeDescriptions": {
+																"typeIdentifier": "t_bool",
+																"typeString": "bool"
+															}
+														},
+														{
+															"hexValue": "5369676e6174757265732068617665206578706972656421",
+															"id": 130,
+															"isConstant": false,
+															"isLValue": false,
+															"isPure": true,
+															"kind": "string",
+															"lValueRequested": false,
+															"nodeType": "Literal",
+															"src": "4285:26:0",
+															"typeDescriptions": {
+																"typeIdentifier": "t_stringliteral_4041a5b126ff1c5880a849f6db58703bbac8d6bf84394f8496cdb8a58a47ae9c",
+																"typeString": "literal_string \"Signatures have expired!\""
+															},
+															"value": "Signatures have expired!"
+														}
+													],
+													"expression": {
+														"argumentTypes": [
+															{
+																"typeIdentifier": "t_bool",
+																"typeString": "bool"
+															},
+															{
+																"typeIdentifier": "t_stringliteral_4041a5b126ff1c5880a849f6db58703bbac8d6bf84394f8496cdb8a58a47ae9c",
+																"typeString": "literal_string \"Signatures have expired!\""
+															}
+														],
+														"id": 124,
+														"name": "require",
+														"nodeType": "Identifier",
+														"overloadedDeclarations": [
+															4294967278,
+															4294967278,
+															4294967278
+														],
+														"referencedDeclaration": 4294967278,
+														"src": "4232:7:0",
+														"typeDescriptions": {
+															"typeIdentifier": "t_function_require_pure$_t_bool_$_t_string_memory_ptr_$returns$__$",
+															"typeString": "function (bool,string memory) pure"
+														}
+													},
+													"id": 131,
+													"isConstant": false,
+													"isLValue": false,
+													"isPure": false,
+													"kind": "functionCall",
+													"lValueRequested": false,
+													"nameLocations": [],
+													"names": [],
+													"nodeType": "FunctionCall",
+													"src": "4232:80:0",
+													"tryCall": false,
+													"typeDescriptions": {
+														"typeIdentifier": "t_tuple$__$",
+														"typeString": "tuple()"
+													}
+												},
+												"id": 132,
+												"nodeType": "ExpressionStatement",
+												"src": "4232:80:0"
+											},
+											{
+												"id": 133,
+												"nodeType": "PlaceholderStatement",
+												"src": "4323:1:0"
+											},
+											{
+												"expression": {
+													"arguments": [],
+													"expression": {
+														"argumentTypes": [],
+														"id": 134,
+														"name": "_resetAllSignatures",
+														"nodeType": "Identifier",
+														"overloadedDeclarations": [],
+														"referencedDeclaration": 213,
+														"src": "4335:19:0",
+														"typeDescriptions": {
+															"typeIdentifier": "t_function_internal_nonpayable$__$returns$__$",
+															"typeString": "function ()"
+														}
+													},
+													"id": 135,
+													"isConstant": false,
+													"isLValue": false,
+													"isPure": false,
+													"kind": "functionCall",
+													"lValueRequested": false,
+													"nameLocations": [],
+													"names": [],
+													"nodeType": "FunctionCall",
+													"src": "4335:21:0",
+													"tryCall": false,
+													"typeDescriptions": {
+														"typeIdentifier": "t_tuple$__$",
+														"typeString": "tuple()"
+													}
+												},
+												"id": 136,
+												"nodeType": "ExpressionStatement",
+												"src": "4335:21:0"
+											}
+										]
+									},
+									"documentation": {
+										"id": 114,
+										"nodeType": "StructuredDocumentation",
+										"src": "3735:358:0",
+										"text": "@dev This modifier absorbs the associated function's body when the conditions of the multi signature guard security scheme are fulfilled\n @custom:requirement-body The number of valid signatures collected from signers must be greater or equal than the configured signature threshold\n @custom:requirement-body Signatures must not be expired"
+									},
+									"id": 138,
+									"name": "multiSignatureGuard",
+									"nameLocation": "4108:19:0",
+									"nodeType": "ModifierDefinition",
+									"parameters": {
+										"id": 115,
+										"nodeType": "ParameterList",
+										"parameters": [],
+										"src": "4128:0:0"
+									},
+									"src": "4099:265:0",
+									"virtual": false,
+									"visibility": "internal"
+								},
+								{
+									"body": {
+										"id": 146,
+										"nodeType": "Block",
+										"src": "4625:48:0",
+										"statements": [
+											{
+												"expression": {
+													"id": 144,
+													"name": "_currentSignatureCount",
+													"nodeType": "Identifier",
+													"overloadedDeclarations": [],
+													"referencedDeclaration": 20,
+													"src": "4643:22:0",
+													"typeDescriptions": {
+														"typeIdentifier": "t_uint8",
+														"typeString": "uint8"
+													}
+												},
+												"functionReturnParameters": 143,
+												"id": 145,
+												"nodeType": "Return",
+												"src": "4636:29:0"
+											}
+										]
+									},
+									"documentation": {
+										"id": 139,
+										"nodeType": "StructuredDocumentation",
+										"src": "4404:154:0",
+										"text": "@dev Retrieves the current signature count\n @notice Retrieves the current signature count\n @return Returns the current signature count"
+									},
+									"functionSelector": "75782ab6",
+									"id": 147,
+									"implemented": true,
+									"kind": "function",
+									"modifiers": [],
+									"name": "currentSignatureCount",
+									"nameLocation": "4573:21:0",
+									"nodeType": "FunctionDefinition",
+									"parameters": {
+										"id": 140,
+										"nodeType": "ParameterList",
+										"parameters": [],
+										"src": "4594:2:0"
+									},
+									"returnParameters": {
+										"id": 143,
+										"nodeType": "ParameterList",
+										"parameters": [
+											{
+												"constant": false,
+												"id": 142,
+												"mutability": "mutable",
+												"name": "",
+												"nameLocation": "-1:-1:-1",
+												"nodeType": "VariableDeclaration",
+												"scope": 147,
+												"src": "4618:5:0",
+												"stateVariable": false,
+												"storageLocation": "default",
+												"typeDescriptions": {
+													"typeIdentifier": "t_uint8",
+													"typeString": "uint8"
+												},
+												"typeName": {
+													"id": 141,
+													"name": "uint8",
+													"nodeType": "ElementaryTypeName",
+													"src": "4618:5:0",
+													"typeDescriptions": {
+														"typeIdentifier": "t_uint8",
+														"typeString": "uint8"
+													}
+												},
+												"visibility": "internal"
+											}
+										],
+										"src": "4617:7:0"
+									},
+									"scope": 287,
+									"src": "4564:109:0",
+									"stateMutability": "view",
+									"virtual": false,
+									"visibility": "public"
+								},
+								{
+									"body": {
+										"id": 159,
+										"nodeType": "Block",
+										"src": "5052:44:0",
+										"statements": [
+											{
+												"expression": {
+													"baseExpression": {
+														"id": 155,
+														"name": "_isSigner",
+														"nodeType": "Identifier",
+														"overloadedDeclarations": [],
+														"referencedDeclaration": 25,
+														"src": "5070:9:0",
+														"typeDescriptions": {
+															"typeIdentifier": "t_mapping$_t_address_$_t_bool_$",
+															"typeString": "mapping(address => bool)"
+														}
+													},
+													"id": 157,
+													"indexExpression": {
+														"id": 156,
+														"name": "signer_",
+														"nodeType": "Identifier",
+														"overloadedDeclarations": [],
+														"referencedDeclaration": 150,
+														"src": "5080:7:0",
+														"typeDescriptions": {
+															"typeIdentifier": "t_address",
+															"typeString": "address"
+														}
+													},
+													"isConstant": false,
+													"isLValue": true,
+													"isPure": false,
+													"lValueRequested": false,
+													"nodeType": "IndexAccess",
+													"src": "5070:18:0",
+													"typeDescriptions": {
+														"typeIdentifier": "t_bool",
+														"typeString": "bool"
+													}
+												},
+												"functionReturnParameters": 154,
+												"id": 158,
+												"nodeType": "Return",
+												"src": "5063:25:0"
+											}
+										]
+									},
+									"documentation": {
+										"id": 148,
+										"nodeType": "StructuredDocumentation",
+										"src": "4681:303:0",
+										"text": "@dev Evaluates whether an address is in the valid signer set or not\n @notice Evaluates whether an address is in the valid signer set or not\n @param signer_ The address to be evaluated\n @return Returns a boolean literal indicating whether the passed address is a signer or not"
+									},
+									"functionSelector": "7df73e27",
+									"id": 160,
+									"implemented": true,
+									"kind": "function",
+									"modifiers": [],
+									"name": "isSigner",
+									"nameLocation": "4999:8:0",
+									"nodeType": "FunctionDefinition",
+									"parameters": {
+										"id": 151,
+										"nodeType": "ParameterList",
+										"parameters": [
+											{
+												"constant": false,
+												"id": 150,
+												"mutability": "mutable",
+												"name": "signer_",
+												"nameLocation": "5016:7:0",
+												"nodeType": "VariableDeclaration",
+												"scope": 160,
+												"src": "5008:15:0",
+												"stateVariable": false,
+												"storageLocation": "default",
+												"typeDescriptions": {
+													"typeIdentifier": "t_address",
+													"typeString": "address"
+												},
+												"typeName": {
+													"id": 149,
+													"name": "address",
+													"nodeType": "ElementaryTypeName",
+													"src": "5008:7:0",
+													"stateMutability": "nonpayable",
+													"typeDescriptions": {
+														"typeIdentifier": "t_address",
+														"typeString": "address"
+													}
+												},
+												"visibility": "internal"
+											}
+										],
+										"src": "5007:17:0"
+									},
+									"returnParameters": {
+										"id": 154,
+										"nodeType": "ParameterList",
+										"parameters": [
+											{
+												"constant": false,
+												"id": 153,
+												"mutability": "mutable",
+												"name": "",
+												"nameLocation": "-1:-1:-1",
+												"nodeType": "VariableDeclaration",
+												"scope": 160,
+												"src": "5046:4:0",
+												"stateVariable": false,
+												"storageLocation": "default",
+												"typeDescriptions": {
+													"typeIdentifier": "t_bool",
+													"typeString": "bool"
+												},
+												"typeName": {
+													"id": 152,
+													"name": "bool",
+													"nodeType": "ElementaryTypeName",
+													"src": "5046:4:0",
+													"typeDescriptions": {
+														"typeIdentifier": "t_bool",
+														"typeString": "bool"
+													}
+												},
+												"visibility": "internal"
+											}
+										],
+										"src": "5045:6:0"
+									},
+									"scope": 287,
+									"src": "4990:106:0",
+									"stateMutability": "view",
+									"virtual": false,
+									"visibility": "public"
+								},
+								{
+									"body": {
+										"id": 172,
+										"nodeType": "Block",
+										"src": "5439:45:0",
+										"statements": [
+											{
+												"expression": {
+													"baseExpression": {
+														"id": 168,
+														"name": "_hasSigned",
+														"nodeType": "Identifier",
+														"overloadedDeclarations": [],
+														"referencedDeclaration": 30,
+														"src": "5457:10:0",
+														"typeDescriptions": {
+															"typeIdentifier": "t_mapping$_t_address_$_t_bool_$",
+															"typeString": "mapping(address => bool)"
+														}
+													},
+													"id": 170,
+													"indexExpression": {
+														"id": 169,
+														"name": "signer_",
+														"nodeType": "Identifier",
+														"overloadedDeclarations": [],
+														"referencedDeclaration": 163,
+														"src": "5468:7:0",
+														"typeDescriptions": {
+															"typeIdentifier": "t_address",
+															"typeString": "address"
+														}
+													},
+													"isConstant": false,
+													"isLValue": true,
+													"isPure": false,
+													"lValueRequested": false,
+													"nodeType": "IndexAccess",
+													"src": "5457:19:0",
+													"typeDescriptions": {
+														"typeIdentifier": "t_bool",
+														"typeString": "bool"
+													}
+												},
+												"functionReturnParameters": 167,
+												"id": 171,
+												"nodeType": "Return",
+												"src": "5450:26:0"
+											}
+										]
+									},
+									"documentation": {
+										"id": 161,
+										"nodeType": "StructuredDocumentation",
+										"src": "5104:266:0",
+										"text": "@dev Evaluates whether a signer has signed or not\n @notice Evaluates whether a signer has signed or not\n @param signer_ The address to be evaluated\n @return Returns a boolean literal indicating whether the passed address has signed or not"
+									},
+									"functionSelector": "bf6a1413",
+									"id": 173,
+									"implemented": true,
+									"kind": "function",
+									"modifiers": [],
+									"name": "hasSigned",
+									"nameLocation": "5385:9:0",
+									"nodeType": "FunctionDefinition",
+									"parameters": {
+										"id": 164,
+										"nodeType": "ParameterList",
+										"parameters": [
+											{
+												"constant": false,
+												"id": 163,
+												"mutability": "mutable",
+												"name": "signer_",
+												"nameLocation": "5403:7:0",
+												"nodeType": "VariableDeclaration",
+												"scope": 173,
+												"src": "5395:15:0",
+												"stateVariable": false,
+												"storageLocation": "default",
+												"typeDescriptions": {
+													"typeIdentifier": "t_address",
+													"typeString": "address"
+												},
+												"typeName": {
+													"id": 162,
+													"name": "address",
+													"nodeType": "ElementaryTypeName",
+													"src": "5395:7:0",
+													"stateMutability": "nonpayable",
+													"typeDescriptions": {
+														"typeIdentifier": "t_address",
+														"typeString": "address"
+													}
+												},
+												"visibility": "internal"
+											}
+										],
+										"src": "5394:17:0"
+									},
+									"returnParameters": {
+										"id": 167,
+										"nodeType": "ParameterList",
+										"parameters": [
+											{
+												"constant": false,
+												"id": 166,
+												"mutability": "mutable",
+												"name": "",
+												"nameLocation": "-1:-1:-1",
+												"nodeType": "VariableDeclaration",
+												"scope": 173,
+												"src": "5433:4:0",
+												"stateVariable": false,
+												"storageLocation": "default",
+												"typeDescriptions": {
+													"typeIdentifier": "t_bool",
+													"typeString": "bool"
+												},
+												"typeName": {
+													"id": 165,
+													"name": "bool",
+													"nodeType": "ElementaryTypeName",
+													"src": "5433:4:0",
+													"typeDescriptions": {
+														"typeIdentifier": "t_bool",
+														"typeString": "bool"
+													}
+												},
+												"visibility": "internal"
+											}
+										],
+										"src": "5432:6:0"
+									},
+									"scope": 287,
+									"src": "5376:108:0",
+									"stateMutability": "view",
+									"virtual": false,
+									"visibility": "public"
+								},
+								{
+									"body": {
+										"id": 181,
+										"nodeType": "Block",
+										"src": "5749:46:0",
+										"statements": [
+											{
+												"expression": {
+													"id": 179,
+													"name": "_signatureExpiryTime",
+													"nodeType": "Identifier",
+													"overloadedDeclarations": [],
+													"referencedDeclaration": 17,
+													"src": "5767:20:0",
+													"typeDescriptions": {
+														"typeIdentifier": "t_uint256",
+														"typeString": "uint256"
+													}
+												},
+												"functionReturnParameters": 178,
+												"id": 180,
+												"nodeType": "Return",
+												"src": "5760:27:0"
+											}
+										]
+									},
+									"documentation": {
+										"id": 174,
+										"nodeType": "StructuredDocumentation",
+										"src": "5492:187:0",
+										"text": "@dev Retrieves the current signature expiry timestamp\n @notice Retrieves the current signature expiry timestamp\n @return Returns the current signature expiry timestamp"
+									},
+									"functionSelector": "8e4e210c",
+									"id": 182,
+									"implemented": true,
+									"kind": "function",
+									"modifiers": [],
+									"name": "getSignatureExpiryTime",
+									"nameLocation": "5694:22:0",
+									"nodeType": "FunctionDefinition",
+									"parameters": {
+										"id": 175,
+										"nodeType": "ParameterList",
+										"parameters": [],
+										"src": "5716:2:0"
+									},
+									"returnParameters": {
+										"id": 178,
+										"nodeType": "ParameterList",
+										"parameters": [
+											{
+												"constant": false,
+												"id": 177,
+												"mutability": "mutable",
+												"name": "",
+												"nameLocation": "-1:-1:-1",
+												"nodeType": "VariableDeclaration",
+												"scope": 182,
+												"src": "5740:7:0",
+												"stateVariable": false,
+												"storageLocation": "default",
+												"typeDescriptions": {
+													"typeIdentifier": "t_uint256",
+													"typeString": "uint256"
+												},
+												"typeName": {
+													"id": 176,
+													"name": "uint256",
+													"nodeType": "ElementaryTypeName",
+													"src": "5740:7:0",
+													"typeDescriptions": {
+														"typeIdentifier": "t_uint256",
+														"typeString": "uint256"
+													}
+												},
+												"visibility": "internal"
+											}
+										],
+										"src": "5739:9:0"
+									},
+									"scope": 287,
+									"src": "5685:110:0",
+									"stateMutability": "view",
+									"virtual": false,
+									"visibility": "public"
+								},
+								{
+									"body": {
+										"id": 212,
+										"nodeType": "Block",
+										"src": "6150:191:0",
+										"statements": [
+											{
+												"expression": {
+													"id": 187,
+													"isConstant": false,
+													"isLValue": false,
+													"isPure": false,
+													"lValueRequested": false,
+													"nodeType": "UnaryOperation",
+													"operator": "delete",
+													"prefix": true,
+													"src": "6161:29:0",
+													"subExpression": {
+														"id": 186,
+														"name": "_currentSignatureCount",
+														"nodeType": "Identifier",
+														"overloadedDeclarations": [],
+														"referencedDeclaration": 20,
+														"src": "6168:22:0",
+														"typeDescriptions": {
+															"typeIdentifier": "t_uint8",
+															"typeString": "uint8"
+														}
+													},
+													"typeDescriptions": {
+														"typeIdentifier": "t_tuple$__$",
+														"typeString": "tuple()"
+													}
+												},
+												"id": 188,
+												"nodeType": "ExpressionStatement",
+												"src": "6161:29:0"
+											},
+											{
+												"body": {
+													"id": 207,
+													"nodeType": "Block",
+													"src": "6243:58:0",
+													"statements": [
+														{
+															"expression": {
+																"id": 205,
+																"isConstant": false,
+																"isLValue": false,
+																"isPure": false,
+																"lValueRequested": false,
+																"leftHandSide": {
+																	"baseExpression": {
+																		"id": 199,
+																		"name": "_hasSigned",
+																		"nodeType": "Identifier",
+																		"overloadedDeclarations": [],
+																		"referencedDeclaration": 30,
+																		"src": "6258:10:0",
+																		"typeDescriptions": {
+																			"typeIdentifier": "t_mapping$_t_address_$_t_bool_$",
+																			"typeString": "mapping(address => bool)"
+																		}
+																	},
+																	"id": 203,
+																	"indexExpression": {
+																		"baseExpression": {
+																			"id": 200,
+																			"name": "_signers",
+																			"nodeType": "Identifier",
+																			"overloadedDeclarations": [],
+																			"referencedDeclaration": 43,
+																			"src": "6269:8:0",
+																			"typeDescriptions": {
+																				"typeIdentifier": "t_array$_t_address_$7_storage",
+																				"typeString": "address[7] storage ref"
+																			}
+																		},
+																		"id": 202,
+																		"indexExpression": {
+																			"id": 201,
+																			"name": "i",
+																			"nodeType": "Identifier",
+																			"overloadedDeclarations": [],
+																			"referencedDeclaration": 190,
+																			"src": "6278:1:0",
+																			"typeDescriptions": {
+																				"typeIdentifier": "t_uint8",
+																				"typeString": "uint8"
+																			}
+																		},
+																		"isConstant": false,
+																		"isLValue": true,
+																		"isPure": false,
+																		"lValueRequested": false,
+																		"nodeType": "IndexAccess",
+																		"src": "6269:11:0",
+																		"typeDescriptions": {
+																			"typeIdentifier": "t_address",
+																			"typeString": "address"
+																		}
+																	},
+																	"isConstant": false,
+																	"isLValue": true,
+																	"isPure": false,
+																	"lValueRequested": true,
+																	"nodeType": "IndexAccess",
+																	"src": "6258:23:0",
+																	"typeDescriptions": {
+																		"typeIdentifier": "t_bool",
+																		"typeString": "bool"
+																	}
+																},
+																"nodeType": "Assignment",
+																"operator": "=",
+																"rightHandSide": {
+																	"hexValue": "66616c7365",
+																	"id": 204,
+																	"isConstant": false,
+																	"isLValue": false,
+																	"isPure": true,
+																	"kind": "bool",
+																	"lValueRequested": false,
+																	"nodeType": "Literal",
+																	"src": "6284:5:0",
+																	"typeDescriptions": {
+																		"typeIdentifier": "t_bool",
+																		"typeString": "bool"
+																	},
+																	"value": "false"
+																},
+																"src": "6258:31:0",
+																"typeDescriptions": {
+																	"typeIdentifier": "t_bool",
+																	"typeString": "bool"
+																}
+															},
+															"id": 206,
+															"nodeType": "ExpressionStatement",
+															"src": "6258:31:0"
+														}
+													]
+												},
+												"condition": {
+													"commonType": {
+														"typeIdentifier": "t_uint8",
+														"typeString": "uint8"
+													},
+													"id": 195,
+													"isConstant": false,
+													"isLValue": false,
+													"isPure": false,
+													"lValueRequested": false,
+													"leftExpression": {
+														"id": 193,
+														"name": "i",
+														"nodeType": "Identifier",
+														"overloadedDeclarations": [],
+														"referencedDeclaration": 190,
+														"src": "6218:1:0",
+														"typeDescriptions": {
+															"typeIdentifier": "t_uint8",
+															"typeString": "uint8"
+														}
+													},
+													"nodeType": "BinaryOperation",
+													"operator": "<",
+													"rightExpression": {
+														"id": 194,
+														"name": "_TOTAL_SIGNERS",
+														"nodeType": "Identifier",
+														"overloadedDeclarations": [],
+														"referencedDeclaration": 6,
+														"src": "6222:14:0",
+														"typeDescriptions": {
+															"typeIdentifier": "t_uint8",
+															"typeString": "uint8"
+														}
+													},
+													"src": "6218:18:0",
+													"typeDescriptions": {
+														"typeIdentifier": "t_bool",
+														"typeString": "bool"
+													}
+												},
+												"id": 208,
+												"initializationExpression": {
+													"assignments": [
+														190
+													],
+													"declarations": [
+														{
+															"constant": false,
+															"id": 190,
+															"mutability": "mutable",
+															"name": "i",
+															"nameLocation": "6211:1:0",
+															"nodeType": "VariableDeclaration",
+															"scope": 208,
+															"src": "6205:7:0",
+															"stateVariable": false,
+															"storageLocation": "default",
+															"typeDescriptions": {
+																"typeIdentifier": "t_uint8",
+																"typeString": "uint8"
+															},
+															"typeName": {
+																"id": 189,
+																"name": "uint8",
+																"nodeType": "ElementaryTypeName",
+																"src": "6205:5:0",
+																"typeDescriptions": {
+																	"typeIdentifier": "t_uint8",
+																	"typeString": "uint8"
+																}
+															},
+															"visibility": "internal"
+														}
+													],
+													"id": 192,
+													"initialValue": {
+														"hexValue": "30",
+														"id": 191,
+														"isConstant": false,
+														"isLValue": false,
+														"isPure": true,
+														"kind": "number",
+														"lValueRequested": false,
+														"nodeType": "Literal",
+														"src": "6215:1:0",
+														"typeDescriptions": {
+															"typeIdentifier": "t_rational_0_by_1",
+															"typeString": "int_const 0"
+														},
+														"value": "0"
+													},
+													"nodeType": "VariableDeclarationStatement",
+													"src": "6205:11:0"
+												},
+												"isSimpleCounterLoop": true,
+												"loopExpression": {
+													"expression": {
+														"id": 197,
+														"isConstant": false,
+														"isLValue": false,
+														"isPure": false,
+														"lValueRequested": false,
+														"nodeType": "UnaryOperation",
+														"operator": "++",
+														"prefix": false,
+														"src": "6238:3:0",
+														"subExpression": {
+															"id": 196,
+															"name": "i",
+															"nodeType": "Identifier",
+															"overloadedDeclarations": [],
+															"referencedDeclaration": 190,
+															"src": "6238:1:0",
+															"typeDescriptions": {
+																"typeIdentifier": "t_uint8",
+																"typeString": "uint8"
+															}
+														},
+														"typeDescriptions": {
+															"typeIdentifier": "t_uint8",
+															"typeString": "uint8"
+														}
+													},
+													"id": 198,
+													"nodeType": "ExpressionStatement",
+													"src": "6238:3:0"
+												},
+												"nodeType": "ForStatement",
+												"src": "6201:100:0"
+											},
+											{
+												"eventCall": {
+													"arguments": [],
+													"expression": {
+														"argumentTypes": [],
+														"id": 209,
+														"name": "SignaturesReset",
+														"nodeType": "Identifier",
+														"overloadedDeclarations": [],
+														"referencedDeclaration": 51,
+														"src": "6316:15:0",
+														"typeDescriptions": {
+															"typeIdentifier": "t_function_event_nonpayable$__$returns$__$",
+															"typeString": "function ()"
+														}
+													},
+													"id": 210,
+													"isConstant": false,
+													"isLValue": false,
+													"isPure": false,
+													"kind": "functionCall",
+													"lValueRequested": false,
+													"nameLocations": [],
+													"names": [],
+													"nodeType": "FunctionCall",
+													"src": "6316:17:0",
+													"tryCall": false,
+													"typeDescriptions": {
+														"typeIdentifier": "t_tuple$__$",
+														"typeString": "tuple()"
+													}
+												},
+												"id": 211,
+												"nodeType": "EmitStatement",
+												"src": "6311:22:0"
+											}
+										]
+									},
+									"documentation": {
+										"id": 183,
+										"nodeType": "StructuredDocumentation",
+										"src": "5851:253:0",
+										"text": "@dev Resets all signatures by setting the current signature count to 0 and invalidating all signatures made by signers\n @notice Resets all signatures by setting the current signature count to 0 and invalidating all signatures made by signers"
+									},
+									"id": 213,
+									"implemented": true,
+									"kind": "function",
+									"modifiers": [],
+									"name": "_resetAllSignatures",
+									"nameLocation": "6119:19:0",
+									"nodeType": "FunctionDefinition",
+									"parameters": {
+										"id": 184,
+										"nodeType": "ParameterList",
+										"parameters": [],
+										"src": "6138:2:0"
+									},
+									"returnParameters": {
+										"id": 185,
+										"nodeType": "ParameterList",
+										"parameters": [],
+										"src": "6150:0:0"
+									},
+									"scope": 287,
+									"src": "6110:231:0",
+									"stateMutability": "nonpayable",
+									"virtual": false,
+									"visibility": "internal"
+								},
+								{
+									"body": {
+										"id": 285,
+										"nodeType": "Block",
+										"src": "6906:701:0",
+										"statements": [
+											{
+												"condition": {
+													"commonType": {
+														"typeIdentifier": "t_uint8",
+														"typeString": "uint8"
+													},
+													"id": 224,
+													"isConstant": false,
+													"isLValue": false,
+													"isPure": false,
+													"lValueRequested": false,
+													"leftExpression": {
+														"arguments": [],
+														"expression": {
+															"argumentTypes": [],
+															"id": 221,
+															"name": "currentSignatureCount",
+															"nodeType": "Identifier",
+															"overloadedDeclarations": [],
+															"referencedDeclaration": 147,
+															"src": "6920:21:0",
+															"typeDescriptions": {
+																"typeIdentifier": "t_function_internal_view$__$returns$_t_uint8_$",
+																"typeString": "function () view returns (uint8)"
+															}
+														},
+														"id": 222,
+														"isConstant": false,
+														"isLValue": false,
+														"isPure": false,
+														"kind": "functionCall",
+														"lValueRequested": false,
+														"nameLocations": [],
+														"names": [],
+														"nodeType": "FunctionCall",
+														"src": "6920:23:0",
+														"tryCall": false,
+														"typeDescriptions": {
+															"typeIdentifier": "t_uint8",
+															"typeString": "uint8"
+														}
+													},
+													"nodeType": "BinaryOperation",
+													"operator": "==",
+													"rightExpression": {
+														"hexValue": "30",
+														"id": 223,
+														"isConstant": false,
+														"isLValue": false,
+														"isPure": true,
+														"kind": "number",
+														"lValueRequested": false,
+														"nodeType": "Literal",
+														"src": "6947:1:0",
+														"typeDescriptions": {
+															"typeIdentifier": "t_rational_0_by_1",
+															"typeString": "int_const 0"
+														},
+														"value": "0"
+													},
+													"src": "6920:28:0",
+													"typeDescriptions": {
+														"typeIdentifier": "t_bool",
+														"typeString": "bool"
+													}
+												},
+												"id": 236,
+												"nodeType": "IfStatement",
+												"src": "6917:184:0",
+												"trueBody": {
+													"id": 235,
+													"nodeType": "Block",
+													"src": "6950:151:0",
+													"statements": [
+														{
+															"expression": {
+																"id": 230,
+																"isConstant": false,
+																"isLValue": false,
+																"isPure": false,
+																"lValueRequested": false,
+																"leftHandSide": {
+																	"id": 225,
+																	"name": "_signatureExpiryTime",
+																	"nodeType": "Identifier",
+																	"overloadedDeclarations": [],
+																	"referencedDeclaration": 17,
+																	"src": "6965:20:0",
+																	"typeDescriptions": {
+																		"typeIdentifier": "t_uint256",
+																		"typeString": "uint256"
+																	}
+																},
+																"nodeType": "Assignment",
+																"operator": "=",
+																"rightHandSide": {
+																	"commonType": {
+																		"typeIdentifier": "t_uint256",
+																		"typeString": "uint256"
+																	},
+																	"id": 229,
+																	"isConstant": false,
+																	"isLValue": false,
+																	"isPure": false,
+																	"lValueRequested": false,
+																	"leftExpression": {
+																		"expression": {
+																			"id": 226,
+																			"name": "block",
+																			"nodeType": "Identifier",
+																			"overloadedDeclarations": [],
+																			"referencedDeclaration": 4294967292,
+																			"src": "6988:5:0",
+																			"typeDescriptions": {
+																				"typeIdentifier": "t_magic_block",
+																				"typeString": "block"
+																			}
+																		},
+																		"id": 227,
+																		"isConstant": false,
+																		"isLValue": false,
+																		"isPure": false,
+																		"lValueRequested": false,
+																		"memberLocation": "6994:9:0",
+																		"memberName": "timestamp",
+																		"nodeType": "MemberAccess",
+																		"src": "6988:15:0",
+																		"typeDescriptions": {
+																			"typeIdentifier": "t_uint256",
+																			"typeString": "uint256"
+																		}
+																	},
+																	"nodeType": "BinaryOperation",
+																	"operator": "+",
+																	"rightExpression": {
+																		"id": 228,
+																		"name": "_SIGNATURE_VALIDITY_TIME",
+																		"nodeType": "Identifier",
+																		"overloadedDeclarations": [],
+																		"referencedDeclaration": 14,
+																		"src": "7006:24:0",
+																		"typeDescriptions": {
+																			"typeIdentifier": "t_uint256",
+																			"typeString": "uint256"
+																		}
+																	},
+																	"src": "6988:42:0",
+																	"typeDescriptions": {
+																		"typeIdentifier": "t_uint256",
+																		"typeString": "uint256"
+																	}
+																},
+																"src": "6965:65:0",
+																"typeDescriptions": {
+																	"typeIdentifier": "t_uint256",
+																	"typeString": "uint256"
+																}
+															},
+															"id": 231,
+															"nodeType": "ExpressionStatement",
+															"src": "6965:65:0"
+														},
+														{
+															"eventCall": {
+																"arguments": [],
+																"expression": {
+																	"argumentTypes": [],
+																	"id": 232,
+																	"name": "SignatureValidityTimeCountdownStarted",
+																	"nodeType": "Identifier",
+																	"overloadedDeclarations": [],
+																	"referencedDeclaration": 54,
+																	"src": "7050:37:0",
+																	"typeDescriptions": {
+																		"typeIdentifier": "t_function_event_nonpayable$__$returns$__$",
+																		"typeString": "function ()"
+																	}
+																},
+																"id": 233,
+																"isConstant": false,
+																"isLValue": false,
+																"isPure": false,
+																"kind": "functionCall",
+																"lValueRequested": false,
+																"nameLocations": [],
+																"names": [],
+																"nodeType": "FunctionCall",
+																"src": "7050:39:0",
+																"tryCall": false,
+																"typeDescriptions": {
+																	"typeIdentifier": "t_tuple$__$",
+																	"typeString": "tuple()"
+																}
+															},
+															"id": 234,
+															"nodeType": "EmitStatement",
+															"src": "7045:44:0"
+														}
+													]
+												}
+											},
+											{
+												"condition": {
+													"commonType": {
+														"typeIdentifier": "t_uint256",
+														"typeString": "uint256"
+													},
+													"id": 241,
+													"isConstant": false,
+													"isLValue": false,
+													"isPure": false,
+													"lValueRequested": false,
+													"leftExpression": {
+														"expression": {
+															"id": 237,
+															"name": "block",
+															"nodeType": "Identifier",
+															"overloadedDeclarations": [],
+															"referencedDeclaration": 4294967292,
+															"src": "7124:5:0",
+															"typeDescriptions": {
+																"typeIdentifier": "t_magic_block",
+																"typeString": "block"
+															}
+														},
+														"id": 238,
+														"isConstant": false,
+														"isLValue": false,
+														"isPure": false,
+														"lValueRequested": false,
+														"memberLocation": "7130:9:0",
+														"memberName": "timestamp",
+														"nodeType": "MemberAccess",
+														"src": "7124:15:0",
+														"typeDescriptions": {
+															"typeIdentifier": "t_uint256",
+															"typeString": "uint256"
+														}
+													},
+													"nodeType": "BinaryOperation",
+													"operator": ">",
+													"rightExpression": {
+														"arguments": [],
+														"expression": {
+															"argumentTypes": [],
+															"id": 239,
+															"name": "getSignatureExpiryTime",
+															"nodeType": "Identifier",
+															"overloadedDeclarations": [],
+															"referencedDeclaration": 182,
+															"src": "7142:22:0",
+															"typeDescriptions": {
+																"typeIdentifier": "t_function_internal_view$__$returns$_t_uint256_$",
+																"typeString": "function () view returns (uint256)"
+															}
+														},
+														"id": 240,
+														"isConstant": false,
+														"isLValue": false,
+														"isPure": false,
+														"kind": "functionCall",
+														"lValueRequested": false,
+														"nameLocations": [],
+														"names": [],
+														"nodeType": "FunctionCall",
+														"src": "7142:24:0",
+														"tryCall": false,
+														"typeDescriptions": {
+															"typeIdentifier": "t_uint256",
+															"typeString": "uint256"
+														}
+													},
+													"src": "7124:42:0",
+													"typeDescriptions": {
+														"typeIdentifier": "t_bool",
+														"typeString": "bool"
+													}
+												},
+												"id": 259,
+												"nodeType": "IfStatement",
+												"src": "7121:281:0",
+												"trueBody": {
+													"id": 258,
+													"nodeType": "Block",
+													"src": "7168:234:0",
+													"statements": [
+														{
+															"expression": {
+																"arguments": [],
+																"expression": {
+																	"argumentTypes": [],
+																	"id": 242,
+																	"name": "_resetAllSignatures",
+																	"nodeType": "Identifier",
+																	"overloadedDeclarations": [],
+																	"referencedDeclaration": 213,
+																	"src": "7183:19:0",
+																	"typeDescriptions": {
+																		"typeIdentifier": "t_function_internal_nonpayable$__$returns$__$",
+																		"typeString": "function ()"
+																	}
+																},
+																"id": 243,
+																"isConstant": false,
+																"isLValue": false,
+																"isPure": false,
+																"kind": "functionCall",
+																"lValueRequested": false,
+																"nameLocations": [],
+																"names": [],
+																"nodeType": "FunctionCall",
+																"src": "7183:21:0",
+																"tryCall": false,
+																"typeDescriptions": {
+																	"typeIdentifier": "t_tuple$__$",
+																	"typeString": "tuple()"
+																}
+															},
+															"id": 244,
+															"nodeType": "ExpressionStatement",
+															"src": "7183:21:0"
+														},
+														{
+															"eventCall": {
+																"arguments": [],
+																"expression": {
+																	"argumentTypes": [],
+																	"id": 245,
+																	"name": "SignaturesExpiredAndReset",
+																	"nodeType": "Identifier",
+																	"overloadedDeclarations": [],
+																	"referencedDeclaration": 57,
+																	"src": "7224:25:0",
+																	"typeDescriptions": {
+																		"typeIdentifier": "t_function_event_nonpayable$__$returns$__$",
+																		"typeString": "function ()"
+																	}
+																},
+																"id": 246,
+																"isConstant": false,
+																"isLValue": false,
+																"isPure": false,
+																"kind": "functionCall",
+																"lValueRequested": false,
+																"nameLocations": [],
+																"names": [],
+																"nodeType": "FunctionCall",
+																"src": "7224:27:0",
+																"tryCall": false,
+																"typeDescriptions": {
+																	"typeIdentifier": "t_tuple$__$",
+																	"typeString": "tuple()"
+																}
+															},
+															"id": 247,
+															"nodeType": "EmitStatement",
+															"src": "7219:32:0"
+														},
+														{
+															"expression": {
+																"id": 253,
+																"isConstant": false,
+																"isLValue": false,
+																"isPure": false,
+																"lValueRequested": false,
+																"leftHandSide": {
+																	"id": 248,
+																	"name": "_signatureExpiryTime",
+																	"nodeType": "Identifier",
+																	"overloadedDeclarations": [],
+																	"referencedDeclaration": 17,
+																	"src": "7266:20:0",
+																	"typeDescriptions": {
+																		"typeIdentifier": "t_uint256",
+																		"typeString": "uint256"
+																	}
+																},
+																"nodeType": "Assignment",
+																"operator": "=",
+																"rightHandSide": {
+																	"commonType": {
+																		"typeIdentifier": "t_uint256",
+																		"typeString": "uint256"
+																	},
+																	"id": 252,
+																	"isConstant": false,
+																	"isLValue": false,
+																	"isPure": false,
+																	"lValueRequested": false,
+																	"leftExpression": {
+																		"expression": {
+																			"id": 249,
+																			"name": "block",
+																			"nodeType": "Identifier",
+																			"overloadedDeclarations": [],
+																			"referencedDeclaration": 4294967292,
+																			"src": "7289:5:0",
+																			"typeDescriptions": {
+																				"typeIdentifier": "t_magic_block",
+																				"typeString": "block"
+																			}
+																		},
+																		"id": 250,
+																		"isConstant": false,
+																		"isLValue": false,
+																		"isPure": false,
+																		"lValueRequested": false,
+																		"memberLocation": "7295:9:0",
+																		"memberName": "timestamp",
+																		"nodeType": "MemberAccess",
+																		"src": "7289:15:0",
+																		"typeDescriptions": {
+																			"typeIdentifier": "t_uint256",
+																			"typeString": "uint256"
+																		}
+																	},
+																	"nodeType": "BinaryOperation",
+																	"operator": "+",
+																	"rightExpression": {
+																		"id": 251,
+																		"name": "_SIGNATURE_VALIDITY_TIME",
+																		"nodeType": "Identifier",
+																		"overloadedDeclarations": [],
+																		"referencedDeclaration": 14,
+																		"src": "7307:24:0",
+																		"typeDescriptions": {
+																			"typeIdentifier": "t_uint256",
+																			"typeString": "uint256"
+																		}
+																	},
+																	"src": "7289:42:0",
+																	"typeDescriptions": {
+																		"typeIdentifier": "t_uint256",
+																		"typeString": "uint256"
+																	}
+																},
+																"src": "7266:65:0",
+																"typeDescriptions": {
+																	"typeIdentifier": "t_uint256",
+																	"typeString": "uint256"
+																}
+															},
+															"id": 254,
+															"nodeType": "ExpressionStatement",
+															"src": "7266:65:0"
+														},
+														{
+															"eventCall": {
+																"arguments": [],
+																"expression": {
+																	"argumentTypes": [],
+																	"id": 255,
+																	"name": "SignatureValidityTimeCountdownStarted",
+																	"nodeType": "Identifier",
+																	"overloadedDeclarations": [],
+																	"referencedDeclaration": 54,
+																	"src": "7351:37:0",
+																	"typeDescriptions": {
+																		"typeIdentifier": "t_function_event_nonpayable$__$returns$__$",
+																		"typeString": "function ()"
+																	}
+																},
+																"id": 256,
+																"isConstant": false,
+																"isLValue": false,
+																"isPure": false,
+																"kind": "functionCall",
+																"lValueRequested": false,
+																"nameLocations": [],
+																"names": [],
+																"nodeType": "FunctionCall",
+																"src": "7351:39:0",
+																"tryCall": false,
+																"typeDescriptions": {
+																	"typeIdentifier": "t_tuple$__$",
+																	"typeString": "tuple()"
+																}
+															},
+															"id": 257,
+															"nodeType": "EmitStatement",
+															"src": "7346:44:0"
+														}
+													]
+												}
+											},
+											{
+												"expression": {
+													"arguments": [
+														{
+															"id": 265,
+															"isConstant": false,
+															"isLValue": false,
+															"isPure": false,
+															"lValueRequested": false,
+															"nodeType": "UnaryOperation",
+															"operator": "!",
+															"prefix": true,
+															"src": "7430:22:0",
+															"subExpression": {
+																"arguments": [
+																	{
+																		"expression": {
+																			"id": 262,
+																			"name": "msg",
+																			"nodeType": "Identifier",
+																			"overloadedDeclarations": [],
+																			"referencedDeclaration": 4294967281,
+																			"src": "7441:3:0",
+																			"typeDescriptions": {
+																				"typeIdentifier": "t_magic_message",
+																				"typeString": "msg"
+																			}
+																		},
+																		"id": 263,
+																		"isConstant": false,
+																		"isLValue": false,
+																		"isPure": false,
+																		"lValueRequested": false,
+																		"memberLocation": "7445:6:0",
+																		"memberName": "sender",
+																		"nodeType": "MemberAccess",
+																		"src": "7441:10:0",
+																		"typeDescriptions": {
+																			"typeIdentifier": "t_address",
+																			"typeString": "address"
+																		}
+																	}
+																],
+																"expression": {
+																	"argumentTypes": [
+																		{
+																			"typeIdentifier": "t_address",
+																			"typeString": "address"
+																		}
+																	],
+																	"id": 261,
+																	"name": "hasSigned",
+																	"nodeType": "Identifier",
+																	"overloadedDeclarations": [],
+																	"referencedDeclaration": 173,
+																	"src": "7431:9:0",
+																	"typeDescriptions": {
+																		"typeIdentifier": "t_function_internal_view$_t_address_$returns$_t_bool_$",
+																		"typeString": "function (address) view returns (bool)"
+																	}
+																},
+																"id": 264,
+																"isConstant": false,
+																"isLValue": false,
+																"isPure": false,
+																"kind": "functionCall",
+																"lValueRequested": false,
+																"nameLocations": [],
+																"names": [],
+																"nodeType": "FunctionCall",
+																"src": "7431:21:0",
+																"tryCall": false,
+																"typeDescriptions": {
+																	"typeIdentifier": "t_bool",
+																	"typeString": "bool"
+																}
+															},
+															"typeDescriptions": {
+																"typeIdentifier": "t_bool",
+																"typeString": "bool"
+															}
+														}
+													],
+													"expression": {
+														"argumentTypes": [
+															{
+																"typeIdentifier": "t_bool",
+																"typeString": "bool"
+															}
+														],
+														"id": 260,
+														"name": "require",
+														"nodeType": "Identifier",
+														"overloadedDeclarations": [
+															4294967278,
+															4294967278,
+															4294967278
+														],
+														"referencedDeclaration": 4294967278,
+														"src": "7422:7:0",
+														"typeDescriptions": {
+															"typeIdentifier": "t_function_require_pure$_t_bool_$returns$__$",
+															"typeString": "function (bool) pure"
+														}
+													},
+													"id": 266,
+													"isConstant": false,
+													"isLValue": false,
+													"isPure": false,
+													"kind": "functionCall",
+													"lValueRequested": false,
+													"nameLocations": [],
+													"names": [],
+													"nodeType": "FunctionCall",
+													"src": "7422:31:0",
+													"tryCall": false,
+													"typeDescriptions": {
+														"typeIdentifier": "t_tuple$__$",
+														"typeString": "tuple()"
+													}
+												},
+												"id": 267,
+												"nodeType": "ExpressionStatement",
+												"src": "7422:31:0"
+											},
+											{
+												"expression": {
+													"id": 273,
+													"isConstant": false,
+													"isLValue": false,
+													"isPure": false,
+													"lValueRequested": false,
+													"leftHandSide": {
+														"baseExpression": {
+															"id": 268,
+															"name": "_hasSigned",
+															"nodeType": "Identifier",
+															"overloadedDeclarations": [],
+															"referencedDeclaration": 30,
+															"src": "7464:10:0",
+															"typeDescriptions": {
+																"typeIdentifier": "t_mapping$_t_address_$_t_bool_$",
+																"typeString": "mapping(address => bool)"
+															}
+														},
+														"id": 271,
+														"indexExpression": {
+															"expression": {
+																"id": 269,
+																"name": "msg",
+																"nodeType": "Identifier",
+																"overloadedDeclarations": [],
+																"referencedDeclaration": 4294967281,
+																"src": "7475:3:0",
+																"typeDescriptions": {
+																	"typeIdentifier": "t_magic_message",
+																	"typeString": "msg"
+																}
+															},
+															"id": 270,
+															"isConstant": false,
+															"isLValue": false,
+															"isPure": false,
+															"lValueRequested": false,
+															"memberLocation": "7479:6:0",
+															"memberName": "sender",
+															"nodeType": "MemberAccess",
+															"src": "7475:10:0",
+															"typeDescriptions": {
+																"typeIdentifier": "t_address",
+																"typeString": "address"
+															}
+														},
+														"isConstant": false,
+														"isLValue": true,
+														"isPure": false,
+														"lValueRequested": true,
+														"nodeType": "IndexAccess",
+														"src": "7464:22:0",
+														"typeDescriptions": {
+															"typeIdentifier": "t_bool",
+															"typeString": "bool"
+														}
+													},
+													"nodeType": "Assignment",
+													"operator": "=",
+													"rightHandSide": {
+														"hexValue": "74727565",
+														"id": 272,
+														"isConstant": false,
+														"isLValue": false,
+														"isPure": true,
+														"kind": "bool",
+														"lValueRequested": false,
+														"nodeType": "Literal",
+														"src": "7489:4:0",
+														"typeDescriptions": {
+															"typeIdentifier": "t_bool",
+															"typeString": "bool"
+														},
+														"value": "true"
+													},
+													"src": "7464:29:0",
+													"typeDescriptions": {
+														"typeIdentifier": "t_bool",
+														"typeString": "bool"
+													}
+												},
+												"id": 274,
+												"nodeType": "ExpressionStatement",
+												"src": "7464:29:0"
+											},
+											{
+												"expression": {
+													"id": 276,
+													"isConstant": false,
+													"isLValue": false,
+													"isPure": false,
+													"lValueRequested": false,
+													"nodeType": "UnaryOperation",
+													"operator": "++",
+													"prefix": false,
+													"src": "7504:24:0",
+													"subExpression": {
+														"id": 275,
+														"name": "_currentSignatureCount",
+														"nodeType": "Identifier",
+														"overloadedDeclarations": [],
+														"referencedDeclaration": 20,
+														"src": "7504:22:0",
+														"typeDescriptions": {
+															"typeIdentifier": "t_uint8",
+															"typeString": "uint8"
+														}
+													},
+													"typeDescriptions": {
+														"typeIdentifier": "t_uint8",
+														"typeString": "uint8"
+													}
+												},
+												"id": 277,
+												"nodeType": "ExpressionStatement",
+												"src": "7504:24:0"
+											},
+											{
+												"eventCall": {
+													"arguments": [
+														{
+															"expression": {
+																"id": 279,
+																"name": "msg",
+																"nodeType": "Identifier",
+																"overloadedDeclarations": [],
+																"referencedDeclaration": 4294967281,
+																"src": "7566:3:0",
+																"typeDescriptions": {
+																	"typeIdentifier": "t_magic_message",
+																	"typeString": "msg"
+																}
+															},
+															"id": 280,
+															"isConstant": false,
+															"isLValue": false,
+															"isPure": false,
+															"lValueRequested": false,
+															"memberLocation": "7570:6:0",
+															"memberName": "sender",
+															"nodeType": "MemberAccess",
+															"src": "7566:10:0",
+															"typeDescriptions": {
+																"typeIdentifier": "t_address",
+																"typeString": "address"
+															}
+														}
+													],
+													"expression": {
+														"argumentTypes": [
+															{
+																"typeIdentifier": "t_address",
+																"typeString": "address"
+															}
+														],
+														"id": 278,
+														"name": "SignatureRegistered",
+														"nodeType": "Identifier",
+														"overloadedDeclarations": [],
+														"referencedDeclaration": 48,
+														"src": "7546:19:0",
+														"typeDescriptions": {
+															"typeIdentifier": "t_function_event_nonpayable$_t_address_$returns$__$",
+															"typeString": "function (address)"
+														}
+													},
+													"id": 281,
+													"isConstant": false,
+													"isLValue": false,
+													"isPure": false,
+													"kind": "functionCall",
+													"lValueRequested": false,
+													"nameLocations": [],
+													"names": [],
+													"nodeType": "FunctionCall",
+													"src": "7546:31:0",
+													"tryCall": false,
+													"typeDescriptions": {
+														"typeIdentifier": "t_tuple$__$",
+														"typeString": "tuple()"
+													}
+												},
+												"id": 282,
+												"nodeType": "EmitStatement",
+												"src": "7541:36:0"
+											},
+											{
+												"expression": {
+													"hexValue": "74727565",
+													"id": 283,
+													"isConstant": false,
+													"isLValue": false,
+													"isPure": true,
+													"kind": "bool",
+													"lValueRequested": false,
+													"nodeType": "Literal",
+													"src": "7595:4:0",
+													"typeDescriptions": {
+														"typeIdentifier": "t_bool",
+														"typeString": "bool"
+													},
+													"value": "true"
+												},
+												"functionReturnParameters": 220,
+												"id": 284,
+												"nodeType": "Return",
+												"src": "7588:11:0"
+											}
+										]
+									},
+									"documentation": {
+										"id": 214,
+										"nodeType": "StructuredDocumentation",
+										"src": "6349:487:0",
+										"text": "@dev Registers a valid signature if all conditions are fulfilled, manages the signature expiry mechanism\n @notice Registers a valid signature if all conditions are fulfilled, manages the signature expiry mechanism\n @return Returns true boolean literal if the signature registration was successful\n @custom:requirement-modifier The caller must be a signer\n @custom:requirement-body A signer can only sign once (in the same signature collection session)"
+									},
+									"functionSelector": "7e9e7959",
+									"id": 286,
+									"implemented": true,
+									"kind": "function",
+									"modifiers": [
+										{
+											"id": 217,
+											"kind": "modifierInvocation",
+											"modifierName": {
+												"id": 216,
+												"name": "onlySigner",
+												"nameLocations": [
+													"6880:10:0"
+												],
+												"nodeType": "IdentifierPath",
+												"referencedDeclaration": 113,
+												"src": "6880:10:0"
+											},
+											"nodeType": "ModifierInvocation",
+											"src": "6880:10:0"
+										}
+									],
+									"name": "registerSignature",
+									"nameLocation": "6851:17:0",
+									"nodeType": "FunctionDefinition",
+									"parameters": {
+										"id": 215,
+										"nodeType": "ParameterList",
+										"parameters": [],
+										"src": "6868:2:0"
+									},
+									"returnParameters": {
+										"id": 220,
+										"nodeType": "ParameterList",
+										"parameters": [
+											{
+												"constant": false,
+												"id": 219,
+												"mutability": "mutable",
+												"name": "",
+												"nameLocation": "-1:-1:-1",
+												"nodeType": "VariableDeclaration",
+												"scope": 286,
+												"src": "6900:4:0",
+												"stateVariable": false,
+												"storageLocation": "default",
+												"typeDescriptions": {
+													"typeIdentifier": "t_bool",
+													"typeString": "bool"
+												},
+												"typeName": {
+													"id": 218,
+													"name": "bool",
+													"nodeType": "ElementaryTypeName",
+													"src": "6900:4:0",
+													"typeDescriptions": {
+														"typeIdentifier": "t_bool",
+														"typeString": "bool"
+													}
+												},
+												"visibility": "internal"
+											}
+										],
+										"src": "6899:6:0"
+									},
+									"scope": 287,
+									"src": "6842:765:0",
+									"stateMutability": "nonpayable",
+									"virtual": false,
+									"visibility": "external"
+								}
+							],
+							"scope": 288,
+							"src": "447:7163:0",
+							"usedErrors": [],
+							"usedEvents": [
+								48,
+								51,
+								54,
+								57
+							]
+						}
+					],
+					"src": "33:7577:0"
+				},
+				"id": 0
+			}
+		}
+	}
+}

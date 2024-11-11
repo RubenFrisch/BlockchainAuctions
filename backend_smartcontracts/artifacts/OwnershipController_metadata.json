@@ -1,0 +1,706 @@
+{
+	"compiler": {
+		"version": "0.8.26+commit.8a97fa7a"
+	},
+	"language": "Solidity",
+	"output": {
+		"abi": [
+			{
+				"anonymous": false,
+				"inputs": [
+					{
+						"indexed": true,
+						"internalType": "address",
+						"name": "previousOwner_",
+						"type": "address"
+					},
+					{
+						"indexed": true,
+						"internalType": "address",
+						"name": "newOwner_",
+						"type": "address"
+					}
+				],
+				"name": "OwnershipTransferCompleted",
+				"type": "event"
+			},
+			{
+				"anonymous": false,
+				"inputs": [
+					{
+						"indexed": true,
+						"internalType": "address",
+						"name": "owner_",
+						"type": "address"
+					},
+					{
+						"indexed": true,
+						"internalType": "address",
+						"name": "pendingOwner_",
+						"type": "address"
+					}
+				],
+				"name": "OwnershipTransferInitiated",
+				"type": "event"
+			},
+			{
+				"anonymous": false,
+				"inputs": [
+					{
+						"indexed": true,
+						"internalType": "address",
+						"name": "owner_",
+						"type": "address"
+					}
+				],
+				"name": "RenounceProcessInitiated",
+				"type": "event"
+			},
+			{
+				"anonymous": false,
+				"inputs": [
+					{
+						"indexed": true,
+						"internalType": "address",
+						"name": "owner_",
+						"type": "address"
+					}
+				],
+				"name": "RenounceProcessTerminated",
+				"type": "event"
+			},
+			{
+				"anonymous": false,
+				"inputs": [
+					{
+						"indexed": false,
+						"internalType": "address",
+						"name": "signer_",
+						"type": "address"
+					}
+				],
+				"name": "SignatureRegistered",
+				"type": "event"
+			},
+			{
+				"anonymous": false,
+				"inputs": [],
+				"name": "SignatureValidityTimeCountdownStarted",
+				"type": "event"
+			},
+			{
+				"anonymous": false,
+				"inputs": [],
+				"name": "SignaturesExpiredAndReset",
+				"type": "event"
+			},
+			{
+				"anonymous": false,
+				"inputs": [],
+				"name": "SignaturesReset",
+				"type": "event"
+			},
+			{
+				"anonymous": false,
+				"inputs": [],
+				"name": "SocialGuardianRecoveryCompleted",
+				"type": "event"
+			},
+			{
+				"anonymous": false,
+				"inputs": [],
+				"name": "TimeLockQueueReset",
+				"type": "event"
+			},
+			{
+				"anonymous": false,
+				"inputs": [],
+				"name": "TimelockQueueStarted",
+				"type": "event"
+			},
+			{
+				"inputs": [],
+				"name": "acceptOwnership",
+				"outputs": [
+					{
+						"internalType": "bool",
+						"name": "",
+						"type": "bool"
+					}
+				],
+				"stateMutability": "nonpayable",
+				"type": "function"
+			},
+			{
+				"inputs": [],
+				"name": "currentSignatureCount",
+				"outputs": [
+					{
+						"internalType": "uint8",
+						"name": "",
+						"type": "uint8"
+					}
+				],
+				"stateMutability": "view",
+				"type": "function"
+			},
+			{
+				"inputs": [],
+				"name": "getQueueTime",
+				"outputs": [
+					{
+						"internalType": "uint256",
+						"name": "",
+						"type": "uint256"
+					}
+				],
+				"stateMutability": "view",
+				"type": "function"
+			},
+			{
+				"inputs": [],
+				"name": "getSignatureExpiryTime",
+				"outputs": [
+					{
+						"internalType": "uint256",
+						"name": "",
+						"type": "uint256"
+					}
+				],
+				"stateMutability": "view",
+				"type": "function"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "address",
+						"name": "signer_",
+						"type": "address"
+					}
+				],
+				"name": "hasSigned",
+				"outputs": [
+					{
+						"internalType": "bool",
+						"name": "",
+						"type": "bool"
+					}
+				],
+				"stateMutability": "view",
+				"type": "function"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "address",
+						"name": "signer_",
+						"type": "address"
+					}
+				],
+				"name": "isSigner",
+				"outputs": [
+					{
+						"internalType": "bool",
+						"name": "",
+						"type": "bool"
+					}
+				],
+				"stateMutability": "view",
+				"type": "function"
+			},
+			{
+				"inputs": [],
+				"name": "owner",
+				"outputs": [
+					{
+						"internalType": "address",
+						"name": "",
+						"type": "address"
+					}
+				],
+				"stateMutability": "view",
+				"type": "function"
+			},
+			{
+				"inputs": [],
+				"name": "pendingOwner",
+				"outputs": [
+					{
+						"internalType": "address",
+						"name": "",
+						"type": "address"
+					}
+				],
+				"stateMutability": "view",
+				"type": "function"
+			},
+			{
+				"inputs": [],
+				"name": "registerSignature",
+				"outputs": [
+					{
+						"internalType": "bool",
+						"name": "",
+						"type": "bool"
+					}
+				],
+				"stateMutability": "nonpayable",
+				"type": "function"
+			},
+			{
+				"inputs": [],
+				"name": "renounceOwnership",
+				"outputs": [
+					{
+						"internalType": "bool",
+						"name": "",
+						"type": "bool"
+					}
+				],
+				"stateMutability": "nonpayable",
+				"type": "function"
+			},
+			{
+				"inputs": [],
+				"name": "renounceUnlocked",
+				"outputs": [
+					{
+						"internalType": "bool",
+						"name": "",
+						"type": "bool"
+					}
+				],
+				"stateMutability": "view",
+				"type": "function"
+			},
+			{
+				"inputs": [],
+				"name": "resetPendingOwner",
+				"outputs": [
+					{
+						"internalType": "bool",
+						"name": "",
+						"type": "bool"
+					}
+				],
+				"stateMutability": "nonpayable",
+				"type": "function"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "address",
+						"name": "newOwner_",
+						"type": "address"
+					}
+				],
+				"name": "socialGuardianRecovery",
+				"outputs": [
+					{
+						"internalType": "bool",
+						"name": "",
+						"type": "bool"
+					}
+				],
+				"stateMutability": "nonpayable",
+				"type": "function"
+			},
+			{
+				"inputs": [],
+				"name": "startQueue",
+				"outputs": [
+					{
+						"internalType": "bool",
+						"name": "",
+						"type": "bool"
+					}
+				],
+				"stateMutability": "nonpayable",
+				"type": "function"
+			},
+			{
+				"inputs": [],
+				"name": "startRenounceProcess",
+				"outputs": [
+					{
+						"internalType": "bool",
+						"name": "",
+						"type": "bool"
+					}
+				],
+				"stateMutability": "nonpayable",
+				"type": "function"
+			},
+			{
+				"inputs": [],
+				"name": "terminateRenounceProcess",
+				"outputs": [
+					{
+						"internalType": "bool",
+						"name": "",
+						"type": "bool"
+					}
+				],
+				"stateMutability": "nonpayable",
+				"type": "function"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "address",
+						"name": "newOwner_",
+						"type": "address"
+					}
+				],
+				"name": "transferOwnership",
+				"outputs": [
+					{
+						"internalType": "bool",
+						"name": "",
+						"type": "bool"
+					}
+				],
+				"stateMutability": "nonpayable",
+				"type": "function"
+			}
+		],
+		"devdoc": {
+			"author": "Ruben Frisch (Óbuda University - John von Neumann Faculty of Informatics, Business Informatics MSc)",
+			"details": "This contract enables the safe control of ownership",
+			"events": {
+				"OwnershipTransferCompleted(address,address)": {
+					"details": "Event for logging the transfer of ownership to a new address (also logs ownership relinquishment to the burn (zero) address)",
+					"params": {
+						"newOwner_": "The address of the new owner (admin)",
+						"previousOwner_": "The address of the previous owner (admin)"
+					}
+				},
+				"OwnershipTransferInitiated(address,address)": {
+					"details": "Event for logging the initiation of the ownership transfer process (nomination of the new owner)",
+					"params": {
+						"owner_": "The current owner's address who initiated the transfer of ownership",
+						"pendingOwner_": "The address of the nominated new owner (pending owner)"
+					}
+				},
+				"RenounceProcessInitiated(address)": {
+					"details": "Event for logging the initiation of the safe 2-step ownership relinquishment (renounce) mechanism",
+					"params": {
+						"owner_": "The owner's address who initiated the 2-step ownership renounce process"
+					}
+				},
+				"RenounceProcessTerminated(address)": {
+					"details": "Event for logging the termination of the 2-step ownership relinquishment (renounce) process",
+					"params": {
+						"owner_": "The owner's address who terminated the 2-step ownership renounce process"
+					}
+				},
+				"SignatureRegistered(address)": {
+					"details": "Event for logging when a valid signature is made",
+					"params": {
+						"signer_": "The address of the signer that made the signature"
+					}
+				},
+				"SignatureValidityTimeCountdownStarted()": {
+					"details": "Event for logging when signature validity countdown starts"
+				},
+				"SignaturesExpiredAndReset()": {
+					"details": "Event for logging when signatures are expired and reset"
+				},
+				"SignaturesReset()": {
+					"details": "Event for logging when signatures are reset"
+				},
+				"SocialGuardianRecoveryCompleted()": {
+					"details": "Event for logging the completion of a social guardian ownership recovery process"
+				},
+				"TimeLockQueueReset()": {
+					"details": "Event for logging when the timelock queue was reset"
+				},
+				"TimelockQueueStarted()": {
+					"details": "Event for logging when a new timelock queue was started"
+				}
+			},
+			"kind": "dev",
+			"methods": {
+				"acceptOwnership()": {
+					"custom:requirement-body": "Only the pending owner can accept ownership",
+					"details": "Handles the second step of the 2-step ownership transfer process (acceptance phase)",
+					"returns": {
+						"_0": "Returns true boolean if the ownership transfer's acceptance phase was successful"
+					}
+				},
+				"constructor": {
+					"details": "The constructor runs only once during deployment, setting the owner of the contract to the EOA address (msg.sender) who signs and propagates the contract bytecode registration transaction"
+				},
+				"currentSignatureCount()": {
+					"details": "Retrieves the current signature count",
+					"returns": {
+						"_0": "Returns the current signature count"
+					}
+				},
+				"getQueueTime()": {
+					"details": "Retrieves the queue timestamp",
+					"returns": {
+						"_0": "Returns the queue timestamp in epoch seconds"
+					}
+				},
+				"getSignatureExpiryTime()": {
+					"details": "Retrieves the current signature expiry timestamp",
+					"returns": {
+						"_0": "Returns the current signature expiry timestamp"
+					}
+				},
+				"hasSigned(address)": {
+					"details": "Evaluates whether a signer has signed or not",
+					"params": {
+						"signer_": "The address to be evaluated"
+					},
+					"returns": {
+						"_0": "Returns a boolean literal indicating whether the passed address has signed or not"
+					}
+				},
+				"isSigner(address)": {
+					"details": "Evaluates whether an address is in the valid signer set or not",
+					"params": {
+						"signer_": "The address to be evaluated"
+					},
+					"returns": {
+						"_0": "Returns a boolean literal indicating whether the passed address is a signer or not"
+					}
+				},
+				"owner()": {
+					"details": "Retrieves the current owner's address",
+					"returns": {
+						"_0": "Returns the address of the owner"
+					}
+				},
+				"pendingOwner()": {
+					"details": "Retrieves the pending owner's address",
+					"returns": {
+						"_0": "Returns the address of the pending (nominated) owner"
+					}
+				},
+				"registerSignature()": {
+					"custom:requirement-body": "A signer can only sign once (in the same signature collection session)",
+					"custom:requirement-modifier": "The caller must be a signer",
+					"details": "Registers a valid signature if all conditions are fulfilled, manages the signature expiry mechanism",
+					"returns": {
+						"_0": "Returns true boolean literal if the signature registration was successful"
+					}
+				},
+				"renounceOwnership()": {
+					"custom:requirement-body": "Ownership relinquishment feature must be toggled on (unlocked) to complete the process",
+					"custom:requirement-modifier": "Only the owner (admin) can call this function",
+					"details": "Completes the 2-step ownership relinquishment process and renounces the ownership in an irreversible way",
+					"returns": {
+						"_0": "Returns true boolean if the 2-step ownership relinquishment process was completed successfully"
+					}
+				},
+				"renounceUnlocked()": {
+					"details": "Retrieves whether the 2-step ownership relinquishment (renounce) mechanism has been initiated or not",
+					"returns": {
+						"_0": "Returns a boolean flag indicating whether the 2-step ownership relinquishment (renounce) mechanism has been initiated or not"
+					}
+				},
+				"resetPendingOwner()": {
+					"custom:requirement-modifier": "Only the owner (admin) can call this function",
+					"details": "Resets the pending owner to the default zero address",
+					"returns": {
+						"_0": "Returns true boolean if the reset of the pending owner was successful"
+					}
+				},
+				"socialGuardianRecovery(address)": {
+					"custom:requirement-modifier": "Only one of the signers can call this functionTimelock guard protected function (timelock delay period must be passed and must be within the grace period)Multi signature guard protected function (unexpired valid signature threshold must be reached)",
+					"details": "Initiates a social recovery by a trusted guardian to regain ownership control in case of a lost or compromised private key",
+					"params": {
+						"newOwner_": "The address of the new owner for the replacement of the current owner"
+					},
+					"returns": {
+						"_0": "Returns a true boolean flag if the social recovery process was completed successfully"
+					}
+				},
+				"startQueue()": {
+					"custom:requirement-modifier": "Only the owner (admin) can call this functionMulti signature guard protected function (unexpired valid signature threshold must be reached)",
+					"details": "Starts a new timelock countdown queue",
+					"returns": {
+						"_0": "Returns true boolean flag if the queue was started successfully"
+					}
+				},
+				"startRenounceProcess()": {
+					"custom:requirement-body": "Ownership relinquishment feature must be toggled off (locked)",
+					"custom:requirement-modifier": "Only the owner (admin) can call this functionTimelock guard protected function (timelock delay period must be passed and must be within the grace period)Multi signature guard protected function (unexpired valid signature threshold must be reached)",
+					"details": "Initiates and unlocks the 2-step ownership relinquishment feature",
+					"returns": {
+						"_0": "Returns true boolean if the initiation of the 2-step ownership relinquishment process was successful"
+					}
+				},
+				"terminateRenounceProcess()": {
+					"custom:requirement-body": "Ownership relinquishment feature must be toggled on (unlocked)",
+					"custom:requirement-modifier": "Only the owner (admin) can call this function",
+					"details": "Terminates the 2-step ownership relinquishment process and locks the feature until it is unlocked again",
+					"returns": {
+						"_0": "Returns true boolean if the termination of the 2-step ownership relinquishment process was successful"
+					}
+				},
+				"transferOwnership(address)": {
+					"custom:requirement-body": "The new owner cannot be the zero (burn) addressThe new owner cannot be the current ownerThe new owner cannot be the current pending (nominated) owner",
+					"custom:requirement-modifier": "Only the owner (admin) can call this functionTimelock guard protected function (timelock delay period must be passed and must be within the grace period)Multi signature guard protected function (unexpired valid signature threshold must be reached)",
+					"details": "Handles the first step of the 2-step ownership transfer process (nomination phase)",
+					"params": {
+						"newOwner_": "The address of the nominated new owner (pending owner)"
+					},
+					"returns": {
+						"_0": "Returns true boolean if the nomination phase of the ownership transfer was successful"
+					}
+				}
+			},
+			"stateVariables": {
+				"_owner": {
+					"details": "Stores the current owner's address (admin)"
+				},
+				"_pendingOwner": {
+					"details": "Stores the pending (nominated) owner's address"
+				},
+				"_renounceUnlocked": {
+					"details": "Indicates whether the safe 2-step ownership relinquishment (renounce) process has been initiated (unlocked) or not (locked) by the owner"
+				}
+			},
+			"title": "Ownership controller contract",
+			"version": 1
+		},
+		"userdoc": {
+			"events": {
+				"OwnershipTransferCompleted(address,address)": {
+					"notice": "Event for logging the transfer of ownership to a new address"
+				},
+				"OwnershipTransferInitiated(address,address)": {
+					"notice": "Event for logging the initiation of the ownership transfer process (nomination of the new owner)"
+				},
+				"RenounceProcessInitiated(address)": {
+					"notice": "Event for logging the initiation of the safe 2-step mechanism for the ownership relinquishment (renounce) process"
+				},
+				"RenounceProcessTerminated(address)": {
+					"notice": "Event for logging the termination of the 2-step ownership relinquishment (renounce) process"
+				},
+				"SignatureRegistered(address)": {
+					"notice": "Event for logging when a valid signature is made"
+				},
+				"SignatureValidityTimeCountdownStarted()": {
+					"notice": "Event for logging when signature validity countdown starts"
+				},
+				"SignaturesExpiredAndReset()": {
+					"notice": "Event for logging when signatures are expired and reset"
+				},
+				"SignaturesReset()": {
+					"notice": "Event for logging when signatures are reset"
+				},
+				"SocialGuardianRecoveryCompleted()": {
+					"notice": "Event for logging the completion of a social guardian ownership recovery process"
+				},
+				"TimeLockQueueReset()": {
+					"notice": "Event for logging when the timelock queue was reset"
+				},
+				"TimelockQueueStarted()": {
+					"notice": "Event for logging when a new timelock queue was started"
+				}
+			},
+			"kind": "user",
+			"methods": {
+				"acceptOwnership()": {
+					"notice": "Handles the second step of the 2-step ownership transfer process (acceptance phase)"
+				},
+				"currentSignatureCount()": {
+					"notice": "Retrieves the current signature count"
+				},
+				"getQueueTime()": {
+					"notice": "Retrieves the queue timestamp"
+				},
+				"getSignatureExpiryTime()": {
+					"notice": "Retrieves the current signature expiry timestamp"
+				},
+				"hasSigned(address)": {
+					"notice": "Evaluates whether a signer has signed or not"
+				},
+				"isSigner(address)": {
+					"notice": "Evaluates whether an address is in the valid signer set or not"
+				},
+				"owner()": {
+					"notice": "Retrieves the current owner's address"
+				},
+				"pendingOwner()": {
+					"notice": "Retrieves the pending owner's address"
+				},
+				"registerSignature()": {
+					"notice": "Registers a valid signature if all conditions are fulfilled, manages the signature expiry mechanism"
+				},
+				"renounceOwnership()": {
+					"notice": "Completes the 2-step ownership relinquishment process and renounces the ownership in an irreversible way"
+				},
+				"renounceUnlocked()": {
+					"notice": "Retrieves whether the 2-step ownership relinquishment (renounce) mechanism has been initiated or not"
+				},
+				"resetPendingOwner()": {
+					"notice": "Resets the pending owner to the default zero address"
+				},
+				"socialGuardianRecovery(address)": {
+					"notice": "Initiates a social recovery by a trusted guardian to regain ownership control in case of a lost or compromised private key"
+				},
+				"startQueue()": {
+					"notice": "Starts a new timelock countdown queue"
+				},
+				"startRenounceProcess()": {
+					"notice": "Initiates and unlocks the 2-step ownership relinquishment feature"
+				},
+				"terminateRenounceProcess()": {
+					"notice": "Terminates the 2-step ownership relinquishment process and locks the feature until it is unlocked again"
+				},
+				"transferOwnership(address)": {
+					"notice": "Handles the first step of the 2-step ownership transfer process (nomination phase)"
+				}
+			},
+			"notice": "This contract enables the safe control of ownership",
+			"version": 1
+		}
+	},
+	"settings": {
+		"compilationTarget": {
+			"OwnershipController.sol": "OwnershipController"
+		},
+		"evmVersion": "cancun",
+		"libraries": {},
+		"metadata": {
+			"bytecodeHash": "ipfs"
+		},
+		"optimizer": {
+			"enabled": false,
+			"runs": 200
+		},
+		"remappings": []
+	},
+	"sources": {
+		"MultiSignatureGuard.sol": {
+			"keccak256": "0xc4c8061842da9a600874246654ec12565da79bc8d1b42fa8965909dd0132d527",
+			"license": "MIT",
+			"urls": [
+				"bzz-raw://0553c4cd882059ad508cc00e43744c152e349ee7a551fd1fe5f2e54dd8a67625",
+				"dweb:/ipfs/QmdC2VTHPn3WhE3mvjezSdqBwmP6q1Baz5vc55CzfMWhZz"
+			]
+		},
+		"OwnershipController.sol": {
+			"keccak256": "0x2ac82459c9cf584ec15cec35a2992a51f9bb42a817d98fa41cab7f07744d0508",
+			"license": "MIT",
+			"urls": [
+				"bzz-raw://f682eb32b63a8aab031d43649c51377a712d808b93ccaec4968230669da88f44",
+				"dweb:/ipfs/QmNu5MqiWt7VENviLzuKJPGzDMHZ3M8g8BvhBLzWrWBX1K"
+			]
+		},
+		"TimelockGuard.sol": {
+			"keccak256": "0xb5778c5f92de1db539d47c012fd1a443e9fbdfcab88c5a1cd9de96edb8fb1dba",
+			"license": "MIT",
+			"urls": [
+				"bzz-raw://8cdbde0fa19fb915ba4f569cbb4fb723a12fa37c9707949ab89171e06aedb188",
+				"dweb:/ipfs/QmcPrbEGzB9TvgoXrn618c6f9WURVCCU1BTnwGWKduyeaQ"
+			]
+		}
+	},
+	"version": 1
+}

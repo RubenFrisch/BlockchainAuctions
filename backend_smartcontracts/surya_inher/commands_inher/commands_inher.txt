@@ -1,0 +1,27 @@
+surya inheritance CircuitBreakerEmergencyController.sol | dot -Tpng -Gdpi=500 -o CircuitBreakerEmergencyController_inheritance.png
+
+surya inheritance EntryFeeController.sol | dot -Tpng -Gdpi=500 -o EntryFeeController_inheritance.png
+
+surya inheritance MultiSignatureGuard.sol | dot -Tpng -Gdpi=500 -o MultiSignatureGuard_inheritance.png
+
+surya inheritance TimelockGuard.sol | dot -Tpng -Gdpi=500 -o TimelockGuard_inheritance.png
+
+surya inheritance WhitelistAuctionController.sol | dot -Tpng -Gdpi=500 -o WhitelistAuctionController_inheritance.png
+
+surya inheritance BlacklistAuctionController.sol | dot -Tpng -Gdpi=500 -o BlacklistAuctionController_inheritance.png
+
+
+surya inheritance OwnershipController_flattened.sol | dot -Tpng -Gdpi=500 -o OwnershipController_flattened_inheritance.png
+
+
+surya inheritance AuctionsLogic_flattened.sol | dot -Tpng -Gdpi=500 -o AuctionsLogic_flattened_inheritance.png
+
+surya inheritance AuctionsLogic.sol | dot -Tpng -Gdpi=500 -o AuctionsLogic_inheritance.png
+
+
+surya inheritance AuctionERC721.sol | dot -Tpng -Gdpi=500 -o AuctionERC721_inheritance.png
+
+surya inheritance AuctionERC721_flattened.sol | dot -Tpng -Gdpi=300 -o AuctionERC721_flattened_inheritance.png
+
+
+surya inheritance CancellableAuctionController.sol | dot -Tpng -Gdpi=500 -o CancellableAuctionController_inheritance.png

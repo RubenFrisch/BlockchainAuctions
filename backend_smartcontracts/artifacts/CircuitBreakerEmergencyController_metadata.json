@@ -1,0 +1,153 @@
+{
+	"compiler": {
+		"version": "0.8.26+commit.8a97fa7a"
+	},
+	"language": "Solidity",
+	"output": {
+		"abi": [
+			{
+				"anonymous": false,
+				"inputs": [],
+				"name": "EmergencyPauseTurnedOff",
+				"type": "event"
+			},
+			{
+				"anonymous": false,
+				"inputs": [],
+				"name": "EmergencyPauseTurnedOn",
+				"type": "event"
+			},
+			{
+				"inputs": [],
+				"name": "isPaused",
+				"outputs": [
+					{
+						"internalType": "bool",
+						"name": "",
+						"type": "bool"
+					}
+				],
+				"stateMutability": "view",
+				"type": "function"
+			},
+			{
+				"inputs": [],
+				"name": "turnEmergencyPauseOff",
+				"outputs": [
+					{
+						"internalType": "bool",
+						"name": "",
+						"type": "bool"
+					}
+				],
+				"stateMutability": "nonpayable",
+				"type": "function"
+			},
+			{
+				"inputs": [],
+				"name": "turnEmergencyPauseOn",
+				"outputs": [
+					{
+						"internalType": "bool",
+						"name": "",
+						"type": "bool"
+					}
+				],
+				"stateMutability": "nonpayable",
+				"type": "function"
+			}
+		],
+		"devdoc": {
+			"author": "Ruben Frisch (Óbuda University - John von Neumann Faculty of Informatics, Business Informatics MSc)",
+			"details": "This contract enables the emergency pause feature",
+			"events": {
+				"EmergencyPauseTurnedOff()": {
+					"details": "Event for logging when the emergency pause feature has been toggled off"
+				},
+				"EmergencyPauseTurnedOn()": {
+					"details": "Event for logging when the emergency pause feature has been toggled on"
+				}
+			},
+			"kind": "dev",
+			"methods": {
+				"isPaused()": {
+					"details": "Retrieves whether the system is currently paused (true) or not paused (false)",
+					"returns": {
+						"_0": "Returns a boolean flag indicating whether the system is paused (true) or not paused (false)"
+					}
+				},
+				"turnEmergencyPauseOff()": {
+					"custom:virtual": "This function should be overriden in the child contract, with access control, execution preconditions, and other checks implementedThe storage modification should be executed by the internal function '_turnEmergencyPauseOff'",
+					"details": "Turns emergency pause off",
+					"returns": {
+						"_0": "Returns true boolean if the emergency pause has been disabled successfully"
+					}
+				},
+				"turnEmergencyPauseOn()": {
+					"custom:virtual": "This function should be overriden in the child contract, with access control, execution preconditions, and other checks implementedThe storage modification should be executed by the internal function '_turnEmergencyPauseOn'",
+					"details": "Turns emergency pause on",
+					"returns": {
+						"_0": "Returns true boolean if the emergency pause has been enabled successfully"
+					}
+				}
+			},
+			"stateVariables": {
+				"_paused": {
+					"details": "Indicates whether the auction system's emergency pause is enabled (true) or not (false)"
+				}
+			},
+			"title": "Emergency circuit breaker controller contract",
+			"version": 1
+		},
+		"userdoc": {
+			"events": {
+				"EmergencyPauseTurnedOff()": {
+					"notice": "Event for logging when the emergency pause feature has been toggled off"
+				},
+				"EmergencyPauseTurnedOn()": {
+					"notice": "Event for logging when the emergency pause feature has been toggled on"
+				}
+			},
+			"kind": "user",
+			"methods": {
+				"isPaused()": {
+					"notice": "Retrieves whether the system is currently paused (true) or not paused (false)"
+				},
+				"turnEmergencyPauseOff()": {
+					"notice": "Turns emergency pause off"
+				},
+				"turnEmergencyPauseOn()": {
+					"notice": "Turns emergency pause on"
+				}
+			},
+			"notice": "This contract enables the emergency pause feature",
+			"version": 1
+		}
+	},
+	"settings": {
+		"compilationTarget": {
+			"CircuitBreakerEmergencyController.sol": "CircuitBreakerEmergencyController"
+		},
+		"evmVersion": "cancun",
+		"libraries": {},
+		"metadata": {
+			"bytecodeHash": "ipfs"
+		},
+		"optimizer": {
+			"enabled": false,
+			"runs": 200
+		},
+		"remappings": []
+	},
+	"sources": {
+		"CircuitBreakerEmergencyController.sol": {
+			"keccak256": "0x1642bffbe96b2754ef5e60cbaee2e155bdded5007aa5db67c4651da432c0ba23",
+			"license": "MIT",
+			"urls": [
+				"bzz-raw://9786edaecfd2666348247396b44bbac2482eb87a4d7cf813b4bef380d8492590",
+				"dweb:/ipfs/QmWiPWTxium3BSbyD8h9MdMK9mgVEpeWHGcZJPzx88DukC"
+			]
+		}
+	},
+	"version": 1
+}

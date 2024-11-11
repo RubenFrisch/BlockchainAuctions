@@ -1,0 +1,1492 @@
+{
+	"compiler": {
+		"version": "0.8.26+commit.8a97fa7a"
+	},
+	"language": "Solidity",
+	"output": {
+		"abi": [
+			{
+				"inputs": [],
+				"stateMutability": "nonpayable",
+				"type": "constructor"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "address",
+						"name": "sender",
+						"type": "address"
+					},
+					{
+						"internalType": "uint256",
+						"name": "tokenId",
+						"type": "uint256"
+					},
+					{
+						"internalType": "address",
+						"name": "owner",
+						"type": "address"
+					}
+				],
+				"name": "ERC721IncorrectOwner",
+				"type": "error"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "address",
+						"name": "operator",
+						"type": "address"
+					},
+					{
+						"internalType": "uint256",
+						"name": "tokenId",
+						"type": "uint256"
+					}
+				],
+				"name": "ERC721InsufficientApproval",
+				"type": "error"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "address",
+						"name": "approver",
+						"type": "address"
+					}
+				],
+				"name": "ERC721InvalidApprover",
+				"type": "error"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "address",
+						"name": "operator",
+						"type": "address"
+					}
+				],
+				"name": "ERC721InvalidOperator",
+				"type": "error"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "address",
+						"name": "owner",
+						"type": "address"
+					}
+				],
+				"name": "ERC721InvalidOwner",
+				"type": "error"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "address",
+						"name": "receiver",
+						"type": "address"
+					}
+				],
+				"name": "ERC721InvalidReceiver",
+				"type": "error"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "address",
+						"name": "sender",
+						"type": "address"
+					}
+				],
+				"name": "ERC721InvalidSender",
+				"type": "error"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "uint256",
+						"name": "tokenId",
+						"type": "uint256"
+					}
+				],
+				"name": "ERC721NonexistentToken",
+				"type": "error"
+			},
+			{
+				"anonymous": false,
+				"inputs": [
+					{
+						"indexed": true,
+						"internalType": "address",
+						"name": "owner",
+						"type": "address"
+					},
+					{
+						"indexed": true,
+						"internalType": "address",
+						"name": "approved",
+						"type": "address"
+					},
+					{
+						"indexed": true,
+						"internalType": "uint256",
+						"name": "tokenId",
+						"type": "uint256"
+					}
+				],
+				"name": "Approval",
+				"type": "event"
+			},
+			{
+				"anonymous": false,
+				"inputs": [
+					{
+						"indexed": true,
+						"internalType": "address",
+						"name": "owner",
+						"type": "address"
+					},
+					{
+						"indexed": true,
+						"internalType": "address",
+						"name": "operator",
+						"type": "address"
+					},
+					{
+						"indexed": false,
+						"internalType": "bool",
+						"name": "approved",
+						"type": "bool"
+					}
+				],
+				"name": "ApprovalForAll",
+				"type": "event"
+			},
+			{
+				"anonymous": false,
+				"inputs": [
+					{
+						"indexed": false,
+						"internalType": "uint256",
+						"name": "_fromTokenId",
+						"type": "uint256"
+					},
+					{
+						"indexed": false,
+						"internalType": "uint256",
+						"name": "_toTokenId",
+						"type": "uint256"
+					}
+				],
+				"name": "BatchMetadataUpdate",
+				"type": "event"
+			},
+			{
+				"anonymous": false,
+				"inputs": [
+					{
+						"indexed": false,
+						"internalType": "uint256",
+						"name": "_tokenId",
+						"type": "uint256"
+					}
+				],
+				"name": "MetadataUpdate",
+				"type": "event"
+			},
+			{
+				"anonymous": false,
+				"inputs": [
+					{
+						"indexed": true,
+						"internalType": "address",
+						"name": "previousOwner_",
+						"type": "address"
+					},
+					{
+						"indexed": true,
+						"internalType": "address",
+						"name": "newOwner_",
+						"type": "address"
+					}
+				],
+				"name": "OwnershipTransferCompleted",
+				"type": "event"
+			},
+			{
+				"anonymous": false,
+				"inputs": [
+					{
+						"indexed": true,
+						"internalType": "address",
+						"name": "owner_",
+						"type": "address"
+					},
+					{
+						"indexed": true,
+						"internalType": "address",
+						"name": "pendingOwner_",
+						"type": "address"
+					}
+				],
+				"name": "OwnershipTransferInitiated",
+				"type": "event"
+			},
+			{
+				"anonymous": false,
+				"inputs": [
+					{
+						"indexed": true,
+						"internalType": "address",
+						"name": "owner_",
+						"type": "address"
+					}
+				],
+				"name": "RenounceProcessInitiated",
+				"type": "event"
+			},
+			{
+				"anonymous": false,
+				"inputs": [
+					{
+						"indexed": true,
+						"internalType": "address",
+						"name": "owner_",
+						"type": "address"
+					}
+				],
+				"name": "RenounceProcessTerminated",
+				"type": "event"
+			},
+			{
+				"anonymous": false,
+				"inputs": [
+					{
+						"indexed": false,
+						"internalType": "address",
+						"name": "signer_",
+						"type": "address"
+					}
+				],
+				"name": "SignatureRegistered",
+				"type": "event"
+			},
+			{
+				"anonymous": false,
+				"inputs": [],
+				"name": "SignatureValidityTimeCountdownStarted",
+				"type": "event"
+			},
+			{
+				"anonymous": false,
+				"inputs": [],
+				"name": "SignaturesExpiredAndReset",
+				"type": "event"
+			},
+			{
+				"anonymous": false,
+				"inputs": [],
+				"name": "SignaturesReset",
+				"type": "event"
+			},
+			{
+				"anonymous": false,
+				"inputs": [],
+				"name": "SocialGuardianRecoveryCompleted",
+				"type": "event"
+			},
+			{
+				"anonymous": false,
+				"inputs": [],
+				"name": "TimeLockQueueReset",
+				"type": "event"
+			},
+			{
+				"anonymous": false,
+				"inputs": [],
+				"name": "TimelockQueueStarted",
+				"type": "event"
+			},
+			{
+				"anonymous": false,
+				"inputs": [
+					{
+						"indexed": true,
+						"internalType": "address",
+						"name": "from",
+						"type": "address"
+					},
+					{
+						"indexed": true,
+						"internalType": "address",
+						"name": "to",
+						"type": "address"
+					},
+					{
+						"indexed": true,
+						"internalType": "uint256",
+						"name": "tokenId",
+						"type": "uint256"
+					}
+				],
+				"name": "Transfer",
+				"type": "event"
+			},
+			{
+				"inputs": [],
+				"name": "acceptOwnership",
+				"outputs": [
+					{
+						"internalType": "bool",
+						"name": "",
+						"type": "bool"
+					}
+				],
+				"stateMutability": "nonpayable",
+				"type": "function"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "address",
+						"name": "to",
+						"type": "address"
+					},
+					{
+						"internalType": "uint256",
+						"name": "tokenId",
+						"type": "uint256"
+					}
+				],
+				"name": "approve",
+				"outputs": [],
+				"stateMutability": "nonpayable",
+				"type": "function"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "address",
+						"name": "owner",
+						"type": "address"
+					}
+				],
+				"name": "balanceOf",
+				"outputs": [
+					{
+						"internalType": "uint256",
+						"name": "",
+						"type": "uint256"
+					}
+				],
+				"stateMutability": "view",
+				"type": "function"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "uint256",
+						"name": "tokenId",
+						"type": "uint256"
+					}
+				],
+				"name": "burn",
+				"outputs": [],
+				"stateMutability": "nonpayable",
+				"type": "function"
+			},
+			{
+				"inputs": [],
+				"name": "currentSignatureCount",
+				"outputs": [
+					{
+						"internalType": "uint8",
+						"name": "",
+						"type": "uint8"
+					}
+				],
+				"stateMutability": "view",
+				"type": "function"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "uint256",
+						"name": "tokenId",
+						"type": "uint256"
+					}
+				],
+				"name": "getApproved",
+				"outputs": [
+					{
+						"internalType": "address",
+						"name": "",
+						"type": "address"
+					}
+				],
+				"stateMutability": "view",
+				"type": "function"
+			},
+			{
+				"inputs": [],
+				"name": "getQueueTime",
+				"outputs": [
+					{
+						"internalType": "uint256",
+						"name": "",
+						"type": "uint256"
+					}
+				],
+				"stateMutability": "view",
+				"type": "function"
+			},
+			{
+				"inputs": [],
+				"name": "getSignatureExpiryTime",
+				"outputs": [
+					{
+						"internalType": "uint256",
+						"name": "",
+						"type": "uint256"
+					}
+				],
+				"stateMutability": "view",
+				"type": "function"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "address",
+						"name": "signer_",
+						"type": "address"
+					}
+				],
+				"name": "hasSigned",
+				"outputs": [
+					{
+						"internalType": "bool",
+						"name": "",
+						"type": "bool"
+					}
+				],
+				"stateMutability": "view",
+				"type": "function"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "address",
+						"name": "owner",
+						"type": "address"
+					},
+					{
+						"internalType": "address",
+						"name": "operator",
+						"type": "address"
+					}
+				],
+				"name": "isApprovedForAll",
+				"outputs": [
+					{
+						"internalType": "bool",
+						"name": "",
+						"type": "bool"
+					}
+				],
+				"stateMutability": "view",
+				"type": "function"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "address",
+						"name": "signer_",
+						"type": "address"
+					}
+				],
+				"name": "isSigner",
+				"outputs": [
+					{
+						"internalType": "bool",
+						"name": "",
+						"type": "bool"
+					}
+				],
+				"stateMutability": "view",
+				"type": "function"
+			},
+			{
+				"inputs": [],
+				"name": "name",
+				"outputs": [
+					{
+						"internalType": "string",
+						"name": "",
+						"type": "string"
+					}
+				],
+				"stateMutability": "view",
+				"type": "function"
+			},
+			{
+				"inputs": [],
+				"name": "owner",
+				"outputs": [
+					{
+						"internalType": "address",
+						"name": "",
+						"type": "address"
+					}
+				],
+				"stateMutability": "view",
+				"type": "function"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "uint256",
+						"name": "tokenId",
+						"type": "uint256"
+					}
+				],
+				"name": "ownerOf",
+				"outputs": [
+					{
+						"internalType": "address",
+						"name": "",
+						"type": "address"
+					}
+				],
+				"stateMutability": "view",
+				"type": "function"
+			},
+			{
+				"inputs": [],
+				"name": "pendingOwner",
+				"outputs": [
+					{
+						"internalType": "address",
+						"name": "",
+						"type": "address"
+					}
+				],
+				"stateMutability": "view",
+				"type": "function"
+			},
+			{
+				"inputs": [],
+				"name": "registerSignature",
+				"outputs": [
+					{
+						"internalType": "bool",
+						"name": "",
+						"type": "bool"
+					}
+				],
+				"stateMutability": "nonpayable",
+				"type": "function"
+			},
+			{
+				"inputs": [],
+				"name": "renounceOwnership",
+				"outputs": [
+					{
+						"internalType": "bool",
+						"name": "",
+						"type": "bool"
+					}
+				],
+				"stateMutability": "nonpayable",
+				"type": "function"
+			},
+			{
+				"inputs": [],
+				"name": "renounceUnlocked",
+				"outputs": [
+					{
+						"internalType": "bool",
+						"name": "",
+						"type": "bool"
+					}
+				],
+				"stateMutability": "view",
+				"type": "function"
+			},
+			{
+				"inputs": [],
+				"name": "resetPendingOwner",
+				"outputs": [
+					{
+						"internalType": "bool",
+						"name": "",
+						"type": "bool"
+					}
+				],
+				"stateMutability": "nonpayable",
+				"type": "function"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "address",
+						"name": "to_",
+						"type": "address"
+					},
+					{
+						"internalType": "string",
+						"name": "uri_",
+						"type": "string"
+					}
+				],
+				"name": "safeMint",
+				"outputs": [],
+				"stateMutability": "nonpayable",
+				"type": "function"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "address",
+						"name": "from",
+						"type": "address"
+					},
+					{
+						"internalType": "address",
+						"name": "to",
+						"type": "address"
+					},
+					{
+						"internalType": "uint256",
+						"name": "tokenId",
+						"type": "uint256"
+					}
+				],
+				"name": "safeTransferFrom",
+				"outputs": [],
+				"stateMutability": "nonpayable",
+				"type": "function"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "address",
+						"name": "from",
+						"type": "address"
+					},
+					{
+						"internalType": "address",
+						"name": "to",
+						"type": "address"
+					},
+					{
+						"internalType": "uint256",
+						"name": "tokenId",
+						"type": "uint256"
+					},
+					{
+						"internalType": "bytes",
+						"name": "data",
+						"type": "bytes"
+					}
+				],
+				"name": "safeTransferFrom",
+				"outputs": [],
+				"stateMutability": "nonpayable",
+				"type": "function"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "address",
+						"name": "operator",
+						"type": "address"
+					},
+					{
+						"internalType": "bool",
+						"name": "approved",
+						"type": "bool"
+					}
+				],
+				"name": "setApprovalForAll",
+				"outputs": [],
+				"stateMutability": "nonpayable",
+				"type": "function"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "address",
+						"name": "newOwner_",
+						"type": "address"
+					}
+				],
+				"name": "socialGuardianRecovery",
+				"outputs": [
+					{
+						"internalType": "bool",
+						"name": "",
+						"type": "bool"
+					}
+				],
+				"stateMutability": "nonpayable",
+				"type": "function"
+			},
+			{
+				"inputs": [],
+				"name": "startQueue",
+				"outputs": [
+					{
+						"internalType": "bool",
+						"name": "",
+						"type": "bool"
+					}
+				],
+				"stateMutability": "nonpayable",
+				"type": "function"
+			},
+			{
+				"inputs": [],
+				"name": "startRenounceProcess",
+				"outputs": [
+					{
+						"internalType": "bool",
+						"name": "",
+						"type": "bool"
+					}
+				],
+				"stateMutability": "nonpayable",
+				"type": "function"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "bytes4",
+						"name": "interfaceID_",
+						"type": "bytes4"
+					}
+				],
+				"name": "supportsInterface",
+				"outputs": [
+					{
+						"internalType": "bool",
+						"name": "",
+						"type": "bool"
+					}
+				],
+				"stateMutability": "view",
+				"type": "function"
+			},
+			{
+				"inputs": [],
+				"name": "symbol",
+				"outputs": [
+					{
+						"internalType": "string",
+						"name": "",
+						"type": "string"
+					}
+				],
+				"stateMutability": "view",
+				"type": "function"
+			},
+			{
+				"inputs": [],
+				"name": "terminateRenounceProcess",
+				"outputs": [
+					{
+						"internalType": "bool",
+						"name": "",
+						"type": "bool"
+					}
+				],
+				"stateMutability": "nonpayable",
+				"type": "function"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "uint256",
+						"name": "tokenID_",
+						"type": "uint256"
+					}
+				],
+				"name": "tokenURI",
+				"outputs": [
+					{
+						"internalType": "string",
+						"name": "",
+						"type": "string"
+					}
+				],
+				"stateMutability": "view",
+				"type": "function"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "address",
+						"name": "from",
+						"type": "address"
+					},
+					{
+						"internalType": "address",
+						"name": "to",
+						"type": "address"
+					},
+					{
+						"internalType": "uint256",
+						"name": "tokenId",
+						"type": "uint256"
+					}
+				],
+				"name": "transferFrom",
+				"outputs": [],
+				"stateMutability": "nonpayable",
+				"type": "function"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "address",
+						"name": "newOwner_",
+						"type": "address"
+					}
+				],
+				"name": "transferOwnership",
+				"outputs": [
+					{
+						"internalType": "bool",
+						"name": "",
+						"type": "bool"
+					}
+				],
+				"stateMutability": "nonpayable",
+				"type": "function"
+			}
+		],
+		"devdoc": {
+			"author": "Ruben Frisch (Óbuda University - John von Neumann Faculty of Informatics, Business Informatics MSc)",
+			"details": "ERC-721 NFT token contract implementation with advanced URI management, NFT token burning, auto-incrementing NFT token IDs, and ownership control",
+			"errors": {
+				"ERC721IncorrectOwner(address,uint256,address)": [
+					{
+						"details": "Indicates an error related to the ownership over a particular token. Used in transfers.",
+						"params": {
+							"owner": "Address of the current owner of a token.",
+							"sender": "Address whose tokens are being transferred.",
+							"tokenId": "Identifier number of a token."
+						}
+					}
+				],
+				"ERC721InsufficientApproval(address,uint256)": [
+					{
+						"details": "Indicates a failure with the `operator`’s approval. Used in transfers.",
+						"params": {
+							"operator": "Address that may be allowed to operate on tokens without being their owner.",
+							"tokenId": "Identifier number of a token."
+						}
+					}
+				],
+				"ERC721InvalidApprover(address)": [
+					{
+						"details": "Indicates a failure with the `approver` of a token to be approved. Used in approvals.",
+						"params": {
+							"approver": "Address initiating an approval operation."
+						}
+					}
+				],
+				"ERC721InvalidOperator(address)": [
+					{
+						"details": "Indicates a failure with the `operator` to be approved. Used in approvals.",
+						"params": {
+							"operator": "Address that may be allowed to operate on tokens without being their owner."
+						}
+					}
+				],
+				"ERC721InvalidOwner(address)": [
+					{
+						"details": "Indicates that an address can't be an owner. For example, `address(0)` is a forbidden owner in EIP-20. Used in balance queries.",
+						"params": {
+							"owner": "Address of the current owner of a token."
+						}
+					}
+				],
+				"ERC721InvalidReceiver(address)": [
+					{
+						"details": "Indicates a failure with the token `receiver`. Used in transfers.",
+						"params": {
+							"receiver": "Address to which tokens are being transferred."
+						}
+					}
+				],
+				"ERC721InvalidSender(address)": [
+					{
+						"details": "Indicates a failure with the token `sender`. Used in transfers.",
+						"params": {
+							"sender": "Address whose tokens are being transferred."
+						}
+					}
+				],
+				"ERC721NonexistentToken(uint256)": [
+					{
+						"details": "Indicates a `tokenId` whose `owner` is the zero address.",
+						"params": {
+							"tokenId": "Identifier number of a token."
+						}
+					}
+				]
+			},
+			"events": {
+				"Approval(address,address,uint256)": {
+					"details": "Emitted when `owner` enables `approved` to manage the `tokenId` token."
+				},
+				"ApprovalForAll(address,address,bool)": {
+					"details": "Emitted when `owner` enables or disables (`approved`) `operator` to manage all of its assets."
+				},
+				"BatchMetadataUpdate(uint256,uint256)": {
+					"details": "This event emits when the metadata of a range of tokens is changed. So that the third-party platforms such as NFT market could timely update the images and related attributes of the NFTs."
+				},
+				"MetadataUpdate(uint256)": {
+					"details": "This event emits when the metadata of a token is changed. So that the third-party platforms such as NFT market could timely update the images and related attributes of the NFT."
+				},
+				"OwnershipTransferCompleted(address,address)": {
+					"details": "Event for logging the transfer of ownership to a new address (also logs ownership relinquishment to the burn (zero) address)",
+					"params": {
+						"newOwner_": "The address of the new owner (admin)",
+						"previousOwner_": "The address of the previous owner (admin)"
+					}
+				},
+				"OwnershipTransferInitiated(address,address)": {
+					"details": "Event for logging the initiation of the ownership transfer process (nomination of the new owner)",
+					"params": {
+						"owner_": "The current owner's address who initiated the transfer of ownership",
+						"pendingOwner_": "The address of the nominated new owner (pending owner)"
+					}
+				},
+				"RenounceProcessInitiated(address)": {
+					"details": "Event for logging the initiation of the safe 2-step ownership relinquishment (renounce) mechanism",
+					"params": {
+						"owner_": "The owner's address who initiated the 2-step ownership renounce process"
+					}
+				},
+				"RenounceProcessTerminated(address)": {
+					"details": "Event for logging the termination of the 2-step ownership relinquishment (renounce) process",
+					"params": {
+						"owner_": "The owner's address who terminated the 2-step ownership renounce process"
+					}
+				},
+				"SignatureRegistered(address)": {
+					"details": "Event for logging when a valid signature is made",
+					"params": {
+						"signer_": "The address of the signer that made the signature"
+					}
+				},
+				"SignatureValidityTimeCountdownStarted()": {
+					"details": "Event for logging when signature validity countdown starts"
+				},
+				"SignaturesExpiredAndReset()": {
+					"details": "Event for logging when signatures are expired and reset"
+				},
+				"SignaturesReset()": {
+					"details": "Event for logging when signatures are reset"
+				},
+				"SocialGuardianRecoveryCompleted()": {
+					"details": "Event for logging the completion of a social guardian ownership recovery process"
+				},
+				"TimeLockQueueReset()": {
+					"details": "Event for logging when the timelock queue was reset"
+				},
+				"TimelockQueueStarted()": {
+					"details": "Event for logging when a new timelock queue was started"
+				},
+				"Transfer(address,address,uint256)": {
+					"details": "Emitted when `tokenId` token is transferred from `from` to `to`."
+				}
+			},
+			"kind": "dev",
+			"methods": {
+				"acceptOwnership()": {
+					"custom:requirement-body": "Only the pending owner can accept ownership",
+					"details": "Handles the second step of the 2-step ownership transfer process (acceptance phase)",
+					"returns": {
+						"_0": "Returns true boolean if the ownership transfer's acceptance phase was successful"
+					}
+				},
+				"approve(address,uint256)": {
+					"details": "See {IERC721-approve}."
+				},
+				"balanceOf(address)": {
+					"details": "See {IERC721-balanceOf}."
+				},
+				"burn(uint256)": {
+					"details": "Burns `tokenId`. See {ERC721-_burn}. Requirements: - The caller must own `tokenId` or be an approved operator."
+				},
+				"constructor": {
+					"details": "Constructor that initializes the ERC721 base contract, sets the name and symbol of the NFT collection"
+				},
+				"currentSignatureCount()": {
+					"details": "Retrieves the current signature count",
+					"returns": {
+						"_0": "Returns the current signature count"
+					}
+				},
+				"getApproved(uint256)": {
+					"details": "See {IERC721-getApproved}."
+				},
+				"getQueueTime()": {
+					"details": "Retrieves the queue timestamp",
+					"returns": {
+						"_0": "Returns the queue timestamp in epoch seconds"
+					}
+				},
+				"getSignatureExpiryTime()": {
+					"details": "Retrieves the current signature expiry timestamp",
+					"returns": {
+						"_0": "Returns the current signature expiry timestamp"
+					}
+				},
+				"hasSigned(address)": {
+					"details": "Evaluates whether a signer has signed or not",
+					"params": {
+						"signer_": "The address to be evaluated"
+					},
+					"returns": {
+						"_0": "Returns a boolean literal indicating whether the passed address has signed or not"
+					}
+				},
+				"isApprovedForAll(address,address)": {
+					"details": "See {IERC721-isApprovedForAll}."
+				},
+				"isSigner(address)": {
+					"details": "Evaluates whether an address is in the valid signer set or not",
+					"params": {
+						"signer_": "The address to be evaluated"
+					},
+					"returns": {
+						"_0": "Returns a boolean literal indicating whether the passed address is a signer or not"
+					}
+				},
+				"name()": {
+					"details": "See {IERC721Metadata-name}."
+				},
+				"owner()": {
+					"details": "Retrieves the current owner's address",
+					"returns": {
+						"_0": "Returns the address of the owner"
+					}
+				},
+				"ownerOf(uint256)": {
+					"details": "See {IERC721-ownerOf}."
+				},
+				"pendingOwner()": {
+					"details": "Retrieves the pending owner's address",
+					"returns": {
+						"_0": "Returns the address of the pending (nominated) owner"
+					}
+				},
+				"registerSignature()": {
+					"custom:requirement-body": "A signer can only sign once (in the same signature collection session)",
+					"custom:requirement-modifier": "The caller must be a signer",
+					"details": "Registers a valid signature if all conditions are fulfilled, manages the signature expiry mechanism",
+					"returns": {
+						"_0": "Returns true boolean literal if the signature registration was successful"
+					}
+				},
+				"renounceOwnership()": {
+					"custom:requirement-body": "Ownership relinquishment feature must be toggled on (unlocked) to complete the process",
+					"custom:requirement-modifier": "Only the owner (admin) can call this function",
+					"details": "Completes the 2-step ownership relinquishment process and renounces the ownership in an irreversible way",
+					"returns": {
+						"_0": "Returns true boolean if the 2-step ownership relinquishment process was completed successfully"
+					}
+				},
+				"renounceUnlocked()": {
+					"details": "Retrieves whether the 2-step ownership relinquishment (renounce) mechanism has been initiated or not",
+					"returns": {
+						"_0": "Returns a boolean flag indicating whether the 2-step ownership relinquishment (renounce) mechanism has been initiated or not"
+					}
+				},
+				"resetPendingOwner()": {
+					"custom:requirement-modifier": "Only the owner (admin) can call this function",
+					"details": "Resets the pending owner to the default zero address",
+					"returns": {
+						"_0": "Returns true boolean if the reset of the pending owner was successful"
+					}
+				},
+				"safeMint(address,string)": {
+					"custom:requirement-modifier": "Only the owner can mint new NFTs",
+					"details": "Mints a new NFT token to an address and sets the specified URI and auto-incremented token ID",
+					"params": {
+						"to_": "Address that will receive the minted NFT",
+						"uri_": "The URI of the minted NFT"
+					}
+				},
+				"safeTransferFrom(address,address,uint256)": {
+					"details": "See {IERC721-safeTransferFrom}."
+				},
+				"safeTransferFrom(address,address,uint256,bytes)": {
+					"details": "See {IERC721-safeTransferFrom}."
+				},
+				"setApprovalForAll(address,bool)": {
+					"details": "See {IERC721-setApprovalForAll}."
+				},
+				"socialGuardianRecovery(address)": {
+					"custom:requirement-modifier": "Only one of the signers can call this functionTimelock guard protected function (timelock delay period must be passed and must be within the grace period)Multi signature guard protected function (unexpired valid signature threshold must be reached)",
+					"details": "Initiates a social recovery by a trusted guardian to regain ownership control in case of a lost or compromised private key",
+					"params": {
+						"newOwner_": "The address of the new owner for the replacement of the current owner"
+					},
+					"returns": {
+						"_0": "Returns a true boolean flag if the social recovery process was completed successfully"
+					}
+				},
+				"startQueue()": {
+					"custom:requirement-modifier": "Only the owner (admin) can call this functionMulti signature guard protected function (unexpired valid signature threshold must be reached)",
+					"details": "Starts a new timelock countdown queue",
+					"returns": {
+						"_0": "Returns true boolean flag if the queue was started successfully"
+					}
+				},
+				"startRenounceProcess()": {
+					"custom:requirement-body": "Ownership relinquishment feature must be toggled off (locked)",
+					"custom:requirement-modifier": "Only the owner (admin) can call this functionTimelock guard protected function (timelock delay period must be passed and must be within the grace period)Multi signature guard protected function (unexpired valid signature threshold must be reached)",
+					"details": "Initiates and unlocks the 2-step ownership relinquishment feature",
+					"returns": {
+						"_0": "Returns true boolean if the initiation of the 2-step ownership relinquishment process was successful"
+					}
+				},
+				"supportsInterface(bytes4)": {
+					"details": "Checks whether the contract supports a specific interface or notImplementation of the supportsInterface function, which is part of the ERC-165 standardERC-165 standard allows smart contracts to declare which interfaces they supportInterfaces have identifiers, which is the first 4 bytes of the Keccak-256 hash of an interface's signatureThe interface ID of ERC721 is 0x80ac58cdIf one of the base contracts implements the interface, the function returns trueUses multiple inheritance which is resolved by C3 linearization, ERC721URIStorage is looked up first, then ERC721",
+					"params": {
+						"interfaceID_": "The interface identifier (first 4 bytes of the Keccak-256 hash of an interface's signature"
+					},
+					"returns": {
+						"_0": "Returns a boolean literal indicating whether the contract supports the specified interface or not"
+					}
+				},
+				"symbol()": {
+					"details": "See {IERC721Metadata-symbol}."
+				},
+				"terminateRenounceProcess()": {
+					"custom:requirement-body": "Ownership relinquishment feature must be toggled on (unlocked)",
+					"custom:requirement-modifier": "Only the owner (admin) can call this function",
+					"details": "Terminates the 2-step ownership relinquishment process and locks the feature until it is unlocked again",
+					"returns": {
+						"_0": "Returns true boolean if the termination of the 2-step ownership relinquishment process was successful"
+					}
+				},
+				"tokenURI(uint256)": {
+					"details": "Retrieves the URI associated with the specific NFT token with tokenID_Overrides both the ERC721 and ERC721URIStorage versions of the tokenURI function (multiple inheritance)C3 linearization algorithm resolves the multiple inheritance, where the inheritance order is ERC721URIStorage first, then ERC721 secondLooks for tokenURI function in ERC721URIStorage first, If it finds the implementation there, it will call that function. If not implemented, call tokenURI from ERC721 base contract",
+					"params": {
+						"tokenID_": "The token ID of the NFT to be retrieved the token URI for"
+					},
+					"returns": {
+						"_0": "Returns the URI (Uniform Resource Identifier) of the NFT with tokenId_"
+					}
+				},
+				"transferFrom(address,address,uint256)": {
+					"details": "See {IERC721-transferFrom}."
+				},
+				"transferOwnership(address)": {
+					"custom:requirement-body": "The new owner cannot be the zero (burn) addressThe new owner cannot be the current ownerThe new owner cannot be the current pending (nominated) owner",
+					"custom:requirement-modifier": "Only the owner (admin) can call this functionTimelock guard protected function (timelock delay period must be passed and must be within the grace period)Multi signature guard protected function (unexpired valid signature threshold must be reached)",
+					"details": "Handles the first step of the 2-step ownership transfer process (nomination phase)",
+					"params": {
+						"newOwner_": "The address of the nominated new owner (pending owner)"
+					},
+					"returns": {
+						"_0": "Returns true boolean if the nomination phase of the ownership transfer was successful"
+					}
+				}
+			},
+			"stateVariables": {
+				"_nextTokenId": {
+					"details": "Stores the token ID number for the next NFT (storage variable used for the auto-incremented NFT token ID feature)"
+				}
+			},
+			"title": "ERC-721 NFT token contract implementation",
+			"version": 1
+		},
+		"userdoc": {
+			"events": {
+				"OwnershipTransferCompleted(address,address)": {
+					"notice": "Event for logging the transfer of ownership to a new address"
+				},
+				"OwnershipTransferInitiated(address,address)": {
+					"notice": "Event for logging the initiation of the ownership transfer process (nomination of the new owner)"
+				},
+				"RenounceProcessInitiated(address)": {
+					"notice": "Event for logging the initiation of the safe 2-step mechanism for the ownership relinquishment (renounce) process"
+				},
+				"RenounceProcessTerminated(address)": {
+					"notice": "Event for logging the termination of the 2-step ownership relinquishment (renounce) process"
+				},
+				"SignatureRegistered(address)": {
+					"notice": "Event for logging when a valid signature is made"
+				},
+				"SignatureValidityTimeCountdownStarted()": {
+					"notice": "Event for logging when signature validity countdown starts"
+				},
+				"SignaturesExpiredAndReset()": {
+					"notice": "Event for logging when signatures are expired and reset"
+				},
+				"SignaturesReset()": {
+					"notice": "Event for logging when signatures are reset"
+				},
+				"SocialGuardianRecoveryCompleted()": {
+					"notice": "Event for logging the completion of a social guardian ownership recovery process"
+				},
+				"TimeLockQueueReset()": {
+					"notice": "Event for logging when the timelock queue was reset"
+				},
+				"TimelockQueueStarted()": {
+					"notice": "Event for logging when a new timelock queue was started"
+				}
+			},
+			"kind": "user",
+			"methods": {
+				"acceptOwnership()": {
+					"notice": "Handles the second step of the 2-step ownership transfer process (acceptance phase)"
+				},
+				"currentSignatureCount()": {
+					"notice": "Retrieves the current signature count"
+				},
+				"getQueueTime()": {
+					"notice": "Retrieves the queue timestamp"
+				},
+				"getSignatureExpiryTime()": {
+					"notice": "Retrieves the current signature expiry timestamp"
+				},
+				"hasSigned(address)": {
+					"notice": "Evaluates whether a signer has signed or not"
+				},
+				"isSigner(address)": {
+					"notice": "Evaluates whether an address is in the valid signer set or not"
+				},
+				"owner()": {
+					"notice": "Retrieves the current owner's address"
+				},
+				"pendingOwner()": {
+					"notice": "Retrieves the pending owner's address"
+				},
+				"registerSignature()": {
+					"notice": "Registers a valid signature if all conditions are fulfilled, manages the signature expiry mechanism"
+				},
+				"renounceOwnership()": {
+					"notice": "Completes the 2-step ownership relinquishment process and renounces the ownership in an irreversible way"
+				},
+				"renounceUnlocked()": {
+					"notice": "Retrieves whether the 2-step ownership relinquishment (renounce) mechanism has been initiated or not"
+				},
+				"resetPendingOwner()": {
+					"notice": "Resets the pending owner to the default zero address"
+				},
+				"safeMint(address,string)": {
+					"notice": "Mints a new NFT token to an address with the specified URI and auto-incremented token ID"
+				},
+				"socialGuardianRecovery(address)": {
+					"notice": "Initiates a social recovery by a trusted guardian to regain ownership control in case of a lost or compromised private key"
+				},
+				"startQueue()": {
+					"notice": "Starts a new timelock countdown queue"
+				},
+				"startRenounceProcess()": {
+					"notice": "Initiates and unlocks the 2-step ownership relinquishment feature"
+				},
+				"supportsInterface(bytes4)": {
+					"notice": "Checks whether the contract supports a specific interface or not"
+				},
+				"terminateRenounceProcess()": {
+					"notice": "Terminates the 2-step ownership relinquishment process and locks the feature until it is unlocked again"
+				},
+				"tokenURI(uint256)": {
+					"notice": "Retrieves the URI associated with the specific NFT token with tokenID_"
+				},
+				"transferOwnership(address)": {
+					"notice": "Handles the first step of the 2-step ownership transfer process (nomination phase)"
+				}
+			},
+			"notice": "ERC-721 NFT token contract implementation with advanced URI management, NFT token burning, auto-incrementing NFT token IDs, and ownership control",
+			"version": 1
+		}
+	},
+	"settings": {
+		"compilationTarget": {
+			"AuctionERC721.sol": "AuctionERC721"
+		},
+		"evmVersion": "cancun",
+		"libraries": {},
+		"metadata": {
+			"bytecodeHash": "ipfs"
+		},
+		"optimizer": {
+			"enabled": false,
+			"runs": 200
+		},
+		"remappings": []
+	},
+	"sources": {
+		"@openzeppelin/contracts/interfaces/IERC165.sol": {
+			"keccak256": "0xde7e9fd9aee8d4f40772f96bb3b58836cbc6dfc0227014a061947f8821ea9724",
+			"license": "MIT",
+			"urls": [
+				"bzz-raw://11fea9f8bc98949ac6709f0c1699db7430d2948137aa94d5a9e95a91f61a710a",
+				"dweb:/ipfs/QmQdfRXxQjwP6yn3DVo1GHPpriKNcFghSPi94Z1oKEFUNS"
+			]
+		},
+		"@openzeppelin/contracts/interfaces/IERC4906.sol": {
+			"keccak256": "0xb31b86c03f4677dcffa4655285d62433509513be9bafa0e04984565052d34e44",
+			"license": "MIT",
+			"urls": [
+				"bzz-raw://a89c6fb0cd5fef4244500b633f63def9f2bb2134debb961e590bd5a2910662fd",
+				"dweb:/ipfs/QmNqWyCxyopvb99RbRomPpfTZGXRi5MnzgpFXE2BFLLgMc"
+			]
+		},
+		"@openzeppelin/contracts/interfaces/IERC721.sol": {
+			"keccak256": "0xc4d7ebf63eb2f6bf3fee1b6c0ee775efa9f31b4843a5511d07eea147e212932d",
+			"license": "MIT",
+			"urls": [
+				"bzz-raw://01c66a2fad66bc710db7510419a7eee569b40b67cd9f01b70a3fc90d6f76c03b",
+				"dweb:/ipfs/QmT1CjJZq4eTNA4nu8E9ZrWfaZu6ReUsDbjcK8DbEFqwx5"
+			]
+		},
+		"@openzeppelin/contracts/interfaces/draft-IERC6093.sol": {
+			"keccak256": "0x60c65f701957fdd6faea1acb0bb45825791d473693ed9ecb34726fdfaa849dd7",
+			"license": "MIT",
+			"urls": [
+				"bzz-raw://ea290300e0efc4d901244949dc4d877fd46e6c5e43dc2b26620e8efab3ab803f",
+				"dweb:/ipfs/QmcLLJppxKeJWqHxE2CUkcfhuRTgHSn8J4kijcLa5MYhSt"
+			]
+		},
+		"@openzeppelin/contracts/token/ERC721/ERC721.sol": {
+			"keccak256": "0x13dd061770956c8489b80cfc89d9cdfc8ea2783d953691ea037a380731d52784",
+			"license": "MIT",
+			"urls": [
+				"bzz-raw://ed37f0f86e7fe31659e48c3a2a5920a92dd7f13c85cf8991fb79fe5f01e08efd",
+				"dweb:/ipfs/QmUtm9bQGvjr9hHGwkPWrbgFmVqzaJcxjkaYDex2oGsonS"
+			]
+		},
+		"@openzeppelin/contracts/token/ERC721/IERC721.sol": {
+			"keccak256": "0x5ef46daa3b58ef2702279d514780316efaa952915ee1aa3396f041ee2982b0b4",
+			"license": "MIT",
+			"urls": [
+				"bzz-raw://2f8f2a76e23b02fc69e8cd24c3cb47da6c7af3a2d6c3a382f8ac25c6e094ade7",
+				"dweb:/ipfs/QmPV4ZS4tPVv4mTCf9ejyZ1ai57EEibDRj7mN2ARDCLV5n"
+			]
+		},
+		"@openzeppelin/contracts/token/ERC721/IERC721Receiver.sol": {
+			"keccak256": "0x7f7a26306c79a65fb8b3b6c757cd74660c532cd8a02e165488e30027dd34ca49",
+			"license": "MIT",
+			"urls": [
+				"bzz-raw://d01e0b2b837ee2f628545e54d8715b49c7ef2befd08356c2e7f6c50dde8a1c22",
+				"dweb:/ipfs/QmWBAn6y2D1xgftci97Z3qR9tQnkvwQpYwFwkTvDMvqU4i"
+			]
+		},
+		"@openzeppelin/contracts/token/ERC721/extensions/ERC721Burnable.sol": {
+			"keccak256": "0xc48434419baa510862ba4b4802bc0500ccddadd02ae2f195548af748c3206b20",
+			"license": "MIT",
+			"urls": [
+				"bzz-raw://85ae0bacd8623ce1cfad08c70ed111e995d23c66ad057b779b838ad2e5598681",
+				"dweb:/ipfs/QmWZGSEjZ9DmbQmHjjsdkRbJtU25Ai65VScDnEziRCkPRB"
+			]
+		},
+		"@openzeppelin/contracts/token/ERC721/extensions/ERC721URIStorage.sol": {
+			"keccak256": "0xcc6f49e0c57072d6a18eef0d5fc22a4cc20462c18f0c365d2dd9a2c732fde670",
+			"license": "MIT",
+			"urls": [
+				"bzz-raw://24915e61c7896c336b60788408cd5792b97b782e98e392920a2c55eb1803fe96",
+				"dweb:/ipfs/QmVHhcmFnMYZBCjnVUk6f5quMCDsBR2j669a1nuMiGWY9Z"
+			]
+		},
+		"@openzeppelin/contracts/token/ERC721/extensions/IERC721Metadata.sol": {
+			"keccak256": "0x37d1aaaa5a2908a09e9dcf56a26ddf762ecf295afb5964695937344fc6802ce1",
+			"license": "MIT",
+			"urls": [
+				"bzz-raw://ed0bfc1b92153c5000e50f4021367b931bbe96372ac6facec3c4961b72053d02",
+				"dweb:/ipfs/Qmbwp8VDerjS5SV1quwHH1oMXxPQ93fzfLVqJ2RCqbowGE"
+			]
+		},
+		"@openzeppelin/contracts/utils/Context.sol": {
+			"keccak256": "0x493033a8d1b176a037b2cc6a04dad01a5c157722049bbecf632ca876224dd4b2",
+			"license": "MIT",
+			"urls": [
+				"bzz-raw://6a708e8a5bdb1011c2c381c9a5cfd8a9a956d7d0a9dc1bd8bcdaf52f76ef2f12",
+				"dweb:/ipfs/Qmax9WHBnVsZP46ZxEMNRQpLQnrdE4dK8LehML1Py8FowF"
+			]
+		},
+		"@openzeppelin/contracts/utils/Strings.sol": {
+			"keccak256": "0x55f102ea785d8399c0e58d1108e2d289506dde18abc6db1b7f68c1f9f9bc5792",
+			"license": "MIT",
+			"urls": [
+				"bzz-raw://6e52e0a7765c943ef14e5bcf11e46e6139fa044be564881378349236bf2e3453",
+				"dweb:/ipfs/QmZEeeXoFPW47amyP35gfzomF9DixqqTEPwzBakv6cZw6i"
+			]
+		},
+		"@openzeppelin/contracts/utils/introspection/ERC165.sol": {
+			"keccak256": "0x9e8778b14317ba9e256c30a76fd6c32b960af621987f56069e1e819c77c6a133",
+			"license": "MIT",
+			"urls": [
+				"bzz-raw://1777404f1dcd0fac188e55a288724ec3c67b45288e49cc64723e95e702b49ab8",
+				"dweb:/ipfs/QmZFdC626GButBApwDUvvTnUzdinevC3B24d7yyh57XkiA"
+			]
+		},
+		"@openzeppelin/contracts/utils/introspection/IERC165.sol": {
+			"keccak256": "0x4296879f55019b23e135000eb36896057e7101fb7fb859c5ef690cf14643757b",
+			"license": "MIT",
+			"urls": [
+				"bzz-raw://87b3541437c8c443ccd36795e56a338ed12855eec17f8da624511b8d1a7e14df",
+				"dweb:/ipfs/QmeJQCtZrQjtJLr6u7ZHWeH3pBnjtLWzvRrKViAi7UZqxL"
+			]
+		},
+		"@openzeppelin/contracts/utils/math/Math.sol": {
+			"keccak256": "0x005ec64c6313f0555d59e278f9a7a5ab2db5bdc72a027f255a37c327af1ec02d",
+			"license": "MIT",
+			"urls": [
+				"bzz-raw://4ece9f0b9c8daca08c76b6b5405a6446b6f73b3a15fab7ff56e296cbd4a2c875",
+				"dweb:/ipfs/QmQyRpyPRL5SQuAgj6SHmbir3foX65FJjbVTTQrA2EFg6L"
+			]
+		},
+		"@openzeppelin/contracts/utils/math/SignedMath.sol": {
+			"keccak256": "0x5f7e4076e175393767754387c962926577f1660dd9b810187b9002407656be72",
+			"license": "MIT",
+			"urls": [
+				"bzz-raw://7d533a1c97cd43a57cd9c465f7ee8dd0e39ae93a8fb8ff8e5303a356b081cdcc",
+				"dweb:/ipfs/QmVBEei6aTnvYNZp2CHYVNKyZS4q1KkjANfY39WVXZXVoT"
+			]
+		},
+		"AuctionERC721.sol": {
+			"keccak256": "0x059e3aebc5f7446c308ebbf201d5aa6efa8fb32aeedfeee2428fba02c3d53634",
+			"license": "MIT",
+			"urls": [
+				"bzz-raw://7af3bcf4c4ff20ec0d24faa90213a6ca7996964910618351fbde760546cd8f3c",
+				"dweb:/ipfs/QmZz93dR1JE9C3AUFiw8Hwm9ihtcdoNxzNk298ACiGtQq5"
+			]
+		},
+		"MultiSignatureGuard.sol": {
+			"keccak256": "0xc4c8061842da9a600874246654ec12565da79bc8d1b42fa8965909dd0132d527",
+			"license": "MIT",
+			"urls": [
+				"bzz-raw://0553c4cd882059ad508cc00e43744c152e349ee7a551fd1fe5f2e54dd8a67625",
+				"dweb:/ipfs/QmdC2VTHPn3WhE3mvjezSdqBwmP6q1Baz5vc55CzfMWhZz"
+			]
+		},
+		"OwnershipController.sol": {
+			"keccak256": "0x2ac82459c9cf584ec15cec35a2992a51f9bb42a817d98fa41cab7f07744d0508",
+			"license": "MIT",
+			"urls": [
+				"bzz-raw://f682eb32b63a8aab031d43649c51377a712d808b93ccaec4968230669da88f44",
+				"dweb:/ipfs/QmNu5MqiWt7VENviLzuKJPGzDMHZ3M8g8BvhBLzWrWBX1K"
+			]
+		},
+		"TimelockGuard.sol": {
+			"keccak256": "0xb5778c5f92de1db539d47c012fd1a443e9fbdfcab88c5a1cd9de96edb8fb1dba",
+			"license": "MIT",
+			"urls": [
+				"bzz-raw://8cdbde0fa19fb915ba4f569cbb4fb723a12fa37c9707949ab89171e06aedb188",
+				"dweb:/ipfs/QmcPrbEGzB9TvgoXrn618c6f9WURVCCU1BTnwGWKduyeaQ"
+			]
+		}
+	},
+	"version": 1
+}

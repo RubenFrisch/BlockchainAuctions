@@ -1,0 +1,246 @@
+{
+	"compiler": {
+		"version": "0.8.26+commit.8a97fa7a"
+	},
+	"language": "Solidity",
+	"output": {
+		"abi": [
+			{
+				"anonymous": false,
+				"inputs": [
+					{
+						"indexed": true,
+						"internalType": "bytes32",
+						"name": "auctionID_",
+						"type": "bytes32"
+					}
+				],
+				"name": "AddedBlacklistedParticipants",
+				"type": "event"
+			},
+			{
+				"anonymous": false,
+				"inputs": [
+					{
+						"indexed": true,
+						"internalType": "bytes32",
+						"name": "auctionID_",
+						"type": "bytes32"
+					}
+				],
+				"name": "AuctionConfiguredAsBlacklisted",
+				"type": "event"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "bytes32",
+						"name": "auctionID_",
+						"type": "bytes32"
+					},
+					{
+						"internalType": "address[]",
+						"name": "participants_",
+						"type": "address[]"
+					}
+				],
+				"name": "blacklistParticipants",
+				"outputs": [
+					{
+						"internalType": "bool",
+						"name": "",
+						"type": "bool"
+					}
+				],
+				"stateMutability": "nonpayable",
+				"type": "function"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "bytes32",
+						"name": "auctionID_",
+						"type": "bytes32"
+					}
+				],
+				"name": "configureAsBlacklistedAuction",
+				"outputs": [
+					{
+						"internalType": "bool",
+						"name": "",
+						"type": "bool"
+					}
+				],
+				"stateMutability": "nonpayable",
+				"type": "function"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "bytes32",
+						"name": "auctionID_",
+						"type": "bytes32"
+					}
+				],
+				"name": "isBlacklistAuction",
+				"outputs": [
+					{
+						"internalType": "bool",
+						"name": "",
+						"type": "bool"
+					}
+				],
+				"stateMutability": "view",
+				"type": "function"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "bytes32",
+						"name": "auctionID_",
+						"type": "bytes32"
+					},
+					{
+						"internalType": "address",
+						"name": "participant_",
+						"type": "address"
+					}
+				],
+				"name": "isBlacklistedParticipant",
+				"outputs": [
+					{
+						"internalType": "bool",
+						"name": "",
+						"type": "bool"
+					}
+				],
+				"stateMutability": "view",
+				"type": "function"
+			}
+		],
+		"devdoc": {
+			"author": "Ruben Frisch (Óbuda University - John von Neumann Faculty of Informatics, Business Informatics MSc)",
+			"details": "This contract enables blacklist auctions",
+			"events": {
+				"AddedBlacklistedParticipants(bytes32)": {
+					"details": "Event for logging the blacklisting of participants",
+					"params": {
+						"auctionID_": "The 256 bit hash identifier of the auction"
+					}
+				},
+				"AuctionConfiguredAsBlacklisted(bytes32)": {
+					"details": "Event for logging the configuration of blacklist auctions",
+					"params": {
+						"auctionID_": "The 256 bit hash identifier of the auction"
+					}
+				}
+			},
+			"kind": "dev",
+			"methods": {
+				"blacklistParticipants(bytes32,address[])": {
+					"custom:virtual": "This function should be overriden in the child contract, with access control, execution preconditions, and other checks implementedThe storage modification should be executed by the internal function '_blacklistParticipants'",
+					"details": "Blacklists an array of addresses (participants) at the specified blacklist auction",
+					"params": {
+						"auctionID_": "The 256 bit hash identifier of the auction",
+						"participants_": "The addresses (participants) to be blacklisted at the specified blacklist auction"
+					},
+					"returns": {
+						"_0": "Returns true boolean literal if the addresses (participants) were successfully blacklisted at the specified auction"
+					}
+				},
+				"configureAsBlacklistedAuction(bytes32)": {
+					"custom:virtual": "This function should be overriden in the child contract, with access control, execution preconditions, and other checks implementedThe storage modification should be executed by the internal function '_configureAsBlacklistedAuction'",
+					"details": "Configures a blacklist auction",
+					"params": {
+						"auctionID_": "The 256 bit hash identifier of the auction"
+					},
+					"returns": {
+						"_0": "Returns true boolean literal if the blacklist auction configuration was successful"
+					}
+				},
+				"isBlacklistAuction(bytes32)": {
+					"details": "Retrieves whether an auction is configured as a blacklist auction or not",
+					"params": {
+						"auctionID_": "The 256 bit hash identifier of the auction"
+					},
+					"returns": {
+						"_0": "Returns a boolean flag that indicates whether an auction is configured as a blacklist auction or not"
+					}
+				},
+				"isBlacklistedParticipant(bytes32,address)": {
+					"details": "Retrieves whether a participant is blacklisted or not at a blacklist auction",
+					"params": {
+						"auctionID_": "The 256 bit hash identifier of the auction",
+						"participant_": "The address of the participant"
+					},
+					"returns": {
+						"_0": "Returns a boolean flag indicating whether the participant is blacklisted or not at the specified blacklist auction"
+					}
+				}
+			},
+			"stateVariables": {
+				"_blacklistedAuction": {
+					"details": "Indicates whether an auction is configured as a blacklist auction or not"
+				},
+				"_blacklistedParticipants": {
+					"details": "Indicates whether an address is blacklisted or not at a specific auction"
+				}
+			},
+			"title": "Blacklist auction controller contract",
+			"version": 1
+		},
+		"userdoc": {
+			"events": {
+				"AddedBlacklistedParticipants(bytes32)": {
+					"notice": "Event for logging the blacklisting of participants"
+				},
+				"AuctionConfiguredAsBlacklisted(bytes32)": {
+					"notice": "Event for logging the configuration of blacklist auctions"
+				}
+			},
+			"kind": "user",
+			"methods": {
+				"blacklistParticipants(bytes32,address[])": {
+					"notice": "Blacklists an array of addresses (participants) at the specified blacklist auction"
+				},
+				"configureAsBlacklistedAuction(bytes32)": {
+					"notice": "Configures a blacklist auction"
+				},
+				"isBlacklistAuction(bytes32)": {
+					"notice": "Retrieves whether an auction is configured as a blacklist auction or not"
+				},
+				"isBlacklistedParticipant(bytes32,address)": {
+					"notice": "Retrieves whether a participant is blacklisted or not at a blacklist auction"
+				}
+			},
+			"notice": "This contract enables blacklist auctions",
+			"version": 1
+		}
+	},
+	"settings": {
+		"compilationTarget": {
+			"BlacklistAuctionController.sol": "BlacklistAuctionController"
+		},
+		"evmVersion": "cancun",
+		"libraries": {},
+		"metadata": {
+			"bytecodeHash": "ipfs"
+		},
+		"optimizer": {
+			"enabled": false,
+			"runs": 200
+		},
+		"remappings": []
+	},
+	"sources": {
+		"BlacklistAuctionController.sol": {
+			"keccak256": "0x5c891f7e73dfcdde5c71e3de9fd833fa3fab475f4bd6fbaa13e666579685b727",
+			"license": "MIT",
+			"urls": [
+				"bzz-raw://4adb87a617c62d68a084c0582b8a6574f71ace80a9be4312af7a102435c24af1",
+				"dweb:/ipfs/QmS4u8h5QwCgwZ9VpkWgj3L8U8iw3X86SKu16q2DMHnzQJ"
+			]
+		}
+	},
+	"version": 1
+}

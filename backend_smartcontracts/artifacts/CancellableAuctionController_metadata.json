@@ -1,0 +1,234 @@
+{
+	"compiler": {
+		"version": "0.8.26+commit.8a97fa7a"
+	},
+	"language": "Solidity",
+	"output": {
+		"abi": [
+			{
+				"anonymous": false,
+				"inputs": [
+					{
+						"indexed": true,
+						"internalType": "bytes32",
+						"name": "auctionID_",
+						"type": "bytes32"
+					}
+				],
+				"name": "AuctionCancelled",
+				"type": "event"
+			},
+			{
+				"anonymous": false,
+				"inputs": [
+					{
+						"indexed": true,
+						"internalType": "bytes32",
+						"name": "auctionID_",
+						"type": "bytes32"
+					}
+				],
+				"name": "AuctionConfiguredAsCancellable",
+				"type": "event"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "bytes32",
+						"name": "auctionID_",
+						"type": "bytes32"
+					}
+				],
+				"name": "cancelAuction",
+				"outputs": [
+					{
+						"internalType": "bool",
+						"name": "",
+						"type": "bool"
+					}
+				],
+				"stateMutability": "nonpayable",
+				"type": "function"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "bytes32",
+						"name": "auctionID_",
+						"type": "bytes32"
+					}
+				],
+				"name": "configureAsCancellableAuction",
+				"outputs": [
+					{
+						"internalType": "bool",
+						"name": "",
+						"type": "bool"
+					}
+				],
+				"stateMutability": "nonpayable",
+				"type": "function"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "bytes32",
+						"name": "auctionID_",
+						"type": "bytes32"
+					}
+				],
+				"name": "isCancellable",
+				"outputs": [
+					{
+						"internalType": "bool",
+						"name": "",
+						"type": "bool"
+					}
+				],
+				"stateMutability": "view",
+				"type": "function"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "bytes32",
+						"name": "auctionID_",
+						"type": "bytes32"
+					}
+				],
+				"name": "isCancelled",
+				"outputs": [
+					{
+						"internalType": "bool",
+						"name": "",
+						"type": "bool"
+					}
+				],
+				"stateMutability": "view",
+				"type": "function"
+			}
+		],
+		"devdoc": {
+			"author": "Ruben Frisch (Óbuda University - John von Neumann Faculty of Informatics, Business Informatics MSc)",
+			"details": "This contract enables cancellable auctions",
+			"events": {
+				"AuctionCancelled(bytes32)": {
+					"details": "Event for logging when an auction has been cancelled",
+					"params": {
+						"auctionID_": "The 256 bit hash identifier of the auction"
+					}
+				},
+				"AuctionConfiguredAsCancellable(bytes32)": {
+					"details": "Event for logging when an auction has been configured as cancellable",
+					"params": {
+						"auctionID_": "The 256 bit hash identifier of the auction"
+					}
+				}
+			},
+			"kind": "dev",
+			"methods": {
+				"cancelAuction(bytes32)": {
+					"custom:virtual": "This function should be overriden in the child contract, with access control, execution preconditions, and other checks implementedThe storage modification should be executed by the internal function '_cancelAuction'",
+					"details": "Cancels a cancellable auction",
+					"params": {
+						"auctionID_": "The 256 bit hash identifier of the auction"
+					},
+					"returns": {
+						"_0": "Returns a true boolean literal if the auction was cancelled successfully"
+					}
+				},
+				"configureAsCancellableAuction(bytes32)": {
+					"custom:virtual": "This function should be overriden in the child contract, with access control, execution preconditions, and other checks implementedThe storage modification should be executed by the internal function '_configureAsCancellableAuction'",
+					"details": "Configures an auction as cancellable",
+					"params": {
+						"auctionID_": "The 256 bit hash identifier of the auction"
+					},
+					"returns": {
+						"_0": "Returns a true boolean literal if the configuration of an auction as cancellable was successful"
+					}
+				},
+				"isCancellable(bytes32)": {
+					"details": "Retrieves whether a specific auction is cancellable (true) or not cancellable (false)",
+					"params": {
+						"auctionID_": "The 256 bit hash identifier of the auction"
+					},
+					"returns": {
+						"_0": "Returns a boolean flag indicating whether an auction is cancellable (true) or not cancellable (false)"
+					}
+				},
+				"isCancelled(bytes32)": {
+					"details": "Retrieves whether a specific cancellable auction is cancelled (true) or not cancelled (false)",
+					"params": {
+						"auctionID_": "The 256 bit hash identifier of the auction"
+					},
+					"returns": {
+						"_0": "Returns a boolean flag indicating whether a cancellable auction is cancelled (true) or not cancelled (false)"
+					}
+				}
+			},
+			"stateVariables": {
+				"_cancelSwitch": {
+					"details": "Indicates whether an auction is cancellable or not"
+				},
+				"_cancelled": {
+					"details": "Indicates whether a cancellable auction was cancalled or not"
+				}
+			},
+			"title": "Cancellable auction controller contract",
+			"version": 1
+		},
+		"userdoc": {
+			"events": {
+				"AuctionCancelled(bytes32)": {
+					"notice": "Event for logging when an auction has been cancelled"
+				},
+				"AuctionConfiguredAsCancellable(bytes32)": {
+					"notice": "Event for logging when an auction has been configured as cancellable"
+				}
+			},
+			"kind": "user",
+			"methods": {
+				"cancelAuction(bytes32)": {
+					"notice": "Cancels a cancellable auction"
+				},
+				"configureAsCancellableAuction(bytes32)": {
+					"notice": "Configures an auction as cancellable"
+				},
+				"isCancellable(bytes32)": {
+					"notice": "Retrieves whether a specific auction is cancellable (true) or not cancellable (false)"
+				},
+				"isCancelled(bytes32)": {
+					"notice": "Retrieves whether a specific cancellable auction is cancelled (true) or not cancelled (false)"
+				}
+			},
+			"notice": "This contract enables cancellable auctions",
+			"version": 1
+		}
+	},
+	"settings": {
+		"compilationTarget": {
+			"CancellableAuctionController.sol": "CancellableAuctionController"
+		},
+		"evmVersion": "cancun",
+		"libraries": {},
+		"metadata": {
+			"bytecodeHash": "ipfs"
+		},
+		"optimizer": {
+			"enabled": false,
+			"runs": 200
+		},
+		"remappings": []
+	},
+	"sources": {
+		"CancellableAuctionController.sol": {
+			"keccak256": "0x1b9bd661d007fa009b2294247bb5be633311a905527269d7e926b31bc9108829",
+			"license": "MIT",
+			"urls": [
+				"bzz-raw://c116f1a0f5f47fba130369cad665bc73ad9147ef5c5ffa6c8737ed7ee2a82d1d",
+				"dweb:/ipfs/QmS7dFEYZEsKLqwYVr4J8squkQi5MXhtTVae16hZaRkvHt"
+			]
+		}
+	},
+	"version": 1
+}

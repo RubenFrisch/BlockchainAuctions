@@ -1,0 +1,375 @@
+{
+	"compiler": {
+		"version": "0.8.26+commit.8a97fa7a"
+	},
+	"language": "Solidity",
+	"output": {
+		"abi": [
+			{
+				"anonymous": false,
+				"inputs": [
+					{
+						"indexed": true,
+						"internalType": "bytes32",
+						"name": "auctionID_",
+						"type": "bytes32"
+					},
+					{
+						"indexed": false,
+						"internalType": "uint256",
+						"name": "entryFeeValue_",
+						"type": "uint256"
+					}
+				],
+				"name": "EntryFeeConfigured",
+				"type": "event"
+			},
+			{
+				"anonymous": false,
+				"inputs": [
+					{
+						"indexed": true,
+						"internalType": "bytes32",
+						"name": "auctionID_",
+						"type": "bytes32"
+					},
+					{
+						"indexed": false,
+						"internalType": "address",
+						"name": "entity_",
+						"type": "address"
+					},
+					{
+						"indexed": false,
+						"internalType": "uint256",
+						"name": "paidEntryFeeAmount_",
+						"type": "uint256"
+					}
+				],
+				"name": "EntryFeePaid",
+				"type": "event"
+			},
+			{
+				"anonymous": false,
+				"inputs": [
+					{
+						"indexed": true,
+						"internalType": "bytes32",
+						"name": "auctionID_",
+						"type": "bytes32"
+					},
+					{
+						"indexed": false,
+						"internalType": "address",
+						"name": "entity_",
+						"type": "address"
+					},
+					{
+						"indexed": false,
+						"internalType": "uint256",
+						"name": "withdrawnEntryFeeAmount_",
+						"type": "uint256"
+					}
+				],
+				"name": "EntryFeeWithdrawn",
+				"type": "event"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "bytes32",
+						"name": "auctionID_",
+						"type": "bytes32"
+					}
+				],
+				"name": "getEntryFee",
+				"outputs": [
+					{
+						"internalType": "uint256",
+						"name": "",
+						"type": "uint256"
+					}
+				],
+				"stateMutability": "view",
+				"type": "function"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "bytes32",
+						"name": "auctionID_",
+						"type": "bytes32"
+					},
+					{
+						"internalType": "address",
+						"name": "participant_",
+						"type": "address"
+					}
+				],
+				"name": "hasPaidEntryFee",
+				"outputs": [
+					{
+						"internalType": "bool",
+						"name": "",
+						"type": "bool"
+					}
+				],
+				"stateMutability": "view",
+				"type": "function"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "bytes32",
+						"name": "auctionID_",
+						"type": "bytes32"
+					},
+					{
+						"internalType": "address",
+						"name": "participant_",
+						"type": "address"
+					}
+				],
+				"name": "hasWithdrawnEntryFee",
+				"outputs": [
+					{
+						"internalType": "bool",
+						"name": "",
+						"type": "bool"
+					}
+				],
+				"stateMutability": "view",
+				"type": "function"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "bytes32",
+						"name": "auctionID_",
+						"type": "bytes32"
+					}
+				],
+				"name": "payEntryFee",
+				"outputs": [
+					{
+						"internalType": "bool",
+						"name": "",
+						"type": "bool"
+					}
+				],
+				"stateMutability": "payable",
+				"type": "function"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "bytes32",
+						"name": "auctionID_",
+						"type": "bytes32"
+					},
+					{
+						"internalType": "uint256",
+						"name": "entryFee_",
+						"type": "uint256"
+					}
+				],
+				"name": "setEntryFee",
+				"outputs": [
+					{
+						"internalType": "bool",
+						"name": "",
+						"type": "bool"
+					}
+				],
+				"stateMutability": "nonpayable",
+				"type": "function"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "bytes32",
+						"name": "auctionID_",
+						"type": "bytes32"
+					}
+				],
+				"name": "withdrawEntryFee",
+				"outputs": [
+					{
+						"internalType": "bool",
+						"name": "",
+						"type": "bool"
+					}
+				],
+				"stateMutability": "nonpayable",
+				"type": "function"
+			}
+		],
+		"devdoc": {
+			"author": "Ruben Frisch (Óbuda University - John von Neumann Faculty of Informatics, Business Informatics MSc)",
+			"details": "This contract enables the configuration and management of the entry fee feature for auctions",
+			"events": {
+				"EntryFeeConfigured(bytes32,uint256)": {
+					"details": "Event for logging the configuration of the entry fee for a specific auction",
+					"params": {
+						"auctionID_": "The 256 bit hash identifier of the auction that the entry fee is being configured for",
+						"entryFeeValue_": "The set entry fee amount in WEI (1000000000000000000 Wei = 1 Ether = 1000000000 Gwei)"
+					}
+				},
+				"EntryFeePaid(bytes32,address,uint256)": {
+					"details": "Event for logging the payment of entry fees",
+					"params": {
+						"auctionID_": "The 256 bit hash identifier of the auction that the entry fee is being paid to",
+						"entity_": "The address that paid the entry fee by calling the 'payEntryFee' function",
+						"paidEntryFeeAmount_": "The amount of the entry fee being paid in Wei (1000000000000000000 Wei = 1 Ether = 1000000000 Gwei)"
+					}
+				},
+				"EntryFeeWithdrawn(bytes32,address,uint256)": {
+					"details": "Event for logging the withdrawal of entry fees",
+					"params": {
+						"auctionID_": "The 256 bit hash identifier of the auction that the entry fee is being withdrawn from",
+						"entity_": "The address that withdrew the entry fee by calling the 'withdrawEntryFee' function",
+						"withdrawnEntryFeeAmount_": "The amount of the entry fee being withdrawn in Wei (1000000000000000000 Wei = 1 Ether = 1000000000 Gwei)"
+					}
+				}
+			},
+			"kind": "dev",
+			"methods": {
+				"getEntryFee(bytes32)": {
+					"details": "Retrieves the entry fee set for the specific auction",
+					"params": {
+						"auctionID_": "The 256 bit hash identifier of the auction"
+					},
+					"returns": {
+						"_0": "Returns the entry fee amount for the specific auction in Wei (1000000000000000000 Wei = 1 Ether = 1000000000 Gwei)"
+					}
+				},
+				"hasPaidEntryFee(bytes32,address)": {
+					"details": "Retrieves the boolean logical value indicating whether the address has paid the entry fee or not for the specific auction",
+					"params": {
+						"auctionID_": "The 256 bit hash identifier of the auction",
+						"participant_": "The address of the participant to be checked"
+					},
+					"returns": {
+						"_0": "Returns a boolean literal that indicates whether the address has paid the entry fee for the specific auction or not"
+					}
+				},
+				"hasWithdrawnEntryFee(bytes32,address)": {
+					"details": "Retrieves the boolean logical value indicating whether the address has withdrawn the entry fee or not from the specific auction",
+					"params": {
+						"auctionID_": "The 256 bit hash identifier of the auction",
+						"participant_": "The address of the participant to be checked"
+					},
+					"returns": {
+						"_0": "Returns a boolean literal that indicates whether the address has withdrawn the entry fee from the specific auction or not"
+					}
+				},
+				"payEntryFee(bytes32)": {
+					"custom:virtual": "This function should be overriden in the child contract, with access control, execution preconditions, and other checks implementedThe storage modification should be done by the internal function '_payEntryFee'",
+					"details": "Manages the internal accounting of entry fee payments",
+					"params": {
+						"auctionID_": "The 256 bit hash identifier of the auction"
+					},
+					"returns": {
+						"_0": "Returns true boolean literal if the entry fee has been successfully paid"
+					}
+				},
+				"setEntryFee(bytes32,uint256)": {
+					"custom:virtual": "This function should be overriden in the child contract, with access control, execution preconditions, and other checks implementedThe storage modification should be done by the internal function '_setEntryFee'",
+					"details": "Sets the entry fee for a specific auction",
+					"params": {
+						"auctionID_": "The 256 bit hash identifier of the auction",
+						"entryFee_": "The amount of the entry fee in WEI (1000000000000000000 Wei = 1 Ether = 1000000000 Gwei)"
+					},
+					"returns": {
+						"_0": "Returns true boolean literal if the entry fee has been successfully set"
+					}
+				},
+				"withdrawEntryFee(bytes32)": {
+					"custom:virtual": "This function should be overriden in the child contract, with access control, execution preconditions, and other checks implementedThe storage modification should be done by the internal function '_withdrawEntryFee'",
+					"details": "Manages the internal accounting of entry fee withdrawals",
+					"params": {
+						"auctionID_": "The 256 bit hash identifier of the auction"
+					},
+					"returns": {
+						"_0": "Returns true if the entry fee withdrawal was successful"
+					}
+				}
+			},
+			"stateVariables": {
+				"_entryFeesPaid": {
+					"details": "Indicates whether an address has paid the entry fee or not for the respective auction"
+				},
+				"_entryFeesWithdrawn": {
+					"details": "Indicates whether an address has withdrawn the entry fee or not for the respective auction"
+				},
+				"_entryfee": {
+					"details": "Stores the entry fee of the respective auction"
+				}
+			},
+			"title": "Entry fee controller contract",
+			"version": 1
+		},
+		"userdoc": {
+			"events": {
+				"EntryFeeConfigured(bytes32,uint256)": {
+					"notice": "Event for logging the configuration of the entry fee for a specific auction"
+				},
+				"EntryFeePaid(bytes32,address,uint256)": {
+					"notice": "Event for logging the payment of entry fees"
+				},
+				"EntryFeeWithdrawn(bytes32,address,uint256)": {
+					"notice": "Event for logging the withdrawal of entry fees"
+				}
+			},
+			"kind": "user",
+			"methods": {
+				"getEntryFee(bytes32)": {
+					"notice": "Retrieves the entry fee set for the specific auction"
+				},
+				"hasPaidEntryFee(bytes32,address)": {
+					"notice": "Retrieves the boolean logical value indicating whether the address has paid the entry fee or not for the specific auction"
+				},
+				"hasWithdrawnEntryFee(bytes32,address)": {
+					"notice": "Retrieves the boolean logical value indicating whether the address has withdrawn the entry fee or not from the specific auction"
+				},
+				"payEntryFee(bytes32)": {
+					"notice": "Manages the internal accounting of entry fee payments"
+				},
+				"setEntryFee(bytes32,uint256)": {
+					"notice": "Sets the entry fee for a specific auction"
+				},
+				"withdrawEntryFee(bytes32)": {
+					"notice": "Manages the internal accounting of entry fee withdrawals"
+				}
+			},
+			"notice": "This contract enables the configuration and management of the entry fee feature for auctions",
+			"version": 1
+		}
+	},
+	"settings": {
+		"compilationTarget": {
+			"EntryFeeController.sol": "EntryFeeController"
+		},
+		"evmVersion": "cancun",
+		"libraries": {},
+		"metadata": {
+			"bytecodeHash": "ipfs"
+		},
+		"optimizer": {
+			"enabled": false,
+			"runs": 200
+		},
+		"remappings": []
+	},
+	"sources": {
+		"EntryFeeController.sol": {
+			"keccak256": "0x8c35b12f797a30ffc1b7dac9342c6df2408aa6809690405921b3b1aa399b530f",
+			"license": "MIT",
+			"urls": [
+				"bzz-raw://8d1d1eba65492b384472e1a71fd26d9a0b52280ae3c9558973149c1c936ad30c",
+				"dweb:/ipfs/QmUoaGN7Mgp8PZrDhBUBmqQfEcjYzp8iRZWHBRrKAaqbdB"
+			]
+		}
+	},
+	"version": 1
+}
