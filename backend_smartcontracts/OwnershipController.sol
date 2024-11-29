@@ -140,7 +140,8 @@ abstract contract OwnershipController is
     /// @custom:requirement-modifier Only one of the signers can call this function
     /// @custom:requirement-modifier Timelock guard protected function (timelock delay period must be passed and must be within the grace period)
     /// @custom:requirement-modifier Multi signature guard protected function (unexpired valid signature threshold must be reached)
-    function socialGuardianRecovery(address newOwner_) external onlySigner timelocked(block.timestamp) multiSignatureGuard returns (bool) {
+    function socialGuardianRecovery(address newOwner_) external onlySigner multiSignatureGuard returns (bool) {
+        require(owner() != address(0));
         _transferOwnership(newOwner_);
         _resetPendingOwner();
         emit SocialGuardianRecoveryCompleted();
